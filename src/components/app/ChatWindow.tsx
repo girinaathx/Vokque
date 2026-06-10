@@ -26,6 +26,18 @@ export function ChatWindow({
   threadId: string;
   initialMessages: UIMessage[];
 }) {
+  const [citeOn, setCiteOn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("oi:cite") === "1";
+  });
+  const citeRef = useRef(citeOn);
+  useEffect(() => {
+    citeRef.current = citeOn;
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("oi:cite", citeOn ? "1" : "0");
+    }
+  }, [citeOn]);
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -36,7 +48,18 @@ export function ChatWindow({
           const token = data.session?.access_token;
           const headers = new Headers(init?.headers);
           if (token) headers.set("Authorization", `Bearer ${token}`);
-          return fetch(url, { ...init, headers });
+          // Inject the live citations flag into the JSON body.
+          let body = init?.body;
+          if (typeof body === "string") {
+            try {
+              const parsed = JSON.parse(body);
+              parsed.cite = citeRef.current;
+              body = JSON.stringify(parsed);
+            } catch {
+              /* leave body as-is */
+            }
+          }
+          return fetch(url, { ...init, headers, body });
         },
       }),
     [threadId],

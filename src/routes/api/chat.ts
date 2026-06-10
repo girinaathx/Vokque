@@ -82,11 +82,13 @@ export const Route = createFileRoute("/api/chat")({
             model: gateway("google/gemini-2.5-flash"),
             system: SYSTEM_PROMPT,
             messages: await convertToModelMessages(messages),
+            abortSignal: request.signal,
           });
 
           return result.toUIMessageStreamResponse({
             originalMessages: messages,
-            onFinish: async ({ messages: finalMessages }) => {
+            onFinish: async ({ messages: finalMessages, isAborted }) => {
+              if (isAborted) return;
               const assistant = finalMessages[finalMessages.length - 1];
               if (assistant && assistant.role === "assistant") {
                 await supa.from("messages").insert({

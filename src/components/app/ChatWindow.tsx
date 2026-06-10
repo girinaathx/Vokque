@@ -211,7 +211,7 @@ export function ChatWindow({
                       )}
                       {!isUser && idx === messages.length - 1 && !isLoading && (
                         <button
-                          onClick={() => regenerate()}
+                          onClick={handleRegenerate}
                           className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
                         >
                           <RotateCcw className="h-3 w-3" /> Regenerate

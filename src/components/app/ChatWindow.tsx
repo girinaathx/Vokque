@@ -282,6 +282,34 @@ export function ChatWindow({
             >
               <Paperclip className="h-4.5 w-4.5" />
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !citeOn;
+                setCiteOn(next);
+                toast.success(
+                  next ? "Citations on — I'll cite sources." : "Citations off",
+                );
+              }}
+              aria-pressed={citeOn}
+              aria-label="Toggle citations"
+              title={
+                citeOn
+                  ? "Citations on: sources will appear inline"
+                  : "Citations off: tap to ask for sources"
+              }
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition",
+                citeOn
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-black/5 hover:text-foreground",
+              )}
+            >
+              <Quote className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">
+                {citeOn ? "Citations on" : "Cite"}
+              </span>
+            </button>
             <textarea
               ref={textareaRef}
               value={input}

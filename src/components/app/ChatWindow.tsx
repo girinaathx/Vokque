@@ -84,13 +84,36 @@ export function ChatWindow({
     setInput("");
   };
 
-  const handleEditSave = (id: string) => {
+  const handleEditSave = async (id: string) => {
     const idx = messages.findIndex((m) => m.id === id);
     if (idx < 0) return;
+    const text = editValue.trim();
+    if (!text) return;
     const truncated = messages.slice(0, idx);
     setMessages(truncated);
     setEditingId(null);
-    sendMessage({ text: editValue });
+    try {
+      await truncateThreadMessages({ data: { threadId, keep: idx } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update");
+      return;
+    }
+    sendMessage({ text });
+  };
+
+  const handleRegenerate = async () => {
+    // Drop the trailing assistant message locally + in DB, then regenerate.
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== "assistant") return;
+    const keep = messages.length - 1;
+    setMessages(messages.slice(0, keep));
+    try {
+      await truncateThreadMessages({ data: { threadId, keep } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to regenerate");
+      return;
+    }
+    regenerate();
   };
 
   return (

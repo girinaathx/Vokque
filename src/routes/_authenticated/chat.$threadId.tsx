@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/app/AppShell";
 import { ChatWindow } from "@/components/app/ChatWindow";
 import { getThreadMessages } from "@/lib/threads.functions";
+import type { UIMessage } from "ai";
 import { Logo } from "@/components/brand/Logo";
 
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
@@ -40,7 +41,7 @@ function ChatPage() {
         <ChatWindow
           key={threadId}
           threadId={threadId}
-          initialMessages={data ?? []}
+          initialMessages={(data ?? []) as unknown as UIMessage[]}
         />
       )}
     </AppShell>

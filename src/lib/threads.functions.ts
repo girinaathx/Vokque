@@ -5,7 +5,7 @@ import { z } from "zod";
 export type StoredMessage = {
   id: string;
   role: "user" | "assistant" | "system";
-  parts: Array<{ type: string; text?: string; [k: string]: unknown }>;
+  parts: Array<Record<string, string>>;
 };
 
 

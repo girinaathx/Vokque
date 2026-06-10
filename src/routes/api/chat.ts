@@ -5,9 +5,17 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 const SYSTEM_PROMPT = `You are Open Intelligence — a warm, witty, premium AI companion that helps with travel, fitness, productivity, study, daily planning, and intelligent conversation. You speak like a thoughtful friend: concise, encouraging, never robotic. Use clean markdown. Use emojis sparingly and only when they add warmth. When the user shares feelings, acknowledge them briefly before helping. Offer concrete next steps. Default to short responses unless the user asks for depth.`;
 
+const CITE_INSTRUCTIONS = `\n\nCITATIONS MODE — ON.
+- For any factual recommendation in travel, fitness, productivity, study, health, or news, cite a credible public source.
+- Inline citations: append a numeric marker after the claim in the form [[1]](https://full.url) — make the marker itself a real markdown link to the source URL.
+- End the message with a "## Sources" section listing each source as a numbered markdown link: "1. [Title — Publisher](https://full.url)".
+- Only cite sources you are confident exist (well-known publishers, official sites, major outlets). Never fabricate URLs. If you are not sure of a URL, say so plainly instead of guessing.
+- For purely conversational, emotional, or opinion replies, skip citations.`;
+
 type ChatBody = {
   messages?: UIMessage[];
   threadId?: string;
+  cite?: boolean;
 };
 
 export const Route = createFileRoute("/api/chat")({
@@ -80,7 +88,7 @@ export const Route = createFileRoute("/api/chat")({
           const gateway = createLovableAiGatewayProvider(apiKey);
           const result = streamText({
             model: gateway("google/gemini-2.5-flash"),
-            system: SYSTEM_PROMPT,
+            system: SYSTEM_PROMPT + (body.cite ? CITE_INSTRUCTIONS : ""),
             messages: await convertToModelMessages(messages),
             abortSignal: request.signal,
           });

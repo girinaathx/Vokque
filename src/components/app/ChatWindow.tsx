@@ -14,6 +14,7 @@ import {
   Pencil,
   Mic,
   Paperclip,
+  Quote,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,18 @@ export function ChatWindow({
   threadId: string;
   initialMessages: UIMessage[];
 }) {
+  const [citeOn, setCiteOn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("oi:cite") === "1";
+  });
+  const citeRef = useRef(citeOn);
+  useEffect(() => {
+    citeRef.current = citeOn;
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("oi:cite", citeOn ? "1" : "0");
+    }
+  }, [citeOn]);
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -35,7 +48,18 @@ export function ChatWindow({
           const token = data.session?.access_token;
           const headers = new Headers(init?.headers);
           if (token) headers.set("Authorization", `Bearer ${token}`);
-          return fetch(url, { ...init, headers });
+          // Inject the live citations flag into the JSON body.
+          let body = init?.body;
+          if (typeof body === "string") {
+            try {
+              const parsed = JSON.parse(body);
+              parsed.cite = citeRef.current;
+              body = JSON.stringify(parsed);
+            } catch {
+              /* leave body as-is */
+            }
+          }
+          return fetch(url, { ...init, headers, body });
         },
       }),
     [threadId],
@@ -258,6 +282,34 @@ export function ChatWindow({
             >
               <Paperclip className="h-4.5 w-4.5" />
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !citeOn;
+                setCiteOn(next);
+                toast.success(
+                  next ? "Citations on — I'll cite sources." : "Citations off",
+                );
+              }}
+              aria-pressed={citeOn}
+              aria-label="Toggle citations"
+              title={
+                citeOn
+                  ? "Citations on: sources will appear inline"
+                  : "Citations off: tap to ask for sources"
+              }
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition",
+                citeOn
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-black/5 hover:text-foreground",
+              )}
+            >
+              <Quote className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">
+                {citeOn ? "Citations on" : "Cite"}
+              </span>
+            </button>
             <textarea
               ref={textareaRef}
               value={input}
@@ -335,8 +387,23 @@ function CopyBtn({ text }: { text: string }) {
 
 function Markdown({ text }: { text: string }) {
   return (
-    <div className="prose prose-sm prose-neutral max-w-none [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-black/6 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.85em] [&_p]:my-0 [&_p+p]:mt-2 [&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-black/90 [&_pre]:p-3 [&_pre]:text-[12.5px] [&_pre_code]:bg-transparent [&_pre_code]:text-white [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5">
-      <ReactMarkdown>{text}</ReactMarkdown>
+    <div className="prose prose-sm prose-neutral max-w-none [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-black/6 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.85em] [&_p]:my-0 [&_p+p]:mt-2 [&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-black/90 [&_pre]:p-3 [&_pre]:text-[12.5px] [&_pre_code]:bg-transparent [&_pre_code]:text-white [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_h2]:mt-4 [&_h2]:mb-1 [&_h2]:text-[13px] [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:tracking-wide [&_h2]:text-muted-foreground">
+      <ReactMarkdown
+        components={{
+          a: ({ href, children }) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline-offset-2 hover:underline"
+            >
+              {children}
+            </a>
+          ),
+        }}
+      >
+        {text}
+      </ReactMarkdown>
     </div>
   );
 }

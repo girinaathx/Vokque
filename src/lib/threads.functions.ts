@@ -86,3 +86,26 @@ export const getThreadMessages = createServerFn({ method: "GET" })
     }));
     return messages;
   });
+
+export const truncateThreadMessages = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ threadId: z.string().uuid(), keep: z.number().int().min(0) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("messages")
+      .select("id, created_at")
+      .eq("thread_id", data.threadId)
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    const toDelete = (rows ?? []).slice(data.keep).map((r) => r.id);
+    if (toDelete.length > 0) {
+      const { error: delErr } = await context.supabase
+        .from("messages")
+        .delete()
+        .in("id", toDelete);
+      if (delErr) throw new Error(delErr.message);
+    }
+    return { ok: true, deleted: toDelete.length };
+  });

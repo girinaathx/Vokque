@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/Logo";
+import { truncateThreadMessages } from "@/lib/threads.functions";
 import {
   ArrowUpRight,
   Copy,
@@ -83,13 +84,36 @@ export function ChatWindow({
     setInput("");
   };
 
-  const handleEditSave = (id: string) => {
+  const handleEditSave = async (id: string) => {
     const idx = messages.findIndex((m) => m.id === id);
     if (idx < 0) return;
+    const text = editValue.trim();
+    if (!text) return;
     const truncated = messages.slice(0, idx);
     setMessages(truncated);
     setEditingId(null);
-    sendMessage({ text: editValue });
+    try {
+      await truncateThreadMessages({ data: { threadId, keep: idx } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update");
+      return;
+    }
+    sendMessage({ text });
+  };
+
+  const handleRegenerate = async () => {
+    // Drop the trailing assistant message locally + in DB, then regenerate.
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== "assistant") return;
+    const keep = messages.length - 1;
+    setMessages(messages.slice(0, keep));
+    try {
+      await truncateThreadMessages({ data: { threadId, keep } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to regenerate");
+      return;
+    }
+    regenerate();
   };
 
   return (
@@ -187,7 +211,7 @@ export function ChatWindow({
                       )}
                       {!isUser && idx === messages.length - 1 && !isLoading && (
                         <button
-                          onClick={() => regenerate()}
+                          onClick={handleRegenerate}
                           className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
                         >
                           <RotateCcw className="h-3 w-3" /> Regenerate

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/Logo";
+import { truncateThreadMessages } from "@/lib/threads.functions";
 import {
   ArrowUpRight,
   Copy,

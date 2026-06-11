@@ -6,6 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/Logo";
 import { truncateThreadMessages } from "@/lib/threads.functions";
 import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
   ArrowUpRight,
   Copy,
   Check,
@@ -15,9 +20,33 @@ import {
   Mic,
   Paperclip,
   Quote,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+type CitationSource = { n: number; title: string; url: string; snippet?: string };
+
+function parseSources(text: string): Map<number, CitationSource> {
+  const map = new Map<number, CitationSource>();
+  const idx = text.search(/^\s*##+\s*Sources\s*$/im);
+  if (idx < 0) return map;
+  const section = text.slice(idx);
+  // Match lines like: "1. [Title](url) — snippet" or "1. [Title](url): snippet"
+  const re =
+    /^\s*(\d+)\.\s*\[([^\]]+)\]\(([^)\s]+)\)(?:\s*[—\-:]\s*(.+))?$/gm;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(section)) !== null) {
+    const n = Number(m[1]);
+    map.set(n, {
+      n,
+      title: m[2].trim(),
+      url: m[3].trim(),
+      snippet: m[4]?.trim(),
+    });
+  }
+  return map;
+}
 
 export function ChatWindow({
   threadId,

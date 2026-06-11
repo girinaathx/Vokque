@@ -415,25 +415,106 @@ function CopyBtn({ text }: { text: string }) {
 }
 
 function Markdown({ text }: { text: string }) {
+  const sources = useMemo(() => parseSources(text), [text]);
   return (
     <div className="prose prose-sm prose-neutral max-w-none [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-black/6 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.85em] [&_p]:my-0 [&_p+p]:mt-2 [&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-black/90 [&_pre]:p-3 [&_pre]:text-[12.5px] [&_pre_code]:bg-transparent [&_pre_code]:text-white [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_h2]:mt-4 [&_h2]:mb-1 [&_h2]:text-[13px] [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:tracking-wide [&_h2]:text-muted-foreground">
       <ReactMarkdown
         components={{
-          a: ({ href, children }) => (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline-offset-2 hover:underline"
-            >
-              {children}
-            </a>
-          ),
+          a: ({ href, children }) => {
+            // Detect inline citation marker rendered as [[n]](url) → link text "[n]"
+            const raw =
+              typeof children === "string"
+                ? children
+                : Array.isArray(children)
+                  ? children.join("")
+                  : "";
+            const match = /^\[(\d+)\]$/.exec(raw.trim());
+            if (match && href) {
+              const n = Number(match[1]);
+              const src = sources.get(n) ?? {
+                n,
+                title: href,
+                url: href,
+                snippet: undefined,
+              };
+              return <CitationMarker n={n} source={src} />;
+            }
+            return (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline-offset-2 hover:underline"
+              >
+                {children}
+              </a>
+            );
+          },
         }}
       >
         {text}
       </ReactMarkdown>
     </div>
+  );
+}
+
+function CitationMarker({ n, source }: { n: number; source: CitationSource }) {
+  return (
+    <HoverCard openDelay={80} closeDelay={120}>
+      <HoverCardTrigger asChild>
+        <a
+          href={source.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glass mx-0.5 inline-flex h-[18px] min-w-[18px] -translate-y-[1px] items-center justify-center rounded-full px-1 align-middle text-[10px] font-semibold text-foreground/80 no-underline transition hover:text-foreground hover:-translate-y-[2px]"
+          aria-label={`Source ${n}: ${source.title}`}
+        >
+          {n}
+        </a>
+      </HoverCardTrigger>
+      <HoverCardContent
+        side="top"
+        align="start"
+        className="glass-strong w-72 rounded-2xl border-black/5 p-3"
+      >
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wide">
+            Source {n}
+          </span>
+          <a
+            href={source.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Open source"
+          >
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
+        <a
+          href={source.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 block text-[13px] font-medium leading-snug text-foreground hover:underline"
+        >
+          {source.title}
+        </a>
+        {source.snippet && (
+          <p className="text-muted-foreground mt-1.5 line-clamp-4 text-[12px] leading-relaxed">
+            {source.snippet}
+          </p>
+        )}
+        <p className="text-muted-foreground/70 mt-2 truncate text-[10.5px]">
+          {(() => {
+            try {
+              return new URL(source.url).hostname.replace(/^www\./, "");
+            } catch {
+              return source.url;
+            }
+          })()}
+        </p>
+      </HoverCardContent>
+    </HoverCard>
   );
 }
 

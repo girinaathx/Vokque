@@ -431,6 +431,43 @@ export function ChatWindow({
   );
 }
 
+function RememberBtn({ text, threadId }: { text: string; threadId: string }) {
+  const [saved, setSaved] = useState(false);
+  const saveFn = useServerFn(createMemory);
+  return (
+    <button
+      onClick={async () => {
+        try {
+          await saveFn({
+            data: {
+              content: text.slice(0, 500),
+              category: "fact",
+              source: "manual",
+              thread_id: threadId,
+            },
+          });
+          setSaved(true);
+          toast.success("Saved to Memory");
+          setTimeout(() => setSaved(false), 1500);
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : "Could not save");
+        }
+      }}
+      className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+    >
+      {saved ? (
+        <>
+          <Check className="h-3 w-3" /> Remembered
+        </>
+      ) : (
+        <>
+          <Brain className="h-3 w-3" /> Remember
+        </>
+      )}
+    </button>
+  );
+}
+
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   return (

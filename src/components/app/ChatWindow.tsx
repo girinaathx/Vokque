@@ -204,9 +204,12 @@ export function ChatWindow({
 
           {messages.map((m, idx) => {
             const isUser = m.role === "user";
-            const text = m.parts
+            const rawText = m.parts
               .map((p) => (p.type === "text" ? p.text : ""))
               .join("");
+            const { agents, body: text } = isUser
+              ? { agents: [] as string[], body: rawText }
+              : parseAgents(rawText);
             return (
               <div
                 key={m.id}
@@ -227,6 +230,22 @@ export function ChatWindow({
                     isUser ? "items-end" : "items-start",
                   )}
                 >
+                  {!isUser && agents.length > 0 && (
+                    <div className="mb-1.5 flex flex-wrap gap-1">
+                      {agents.map((a) => (
+                        <span
+                          key={a}
+                          className={cn(
+                            "rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
+                            AGENT_STYLES[a] ?? AGENT_STYLES.General,
+                          )}
+                        >
+                          {a} AI
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
                   {editingId === m.id && isUser ? (
                     <div className="glass-bubble-user w-full rounded-3xl p-3">
                       <textarea
@@ -272,6 +291,7 @@ export function ChatWindow({
                   {!editingId && text && (
                     <div className="mt-1.5 flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
                       <CopyBtn text={text} />
+                      <RememberBtn text={text} threadId={threadId} />
                       {isUser && (
                         <button
                           onClick={() => {

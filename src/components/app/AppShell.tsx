@@ -17,7 +17,6 @@ import {
   Menu,
   X,
   Sparkles,
-  Mic,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -197,7 +196,7 @@ function Sidebar({
         to="/dashboard"
         onClick={closeMobile}
         className={cn(
-          "mb-1 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
+          "mb-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
           !activeThreadId
             ? "bg-black/6 font-medium"
             : "hover:bg-black/5 text-muted-foreground",
@@ -205,14 +204,6 @@ function Sidebar({
       >
         <Sparkles className="h-4 w-4" />
         Home
-      </Link>
-      <Link
-        to="/voice"
-        onClick={closeMobile}
-        className="text-muted-foreground hover:bg-black/5 mb-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
-      >
-        <Mic className="h-4 w-4" />
-        Aria · Voice
       </Link>
 
       <div className="text-muted-foreground mt-2 mb-1 px-3 text-[10px] font-semibold tracking-wider uppercase">

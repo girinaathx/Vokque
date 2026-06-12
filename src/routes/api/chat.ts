@@ -1,22 +1,60 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import {
+  convertToModelMessages,
+  generateText,
+  streamText,
+  type UIMessage,
+} from "ai";
 import { createClient } from "@supabase/supabase-js";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
-const SYSTEM_PROMPT = `You are Open Intelligence — a warm, witty, premium AI companion that helps with travel, fitness, productivity, study, daily planning, and intelligent conversation. You speak like a thoughtful friend: concise, encouraging, never robotic. Use clean markdown. Use emojis sparingly and only when they add warmth. When the user shares feelings, acknowledge them briefly before helping. Offer concrete next steps. Default to short responses unless the user asks for depth.`;
+const AGENTS = ["Business", "Coding", "Design", "Research", "General"] as const;
+type Agent = (typeof AGENTS)[number];
+
+const AGENT_PERSONAS: Record<Agent, string> = {
+  Business:
+    "Business AI — startup strategy, marketing, branding, sales, growth, monetization, GTM.",
+  Coding:
+    "Coding AI — software engineering, web/mobile dev, APIs, debugging, system architecture, code review.",
+  Design:
+    "Design AI — UI/UX, product design, brand systems, typography, graphics, design tokens.",
+  Research:
+    "Research AI — deep research, fact-checking, market intelligence, source-backed summaries.",
+  General:
+    "General assistant — everyday help: travel, fitness, productivity, daily planning, conversation.",
+};
+
+const CORE_SYSTEM = `You are Open Intelligence — a premium AI operating system that combines a team of specialist agents into one unified voice. You are warm, accurate, professional, and proactive. You don't just answer — you take action, produce artifacts (plans, drafts, docs, code, designs), and help the user reach real outcomes.
+
+GOLDEN RULE: behave like an AI operating system, not a chatbot. Remember the user, collaborate across specialties, execute, and ship outcomes.
+
+VOICE: thoughtful, concise, kind. Use clean markdown. Emojis sparingly. Acknowledge feelings briefly before helping. Always offer a concrete next step.
+
+ROUTING: At the very start of every reply, output a hidden HTML comment naming the specialist(s) you are channeling, picked from: Business, Coding, Design, Research, General. Format EXACTLY:
+<!--agents:X,Y-->
+Pick 1–3 of the most relevant agents. Do not mention this comment to the user. After the comment, continue with your normal markdown reply on a new line. Never wrap the comment in code fences.
+
+PROACTIVE: when the user has a goal, break it into steps, name obstacles, recommend actions, and offer to execute (draft the email, build the plan, write the code, outline the design).`;
 
 const CITE_INSTRUCTIONS = `\n\nCITATIONS MODE — ON.
-- For any factual recommendation in travel, fitness, productivity, study, health, or news, cite a credible public source.
-- Inline citations: append a numeric marker after the claim in the form [[1]](https://full.url) — make the marker itself a real markdown link to the source URL.
-- End the message with a "## Sources" section listing each source as a numbered markdown link: "1. [Title — Publisher](https://full.url)".
-- Only cite sources you are confident exist (well-known publishers, official sites, major outlets). Never fabricate URLs. If you are not sure of a URL, say so plainly instead of guessing.
-- For purely conversational, emotional, or opinion replies, skip citations.`;
+- For any factual recommendation in travel, fitness, productivity, study, health, news, or research, cite a credible public source.
+- Inline citations: append a numeric marker after the claim as [[1]](https://full.url) — the marker itself a real markdown link.
+- End with a "## Sources" section as a numbered list: "1. [Title — Publisher](https://full.url)".
+- Never fabricate URLs.`;
 
 type ChatBody = {
   messages?: UIMessage[];
   threadId?: string;
   cite?: boolean;
 };
+
+function buildMemoryBlock(
+  mems: { content: string; category: string }[] | null | undefined,
+) {
+  if (!mems || mems.length === 0) return "";
+  const lines = mems.map((m) => `- [${m.category}] ${m.content}`).join("\n");
+  return `\n\nUSER MEMORY — what you know about this user. Use it naturally; never repeat it back verbatim unless asked.\n${lines}`;
+}
 
 export const Route = createFileRoute("/api/chat")({
   server: {
@@ -60,17 +98,13 @@ export const Route = createFileRoute("/api/chat")({
             role: "user",
             parts: last.parts,
           });
-          // Touch thread updated_at + auto-title if still default
           const firstText =
             last.parts.find((p) => p.type === "text")?.text?.slice(0, 60) ??
             "New conversation";
           await supa
             .from("threads")
-            .update({
-              updated_at: new Date().toISOString(),
-            })
+            .update({ updated_at: new Date().toISOString() })
             .eq("id", threadId);
-          // Best-effort title set only when current title is default
           const { data: t } = await supa
             .from("threads")
             .select("title")
@@ -84,11 +118,28 @@ export const Route = createFileRoute("/api/chat")({
           }
         }
 
+        // Load user memories to inject as context.
+        const { data: mems } = await supa
+          .from("memories")
+          .select("content, category")
+          .order("created_at", { ascending: false })
+          .limit(40);
+
+        const gateway = createLovableAiGatewayProvider(apiKey);
+        const personaBlock =
+          "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
+          AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");
+
+        const systemPrompt =
+          CORE_SYSTEM +
+          personaBlock +
+          buildMemoryBlock(mems) +
+          (body.cite ? CITE_INSTRUCTIONS : "");
+
         try {
-          const gateway = createLovableAiGatewayProvider(apiKey);
           const result = streamText({
             model: gateway("google/gemini-2.5-flash"),
-            system: SYSTEM_PROMPT + (body.cite ? CITE_INSTRUCTIONS : ""),
+            system: systemPrompt,
             messages: await convertToModelMessages(messages),
             abortSignal: request.signal,
           });
@@ -109,6 +160,34 @@ export const Route = createFileRoute("/api/chat")({
                   .from("threads")
                   .update({ updated_at: new Date().toISOString() })
                   .eq("id", threadId);
+
+                // Auto-capture memories from this exchange (best-effort).
+                try {
+                  const userText =
+                    last && last.role === "user"
+                      ? last.parts
+                          .map((p) => (p.type === "text" ? p.text : ""))
+                          .join(" ")
+                          .slice(0, 2000)
+                      : "";
+                  const assistantText = assistant.parts
+                    .map((p) => (p.type === "text" ? p.text : ""))
+                    .join(" ")
+                    .replace(/<!--agents:[^>]*-->/g, "")
+                    .slice(0, 2000);
+                  if (userText) {
+                    await extractAndStoreMemories({
+                      gateway,
+                      supa,
+                      userId,
+                      threadId,
+                      userText,
+                      assistantText,
+                    });
+                  }
+                } catch {
+                  /* extraction is best-effort */
+                }
               }
             },
           });
@@ -120,3 +199,61 @@ export const Route = createFileRoute("/api/chat")({
     },
   },
 });
+
+async function extractAndStoreMemories({
+  gateway,
+  supa,
+  userId,
+  threadId,
+  userText,
+  assistantText,
+}: {
+  gateway: ReturnType<typeof createLovableAiGatewayProvider>;
+  supa: ReturnType<typeof createClient>;
+  userId: string;
+  threadId: string;
+  userText: string;
+  assistantText: string;
+}) {
+  const { text } = await generateText({
+    model: gateway("google/gemini-2.5-flash"),
+    system: `You extract durable, user-specific memories from a chat exchange.
+Return ONLY a JSON object: {"memories":[{"content":"...","category":"preference|project|goal|style|fact|general"}]}
+Rules:
+- Capture ONLY long-term, reusable facts about the USER (preferences, ongoing projects, goals, communication style, important personal facts).
+- DO NOT capture transient questions, generic facts, the assistant's answers, or anything sensitive (passwords, payment, government IDs, health diagnoses).
+- 0 to 3 items. Empty array if nothing worth remembering.
+- "content" must be a single concise sentence written in third person about the user (e.g. "Prefers vegetarian meals when traveling.").`,
+    prompt: `USER: ${userText}\n\nASSISTANT: ${assistantText}`,
+  });
+
+  let parsed: { memories?: { content?: string; category?: string }[] } = {};
+  try {
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+  } catch {
+    return;
+  }
+  const items = (parsed.memories ?? [])
+    .filter((m) => typeof m.content === "string" && m.content.trim().length > 3)
+    .slice(0, 3);
+  if (items.length === 0) return;
+
+  const valid = new Set([
+    "preference",
+    "project",
+    "goal",
+    "style",
+    "fact",
+    "general",
+  ]);
+  await supa.from("memories").insert(
+    items.map((m) => ({
+      user_id: userId,
+      thread_id: threadId,
+      content: m.content!.trim().slice(0, 500),
+      category: valid.has(m.category ?? "") ? m.category : "general",
+      source: "auto",
+    })),
+  );
+}

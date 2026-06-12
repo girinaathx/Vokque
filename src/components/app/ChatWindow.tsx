@@ -21,9 +21,30 @@ import {
   Paperclip,
   Quote,
   ExternalLink,
+  Brain,
 } from "lucide-react";
 import { toast } from "sonner";
+import { createMemory } from "@/lib/memories.functions";
+import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
+
+const AGENT_STYLES: Record<string, string> = {
+  Business: "bg-amber-100 text-amber-900",
+  Coding: "bg-sky-100 text-sky-900",
+  Design: "bg-pink-100 text-pink-900",
+  Research: "bg-emerald-100 text-emerald-900",
+  General: "bg-black/6 text-foreground",
+};
+
+function parseAgents(text: string): { agents: string[]; body: string } {
+  const m = text.match(/^\s*<!--\s*agents:([^>]*?)-->\s*\n?/i);
+  if (!m) return { agents: [], body: text };
+  const agents = m[1]
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return { agents, body: text.slice(m[0].length) };
+}
 
 type CitationSource = { n: number; title: string; url: string; snippet?: string };
 
@@ -183,9 +204,12 @@ export function ChatWindow({
 
           {messages.map((m, idx) => {
             const isUser = m.role === "user";
-            const text = m.parts
+            const rawText = m.parts
               .map((p) => (p.type === "text" ? p.text : ""))
               .join("");
+            const { agents, body: text } = isUser
+              ? { agents: [] as string[], body: rawText }
+              : parseAgents(rawText);
             return (
               <div
                 key={m.id}
@@ -206,6 +230,22 @@ export function ChatWindow({
                     isUser ? "items-end" : "items-start",
                   )}
                 >
+                  {!isUser && agents.length > 0 && (
+                    <div className="mb-1.5 flex flex-wrap gap-1">
+                      {agents.map((a) => (
+                        <span
+                          key={a}
+                          className={cn(
+                            "rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
+                            AGENT_STYLES[a] ?? AGENT_STYLES.General,
+                          )}
+                        >
+                          {a} AI
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
                   {editingId === m.id && isUser ? (
                     <div className="glass-bubble-user w-full rounded-3xl p-3">
                       <textarea
@@ -251,6 +291,7 @@ export function ChatWindow({
                   {!editingId && text && (
                     <div className="mt-1.5 flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
                       <CopyBtn text={text} />
+                      <RememberBtn text={text} threadId={threadId} />
                       {isUser && (
                         <button
                           onClick={() => {
@@ -387,6 +428,43 @@ export function ChatWindow({
         </div>
       </div>
     </div>
+  );
+}
+
+function RememberBtn({ text, threadId }: { text: string; threadId: string }) {
+  const [saved, setSaved] = useState(false);
+  const saveFn = useServerFn(createMemory);
+  return (
+    <button
+      onClick={async () => {
+        try {
+          await saveFn({
+            data: {
+              content: text.slice(0, 500),
+              category: "fact",
+              source: "manual",
+              thread_id: threadId,
+            },
+          });
+          setSaved(true);
+          toast.success("Saved to Memory");
+          setTimeout(() => setSaved(false), 1500);
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : "Could not save");
+        }
+      }}
+      className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+    >
+      {saved ? (
+        <>
+          <Check className="h-3 w-3" /> Remembered
+        </>
+      ) : (
+        <>
+          <Brain className="h-3 w-3" /> Remember
+        </>
+      )}
+    </button>
   );
 }
 

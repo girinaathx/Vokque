@@ -209,7 +209,8 @@ async function extractAndStoreMemories({
   assistantText,
 }: {
   gateway: ReturnType<typeof createLovableAiGatewayProvider>;
-  supa: ReturnType<typeof createClient>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supa: any;
   userId: string;
   threadId: string;
   userText: string;

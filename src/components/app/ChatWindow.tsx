@@ -21,9 +21,30 @@ import {
   Paperclip,
   Quote,
   ExternalLink,
+  Brain,
 } from "lucide-react";
 import { toast } from "sonner";
+import { createMemory } from "@/lib/memories.functions";
+import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
+
+const AGENT_STYLES: Record<string, string> = {
+  Business: "bg-amber-100 text-amber-900",
+  Coding: "bg-sky-100 text-sky-900",
+  Design: "bg-pink-100 text-pink-900",
+  Research: "bg-emerald-100 text-emerald-900",
+  General: "bg-black/6 text-foreground",
+};
+
+function parseAgents(text: string): { agents: string[]; body: string } {
+  const m = text.match(/^\s*<!--\s*agents:([^>]*?)-->\s*\n?/i);
+  if (!m) return { agents: [], body: text };
+  const agents = m[1]
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return { agents, body: text.slice(m[0].length) };
+}
 
 type CitationSource = { n: number; title: string; url: string; snippet?: string };
 

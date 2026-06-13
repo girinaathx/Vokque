@@ -274,122 +274,140 @@ export function ChatWindow({
             const { agents, body: text } = isUser
               ? { agents: [] as string[], body: rawText }
               : parseAgents(rawText);
+            const fileParts = m.parts.filter(
+              (p) =>
+                p.type === "file" ||
+                (typeof p.type === "string" && p.type.startsWith("file")),
+            ) as Array<{ url?: string; mediaType?: string; filename?: string }>;
             return (
               <div
                 key={m.id}
                 className={cn(
-                  "animate-fade-up group flex gap-3",
-                  isUser ? "justify-end" : "justify-start",
+                  "animate-fade-up group flex flex-col",
+                  isUser ? "items-end" : "items-start",
                 )}
               >
-                {!isUser && (
-                  <div className="glass mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl">
-                    <Logo size={18} />
+                {!isUser && agents.length > 0 && (
+                  <div className="mb-1.5 flex flex-wrap gap-1">
+                    {agents.map((a) => (
+                      <span
+                        key={a}
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
+                          AGENT_STYLES[a] ?? AGENT_STYLES.General,
+                        )}
+                      >
+                        {a} AI
+                      </span>
+                    ))}
                   </div>
                 )}
 
-                <div
-                  className={cn(
-                    "min-w-0 max-w-[88%] flex-col",
-                    isUser ? "items-end" : "items-start",
-                  )}
-                >
-                  {!isUser && agents.length > 0 && (
-                    <div className="mb-1.5 flex flex-wrap gap-1">
-                      {agents.map((a) => (
+                {fileParts.length > 0 && (
+                  <div
+                    className={cn(
+                      "mb-2 flex flex-wrap gap-2",
+                      isUser ? "justify-end" : "justify-start",
+                    )}
+                  >
+                    {fileParts.map((f, i) =>
+                      f.mediaType?.startsWith("image/") && f.url ? (
+                        <img
+                          key={i}
+                          src={f.url}
+                          alt={f.filename ?? "attachment"}
+                          className="max-h-56 max-w-[260px] rounded-2xl object-cover shadow-sm"
+                        />
+                      ) : (
                         <span
-                          key={a}
-                          className={cn(
-                            "rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
-                            AGENT_STYLES[a] ?? AGENT_STYLES.General,
-                          )}
+                          key={i}
+                          className="glass inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px]"
                         >
-                          {a} AI
+                          <Paperclip className="h-3 w-3" />
+                          {f.filename ?? f.mediaType ?? "file"}
                         </span>
-                      ))}
-                    </div>
-                  )}
+                      ),
+                    )}
+                  </div>
+                )}
 
-                  {editingId === m.id && isUser ? (
-                    <div className="glass-bubble-user w-full rounded-3xl p-3">
-                      <textarea
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        autoFocus
-                        rows={3}
-                        className="w-full resize-none bg-transparent text-[15px] outline-none"
-                      />
-                      <div className="mt-2 flex justify-end gap-2">
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="hover:bg-black/5 rounded-full px-3 py-1 text-xs"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => handleEditSave(m.id)}
-                          className="bg-primary text-primary-foreground rounded-full px-3 py-1 text-xs font-medium"
-                        >
-                          Update & resend
-                        </button>
-                      </div>
+                {editingId === m.id && isUser ? (
+                  <div className="glass w-full max-w-[88%] rounded-3xl p-3">
+                    <textarea
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      autoFocus
+                      rows={3}
+                      className="w-full resize-none bg-transparent text-[15px] outline-none"
+                    />
+                    <div className="mt-2 flex justify-end gap-2">
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="hover:bg-black/5 rounded-full px-3 py-1 text-xs"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => handleEditSave(m.id)}
+                        className="bg-primary text-primary-foreground rounded-full px-3 py-1 text-xs font-medium"
+                      >
+                        Update & resend
+                      </button>
                     </div>
-                  ) : (
-                    <div
-                      className={cn(
-                        "rounded-3xl px-4 py-3 text-[15px] leading-relaxed",
-                        isUser
-                          ? "glass-bubble-user rounded-tr-lg"
-                          : "glass-bubble-ai rounded-tl-lg",
-                      )}
-                    >
+                  </div>
+                ) : (
+                  <div
+                    className={cn(
+                      "min-w-0 text-[15px] leading-relaxed",
+                      isUser
+                        ? "max-w-[88%] text-right font-medium text-foreground"
+                        : "w-full text-foreground/90",
+                    )}
+                  >
+                    {isUser ? (
+                      <p className="whitespace-pre-wrap">{text}</p>
+                    ) : (
                       <Markdown text={text} />
-                      {!isUser &&
-                        idx === messages.length - 1 &&
-                        status === "streaming" &&
-                        !text && <span className="shimmer-text">Thinking…</span>}
-                    </div>
-                  )}
+                    )}
+                    {!isUser &&
+                      idx === messages.length - 1 &&
+                      status === "streaming" &&
+                      !text && <span className="shimmer-text">Thinking…</span>}
+                  </div>
+                )}
 
-                  {/* Message actions */}
-                  {!editingId && text && (
-                    <div className="mt-1.5 flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
-                      <CopyBtn text={text} />
-                      <RememberBtn text={text} threadId={threadId} />
-                      {isUser && (
-                        <button
-                          onClick={() => {
-                            setEditingId(m.id);
-                            setEditValue(text);
-                          }}
-                          className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
-                        >
-                          <Pencil className="h-3 w-3" /> Edit
-                        </button>
-                      )}
-                      {!isUser && idx === messages.length - 1 && !isLoading && (
-                        <button
-                          onClick={handleRegenerate}
-                          className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
-                        >
-                          <RotateCcw className="h-3 w-3" /> Regenerate
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                {!editingId && text && (
+                  <div className="mt-1.5 flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
+                    <CopyBtn text={text} />
+                    <RememberBtn text={text} threadId={threadId} />
+                    {isUser && (
+                      <button
+                        onClick={() => {
+                          setEditingId(m.id);
+                          setEditValue(text);
+                        }}
+                        className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+                      >
+                        <Pencil className="h-3 w-3" /> Edit
+                      </button>
+                    )}
+                    {!isUser && idx === messages.length - 1 && !isLoading && (
+                      <button
+                        onClick={handleRegenerate}
+                        className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+                      >
+                        <RotateCcw className="h-3 w-3" /> Regenerate
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
 
           {status === "submitted" && (
-            <div className="animate-fade-up flex gap-3">
-              <div className="glass mt-0.5 flex h-8 w-8 items-center justify-center rounded-2xl">
-                <Logo size={18} />
-              </div>
-              <div className="glass-bubble-ai rounded-3xl rounded-tl-lg px-4 py-3">
-                <span className="shimmer-text text-[15px]">Thinking…</span>
-              </div>
+            <div className="animate-fade-up">
+              <span className="shimmer-text text-[15px]">Thinking…</span>
             </div>
           )}
 
@@ -401,49 +419,89 @@ export function ChatWindow({
         </div>
       </div>
 
-      {/* Floating composer dock */}
+      {/* Floating Liquid Glass composer */}
       <div className="pointer-events-none absolute right-0 bottom-0 left-0 px-3 pb-4 lg:px-8 lg:pb-6">
         <div className="pointer-events-auto mx-auto w-full max-w-3xl">
+          {attachments.length > 0 && (
+            <div className="glass mb-2 flex flex-wrap gap-2 rounded-3xl p-2">
+              {attachments.map((f, i) => {
+                const isImg = f.type.startsWith("image/");
+                const url = isImg ? URL.createObjectURL(f) : null;
+                return (
+                  <div
+                    key={`${f.name}-${i}`}
+                    className="relative flex items-center gap-2 rounded-2xl bg-white/70 py-1 pr-2 pl-1 text-[12px] shadow-sm"
+                  >
+                    {url ? (
+                      <img
+                        src={url}
+                        alt={f.name}
+                        className="h-9 w-9 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <span className="bg-black/6 flex h-9 w-9 items-center justify-center rounded-xl">
+                        <Paperclip className="h-4 w-4" />
+                      </span>
+                    )}
+                    <span className="max-w-[140px] truncate">{f.name}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setAttachments((p) => p.filter((_, j) => j !== i))
+                      }
+                      className="hover:bg-black/10 flex h-5 w-5 items-center justify-center rounded-full"
+                      aria-label="Remove"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           <form
             onSubmit={handleSubmit}
-            className="glass-dock liquid-shine liquid-shine-after flex items-end gap-1.5 rounded-[28px] p-2"
+            className={cn(
+              "glass-dock liquid-shine liquid-shine-after flex items-end gap-1 rounded-full p-1.5 transition-all duration-300",
+              "focus-within:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25),0_0_0_3px_rgba(255,255,255,0.6)_inset]",
+            )}
           >
-            <button
-              type="button"
-              className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition"
-              aria-label="Attach"
-              onClick={() => toast.info("Attachments coming soon")}
-            >
-              <Paperclip className="h-4.5 w-4.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const next = !citeOn;
-                setCiteOn(next);
-                toast.success(
-                  next ? "Citations on — I'll cite sources." : "Citations off",
-                );
+            <input
+              ref={fileInputRef}
+              type="file"
+              hidden
+              multiple
+              accept=".pdf,.txt,.md,.csv,.json,.docx,.xlsx,.pptx"
+              onChange={(e) => {
+                addFiles(e.target.files);
+                e.target.value = "";
               }}
-              aria-pressed={citeOn}
-              aria-label="Toggle citations"
-              title={
-                citeOn
-                  ? "Citations on: sources will appear inline"
-                  : "Citations off: tap to ask for sources"
-              }
-              className={cn(
-                "flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition",
-                citeOn
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-black/5 hover:text-foreground",
-              )}
+            />
+            <input
+              ref={imageInputRef}
+              type="file"
+              hidden
+              multiple
+              accept="image/*"
+              onChange={(e) => {
+                addFiles(e.target.files);
+                e.target.value = "";
+              }}
+            />
+            <GlassIconBtn
+              ariaLabel="Attach file"
+              onClick={() => fileInputRef.current?.click()}
             >
-              <Quote className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">
-                {citeOn ? "Citations on" : "Cite"}
-              </span>
-            </button>
+              <Paperclip className="h-[18px] w-[18px]" />
+            </GlassIconBtn>
+            <GlassIconBtn
+              ariaLabel="Attach image"
+              onClick={() => imageInputRef.current?.click()}
+            >
+              <ImagePlus className="h-[18px] w-[18px]" />
+            </GlassIconBtn>
+
             <textarea
               ref={textareaRef}
               value={input}
@@ -456,21 +514,48 @@ export function ChatWindow({
               }}
               rows={1}
               placeholder="Message Open Intelligence…"
-              className="placeholder:text-muted-foreground/70 max-h-48 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[15px] outline-none"
+              className="placeholder:text-muted-foreground/70 max-h-48 min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[15px] outline-none"
             />
+
             <button
               type="button"
-              className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition"
-              aria-label="Voice"
-              onClick={() => toast.info("Voice coming soon")}
+              onClick={() => {
+                const next = !citeOn;
+                setCiteOn(next);
+                toast.success(
+                  next ? "Citations on — I'll cite sources." : "Citations off",
+                );
+              }}
+              aria-pressed={citeOn}
+              aria-label="Toggle citations"
+              className={cn(
+                "hidden h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition sm:flex",
+                citeOn
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-black/5 hover:text-foreground",
+              )}
             >
-              <Mic className="h-4.5 w-4.5" />
+              <Quote className="h-3.5 w-3.5" />
+              Cite
             </button>
+
+            <GlassIconBtn
+              ariaLabel={listening ? "Stop listening" : "Voice input"}
+              onClick={toggleVoice}
+              active={listening}
+            >
+              {listening ? (
+                <MicOff className="h-[18px] w-[18px]" />
+              ) : (
+                <Mic className="h-[18px] w-[18px]" />
+              )}
+            </GlassIconBtn>
+
             {isLoading ? (
               <button
                 type="button"
                 onClick={() => stop()}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-95"
+                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-md transition active:scale-90"
                 aria-label="Stop"
               >
                 <Square className="h-3.5 w-3.5" fill="currentColor" />
@@ -478,11 +563,11 @@ export function ChatWindow({
             ) : (
               <button
                 type="submit"
-                disabled={!input.trim()}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-95 disabled:opacity-40"
+                disabled={!input.trim() && attachments.length === 0}
+                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-md transition hover:shadow-lg active:scale-90 disabled:opacity-40 disabled:shadow-none"
                 aria-label="Send"
               >
-                <ArrowUpRight className="h-4.5 w-4.5" />
+                <ArrowUp className="h-[18px] w-[18px]" />
               </button>
             )}
           </form>

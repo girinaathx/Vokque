@@ -129,8 +129,14 @@ export function ChatWindow({
   const [input, setInput] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [listening, setListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
   const isLoading = status === "submitted" || status === "streaming";
 
   // Auto-focus + auto-scroll
@@ -153,13 +159,68 @@ export function ChatWindow({
     }
   }, [threadId, messages.length, sendMessage]);
 
+  const addFiles = (files: FileList | File[] | null) => {
+    if (!files) return;
+    const incoming = Array.from(files).filter((f) => f.size <= 20 * 1024 * 1024);
+    if (incoming.length === 0) {
+      toast.error("Files must be under 20MB");
+      return;
+    }
+    setAttachments((prev) => [...prev, ...incoming].slice(0, 10));
+  };
+
+  const toFileList = (files: File[]): FileList => {
+    const dt = new DataTransfer();
+    files.forEach((f) => dt.items.add(f));
+    return dt.files;
+  };
+
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     const text = input.trim();
-    if (!text || isLoading) return;
-    sendMessage({ text });
+    if ((!text && attachments.length === 0) || isLoading) return;
+    sendMessage({
+      text: text || "(attached)",
+      files: attachments.length ? toFileList(attachments) : undefined,
+    });
     setInput("");
+    setAttachments([]);
   };
+
+  const toggleVoice = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const W = window as any;
+    const SR = W.SpeechRecognition || W.webkitSpeechRecognition;
+    if (!SR) {
+      toast.error("Voice input not supported on this browser");
+      return;
+    }
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    const rec = new SR();
+    rec.lang = navigator.language || "en-US";
+    rec.interimResults = true;
+    rec.continuous = false;
+    let finalText = "";
+    rec.onresult = (e: { results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => {
+      let interim = "";
+      for (let i = 0; i < e.results.length; i++) {
+        const r = e.results[i];
+        const t = r[0].transcript;
+        if (r.isFinal) finalText += t;
+        else interim += t;
+      }
+      setInput((finalText + interim).trim());
+    };
+    rec.onerror = () => setListening(false);
+    rec.onend = () => setListening(false);
+    rec.start();
+    recognitionRef.current = rec;
+    setListening(true);
+  };
+
 
   const handleEditSave = async (id: string) => {
     const idx = messages.findIndex((m) => m.id === id);

@@ -617,6 +617,34 @@ function RememberBtn({ text, threadId }: { text: string; threadId: string }) {
   );
 }
 
+function GlassIconBtn({
+  ariaLabel,
+  onClick,
+  active,
+  children,
+}: {
+  ariaLabel: string;
+  onClick: () => void;
+  active?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className={cn(
+        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90",
+        active
+          ? "bg-destructive text-destructive-foreground shadow-md animate-pulse"
+          : "text-muted-foreground hover:bg-white/60 hover:text-foreground hover:shadow-sm",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   return (

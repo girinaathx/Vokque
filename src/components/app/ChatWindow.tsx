@@ -11,17 +11,20 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import {
-  ArrowUpRight,
+  ArrowUp,
   Copy,
   Check,
   RotateCcw,
   Square,
   Pencil,
   Mic,
+  MicOff,
   Paperclip,
   Quote,
   ExternalLink,
   Brain,
+  ImagePlus,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createMemory } from "@/lib/memories.functions";

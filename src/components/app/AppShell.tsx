@@ -84,29 +84,31 @@ export function AppShell({
         />
       </aside>
 
-      {/* Mobile top bar */}
-      <header className="glass-dock fixed top-0 right-0 left-0 z-40 flex items-center justify-between px-4 py-2.5 lg:hidden">
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="hover:bg-black/5 flex h-9 w-9 items-center justify-center rounded-full transition"
-          aria-label="Menu"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-        <Link to="/dashboard" className="flex items-center gap-2">
-          <Logo size={22} />
-          <span className="text-sm font-semibold tracking-tight">
-            Open Intelligence
-          </span>
-        </Link>
-        <button
-          onClick={() => createMut.mutate()}
-          disabled={createMut.isPending}
-          className="hover:bg-black/5 flex h-9 w-9 items-center justify-center rounded-full transition disabled:opacity-50"
-          aria-label="New chat"
-        >
-          <Plus className="h-5 w-5" />
-        </button>
+      {/* Mobile top bar — floating Liquid Glass */}
+      <header className="fixed top-2.5 right-3 left-3 z-40 lg:hidden">
+        <div className="glass-dock liquid-shine liquid-shine-after flex items-center justify-between rounded-full px-2 py-2">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:shadow-md"
+            aria-label="Menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <Logo size={22} />
+            <span className="text-sm font-semibold tracking-tight">
+              Open Intelligence
+            </span>
+          </Link>
+          <button
+            onClick={() => createMut.mutate()}
+            disabled={createMut.isPending}
+            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:shadow-md disabled:opacity-50"
+            aria-label="New chat"
+          >
+            <Plus className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
       {/* Mobile drawer */}
@@ -140,7 +142,7 @@ export function AppShell({
       )}
 
       {/* Main */}
-      <main className="flex min-w-0 flex-1 flex-col pt-14 lg:pt-0">
+      <main className="flex min-w-0 flex-1 flex-col pt-16 lg:pt-0">
         {children}
       </main>
     </div>

@@ -18,6 +18,7 @@ import {
   X,
   Sparkles,
   Brain,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -211,10 +212,18 @@ function Sidebar({
       <Link
         to="/memory"
         onClick={closeMobile}
-        className="text-muted-foreground hover:bg-black/5 mb-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
+        className="text-muted-foreground hover:bg-black/5 mb-1 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
       >
         <Brain className="h-4 w-4" />
         Memory
+      </Link>
+      <Link
+        to="/settings"
+        onClick={closeMobile}
+        className="text-muted-foreground hover:bg-black/5 mb-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
+      >
+        <SettingsIcon className="h-4 w-4" />
+        Settings
       </Link>
 
       <div className="text-muted-foreground mt-2 mb-1 px-3 text-[10px] font-semibold tracking-wider uppercase">

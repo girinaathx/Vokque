@@ -28,7 +28,7 @@ export function Logo({ className, size = 40, glow = false }: LogoProps) {
         alt="Open Intelligence"
         width={size}
         height={size}
-        className="relative h-full w-full object-contain"
+        className="relative h-full w-full object-contain dark:invert"
         draggable={false}
       />
     </div>

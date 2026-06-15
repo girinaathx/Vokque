@@ -131,7 +131,7 @@ function SettingsPage() {
             {active === "chats" && <ChatsSection />}
             {active === "voice" && <VoiceSection />}
             {active === "account" && <AccountSection />}
-            {active === "general" && <PlaceholderSection title="General" description="Language, region, and default behavior controls will live here." />}
+            {active === "general" && <ChatAppearanceSection />}
             {active === "personalization" && <PlaceholderSection title="Personalization" description="Tone, persona, and response style — coming soon." />}
             {active === "data" && <PlaceholderSection title="Data Controls" description="Manage how Open Intelligence handles your data, exports, and deletions." />}
             {active === "security" && <PlaceholderSection title="Security" description="Sessions, 2-factor authentication, and connected devices — coming soon." />}

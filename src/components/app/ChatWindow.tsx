@@ -360,8 +360,8 @@ export function ChatWindow({
                     className={cn(
                       "min-w-0 text-[15px] leading-relaxed",
                       isUser
-                        ? "max-w-[88%] text-right font-medium text-foreground"
-                        : "w-full text-foreground/90",
+                        ? "chat-bubble chat-bubble-user max-w-[88%] whitespace-pre-wrap"
+                        : "chat-bubble chat-bubble-ai w-full max-w-full",
                     )}
                   >
                     {isUser ? (

@@ -255,10 +255,10 @@ function Sidebar({
                 params={{ threadId: t.id }}
                 onClick={closeMobile}
                 className={cn(
-                  "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
+                  "flex items-center gap-2.5 rounded-2xl px-3 py-2 text-sm transition",
                   activeThreadId === t.id
-                    ? "bg-black/6 font-medium"
-                    : "hover:bg-black/4",
+                    ? "bg-foreground/8 font-medium"
+                    : "hover:bg-foreground/5",
                 )}
               >
                 <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-60" />
@@ -270,7 +270,7 @@ function Sidebar({
                   e.stopPropagation();
                   if (confirm("Delete this conversation?")) onDelete(t.id);
                 }}
-                className="hover:bg-black/8 absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg opacity-0 transition group-hover:opacity-100"
+                className="hover:bg-foreground/10 absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg opacity-0 transition group-hover:opacity-100"
                 aria-label="Delete"
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -282,7 +282,7 @@ function Sidebar({
 
       <button
         onClick={onSignOut}
-        className="text-muted-foreground hover:bg-black/5 hover:text-foreground mt-3 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
+        className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground mt-3 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <LogOut className="h-4 w-4" />
         Sign out
@@ -290,3 +290,4 @@ function Sidebar({
     </div>
   );
 }
+

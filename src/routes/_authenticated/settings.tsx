@@ -135,9 +135,12 @@ function SettingsPage() {
             {active === "data" && <PlaceholderSection title="Data Controls" description="Manage how Open Intelligence handles your data, exports, and deletions." />}
             {active === "security" && <PlaceholderSection title="Security" description="Sessions, 2-factor authentication, and connected devices — coming soon." />}
             {active === "storage" && <PlaceholderSection title="Storage" description="Local cache, attachments, and usage stats — coming soon." />}
+            {active === "notifications" && <PlaceholderSection title="Notifications" description="Push, email, and in-app notification preferences — coming soon." />}
+            {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how Open Intelligence handles your data, chats, and account." />}
             {active === "billing" && <PlaceholderSection title="Billing" description="Plan, invoices, and payment methods — coming soon." />}
             {active === "help" && <PlaceholderSection title="Help & Support" description="Reach out anytime at support@o1platforms.com." />}
             {active === "about" && <AboutSection />}
+
           </div>
         </div>
       </div>

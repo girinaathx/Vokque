@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { AppShell } from "@/components/app/AppShell";
+import { ChatAppearanceSection } from "@/components/settings/ChatAppearanceSection";
 import { useTheme, type ThemePref } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -130,7 +131,7 @@ function SettingsPage() {
             {active === "chats" && <ChatsSection />}
             {active === "voice" && <VoiceSection />}
             {active === "account" && <AccountSection />}
-            {active === "general" && <PlaceholderSection title="General" description="Language, region, and default behavior controls will live here." />}
+            {active === "general" && <ChatAppearanceSection />}
             {active === "personalization" && <PlaceholderSection title="Personalization" description="Tone, persona, and response style — coming soon." />}
             {active === "data" && <PlaceholderSection title="Data Controls" description="Manage how Open Intelligence handles your data, exports, and deletions." />}
             {active === "security" && <PlaceholderSection title="Security" description="Sessions, 2-factor authentication, and connected devices — coming soon." />}

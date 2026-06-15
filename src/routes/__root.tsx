@@ -15,6 +15,7 @@ import { logoUrl } from "@/components/brand/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/lib/theme";
+import { ChatAppearanceProvider } from "@/lib/chat-appearance";
 
 const themeBootScript = `(function(){try{var t=localStorage.getItem('oi:theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
 
@@ -163,10 +164,12 @@ function RootComponent() {
 
   return (
     <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <Outlet />
-        <Toaster position="top-center" />
-      </QueryClientProvider>
+      <ChatAppearanceProvider>
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+          <Toaster position="top-center" />
+        </QueryClientProvider>
+      </ChatAppearanceProvider>
     </ThemeProvider>
   );
 }

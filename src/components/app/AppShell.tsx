@@ -87,12 +87,12 @@ export function AppShell({
         />
       </aside>
 
-      {/* Mobile top bar — floating Liquid Glass */}
+      {/* Mobile top bar — dark matte liquid glass (no shine) */}
       <header className="fixed top-2.5 right-3 left-3 z-40 lg:hidden">
-        <div className="glass-dock liquid-shine liquid-shine-after flex items-center justify-between rounded-full px-2 py-2">
+        <div className="glass-dock flex items-center justify-between rounded-full px-2 py-2">
           <button
             onClick={() => setMobileOpen(true)}
-            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:shadow-md"
+            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90"
             aria-label="Menu"
           >
             <Menu className="h-5 w-5" />
@@ -106,7 +106,7 @@ export function AppShell({
           <button
             onClick={() => createMut.mutate()}
             disabled={createMut.isPending}
-            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:shadow-md disabled:opacity-50"
+            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
             aria-label="New chat"
           >
             <Plus className="h-5 w-5" />
@@ -114,18 +114,18 @@ export function AppShell({
         </div>
       </header>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — single floating panel, no nested frame */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="animate-fade-in-soft absolute inset-0 bg-black/30 backdrop-blur-sm"
+            className="animate-fade-in-soft absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="animate-glass-pop absolute top-3 bottom-3 left-3 w-[min(80vw,300px)]">
-            <div className="glass-strong relative h-full overflow-hidden rounded-3xl p-4">
+          <div className="animate-glass-pop absolute top-3 bottom-3 left-3 w-[min(82vw,300px)]">
+            <div className="relative h-full">
               <button
                 onClick={() => setMobileOpen(false)}
-                className="hover:bg-black/5 absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full"
+                className="hover:bg-foreground/10 absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -143,6 +143,7 @@ export function AppShell({
           </div>
         </div>
       )}
+
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col pt-16 lg:pt-0">

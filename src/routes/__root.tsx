@@ -164,10 +164,12 @@ function RootComponent() {
 
   return (
     <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <Outlet />
-        <Toaster position="top-center" />
-      </QueryClientProvider>
+      <ChatAppearanceProvider>
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+          <Toaster position="top-center" />
+        </QueryClientProvider>
+      </ChatAppearanceProvider>
     </ThemeProvider>
   );
 }

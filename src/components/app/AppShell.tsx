@@ -203,19 +203,19 @@ function Sidebar({
         to="/dashboard"
         onClick={closeMobile}
         className={cn(
-          "mb-1 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
+          "mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition",
           !activeThreadId
-            ? "bg-black/6 font-medium"
-            : "hover:bg-black/5 text-muted-foreground",
+            ? "bg-foreground/8 font-medium"
+            : "text-muted-foreground hover:bg-foreground/5",
         )}
       >
-        <Sparkles className="h-4 w-4" />
+        <Home className="h-4 w-4" />
         Home
       </Link>
       <Link
         to="/memory"
         onClick={closeMobile}
-        className="text-muted-foreground hover:bg-black/5 mb-1 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
+        className="text-muted-foreground hover:bg-foreground/5 mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <Brain className="h-4 w-4" />
         Memory
@@ -223,11 +223,20 @@ function Sidebar({
       <Link
         to="/settings"
         onClick={closeMobile}
-        className="text-muted-foreground hover:bg-black/5 mb-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
+        className="text-muted-foreground hover:bg-foreground/5 mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <SettingsIcon className="h-4 w-4" />
         Settings
       </Link>
+      <Link
+        to="/privacy"
+        onClick={closeMobile}
+        className="text-muted-foreground hover:bg-foreground/5 mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+      >
+        <ShieldCheck className="h-4 w-4" />
+        Privacy Policy
+      </Link>
+
 
       <div className="text-muted-foreground mt-2 mb-1 px-3 text-[10px] font-semibold tracking-wider uppercase">
         Recent

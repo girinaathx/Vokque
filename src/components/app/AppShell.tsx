@@ -16,12 +16,14 @@ import {
   LogOut,
   Menu,
   X,
-  Sparkles,
+  Home,
   Brain,
   Settings as SettingsIcon,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
 
 export function AppShell({
   children,
@@ -85,12 +87,12 @@ export function AppShell({
         />
       </aside>
 
-      {/* Mobile top bar — floating Liquid Glass */}
+      {/* Mobile top bar — dark matte liquid glass (no shine) */}
       <header className="fixed top-2.5 right-3 left-3 z-40 lg:hidden">
-        <div className="glass-dock liquid-shine liquid-shine-after flex items-center justify-between rounded-full px-2 py-2">
+        <div className="glass-dock flex items-center justify-between rounded-full px-2 py-2">
           <button
             onClick={() => setMobileOpen(true)}
-            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:shadow-md"
+            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90"
             aria-label="Menu"
           >
             <Menu className="h-5 w-5" />
@@ -104,7 +106,7 @@ export function AppShell({
           <button
             onClick={() => createMut.mutate()}
             disabled={createMut.isPending}
-            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:shadow-md disabled:opacity-50"
+            className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
             aria-label="New chat"
           >
             <Plus className="h-5 w-5" />
@@ -112,18 +114,18 @@ export function AppShell({
         </div>
       </header>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — single floating panel, no nested frame */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="animate-fade-in-soft absolute inset-0 bg-black/30 backdrop-blur-sm"
+            className="animate-fade-in-soft absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="animate-glass-pop absolute top-3 bottom-3 left-3 w-[min(80vw,300px)]">
-            <div className="glass-strong relative h-full overflow-hidden rounded-3xl p-4">
+          <div className="animate-glass-pop absolute top-3 bottom-3 left-3 w-[min(82vw,300px)]">
+            <div className="relative h-full">
               <button
                 onClick={() => setMobileOpen(false)}
-                className="hover:bg-black/5 absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full"
+                className="hover:bg-foreground/10 absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -141,6 +143,7 @@ export function AppShell({
           </div>
         </div>
       )}
+
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col pt-16 lg:pt-0">
@@ -200,19 +203,19 @@ function Sidebar({
         to="/dashboard"
         onClick={closeMobile}
         className={cn(
-          "mb-1 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
+          "mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition",
           !activeThreadId
-            ? "bg-black/6 font-medium"
-            : "hover:bg-black/5 text-muted-foreground",
+            ? "bg-foreground/8 font-medium"
+            : "text-muted-foreground hover:bg-foreground/5",
         )}
       >
-        <Sparkles className="h-4 w-4" />
+        <Home className="h-4 w-4" />
         Home
       </Link>
       <Link
         to="/memory"
         onClick={closeMobile}
-        className="text-muted-foreground hover:bg-black/5 mb-1 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
+        className="text-muted-foreground hover:bg-foreground/5 mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <Brain className="h-4 w-4" />
         Memory
@@ -220,11 +223,20 @@ function Sidebar({
       <Link
         to="/settings"
         onClick={closeMobile}
-        className="text-muted-foreground hover:bg-black/5 mb-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
+        className="text-muted-foreground hover:bg-foreground/5 mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <SettingsIcon className="h-4 w-4" />
         Settings
       </Link>
+      <Link
+        to="/privacy"
+        onClick={closeMobile}
+        className="text-muted-foreground hover:bg-foreground/5 mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+      >
+        <ShieldCheck className="h-4 w-4" />
+        Privacy Policy
+      </Link>
+
 
       <div className="text-muted-foreground mt-2 mb-1 px-3 text-[10px] font-semibold tracking-wider uppercase">
         Recent
@@ -243,10 +255,10 @@ function Sidebar({
                 params={{ threadId: t.id }}
                 onClick={closeMobile}
                 className={cn(
-                  "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
+                  "flex items-center gap-2.5 rounded-2xl px-3 py-2 text-sm transition",
                   activeThreadId === t.id
-                    ? "bg-black/6 font-medium"
-                    : "hover:bg-black/4",
+                    ? "bg-foreground/8 font-medium"
+                    : "hover:bg-foreground/5",
                 )}
               >
                 <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-60" />
@@ -258,7 +270,7 @@ function Sidebar({
                   e.stopPropagation();
                   if (confirm("Delete this conversation?")) onDelete(t.id);
                 }}
-                className="hover:bg-black/8 absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg opacity-0 transition group-hover:opacity-100"
+                className="hover:bg-foreground/10 absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg opacity-0 transition group-hover:opacity-100"
                 aria-label="Delete"
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -270,7 +282,7 @@ function Sidebar({
 
       <button
         onClick={onSignOut}
-        className="text-muted-foreground hover:bg-black/5 hover:text-foreground mt-3 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition"
+        className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground mt-3 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <LogOut className="h-4 w-4" />
         Sign out
@@ -278,3 +290,4 @@ function Sidebar({
     </div>
   );
 }
+

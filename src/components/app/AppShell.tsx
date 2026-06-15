@@ -16,12 +16,14 @@ import {
   LogOut,
   Menu,
   X,
-  Sparkles,
+  Home,
   Brain,
   Settings as SettingsIcon,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
 
 export function AppShell({
   children,

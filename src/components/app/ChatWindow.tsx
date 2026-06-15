@@ -462,10 +462,7 @@ export function ChatWindow({
 
           <form
             onSubmit={handleSubmit}
-            className={cn(
-              "glass-dock liquid-shine liquid-shine-after flex items-end gap-1 rounded-full p-1.5 transition-all duration-300",
-              "focus-within:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25),0_0_0_3px_rgba(255,255,255,0.6)_inset]",
-            )}
+            className="glass-matte flex items-end gap-1 rounded-full p-1.5 transition-colors duration-200"
           >
             <input
               ref={fileInputRef}

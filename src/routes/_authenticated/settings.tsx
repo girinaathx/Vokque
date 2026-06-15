@@ -25,6 +25,8 @@ import {
   Monitor,
   LogOut,
   ChevronRight,
+  Bell,
+  Lock,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -51,6 +53,8 @@ type SectionId =
   | "security"
   | "storage"
   | "account"
+  | "notifications"
+  | "privacy"
   | "billing"
   | "help"
   | "about";
@@ -62,14 +66,17 @@ const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
   { id: "voice", label: "Voice", icon: Mic },
   { id: "memory", label: "Memory", icon: Brain },
   { id: "chats", label: "Chats", icon: MessageSquare },
+  { id: "notifications", label: "Notifications", icon: Bell },
   { id: "data", label: "Data Controls", icon: Database },
-  { id: "security", label: "Security", icon: ShieldCheck },
+  { id: "security", label: "Security", icon: Lock },
   { id: "storage", label: "Storage", icon: HardDrive },
   { id: "account", label: "Account", icon: User },
+  { id: "privacy", label: "Privacy Policy", icon: ShieldCheck },
   { id: "billing", label: "Billing", icon: CreditCard },
   { id: "help", label: "Help & Support", icon: LifeBuoy },
   { id: "about", label: "About", icon: Info },
 ];
+
 
 function SettingsPage() {
   const [active, setActive] = useState<SectionId>("appearance");

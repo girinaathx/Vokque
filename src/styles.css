@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   OPEN INTELLIGENCE — iOS 26 Liquid Glass (Light Edition)
+   FEYNCLOUD — Pure White (light) & AMOLED Dark themes
    ============================================================ */
 
 @theme inline {
@@ -48,71 +48,70 @@
 :root {
   --radius: 1rem;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0 0 0);
-  --primary: oklch(0 0 0);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.965 0 0);
-  --accent-foreground: oklch(0 0 0);
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #000000;
+  --muted: #f5f5f5;
+  --muted-foreground: rgba(0, 0, 0, 0.55);
+  --accent: #f5f5f5;
+  --accent-foreground: #000000;
   --destructive: oklch(0.55 0.22 27);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0 0 0 / 0.08);
-  --input: oklch(0 0 0 / 0.08);
-  --ring: oklch(0 0 0 / 0.3);
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.08);
+  --ring: rgba(0, 0, 0, 0.3);
 
-  --glass: oklch(1 0 0 / 0.62);
-  --glass-strong: oklch(1 0 0 / 0.85);
+  --glass: rgba(255, 255, 255, 1);
+  --glass-strong: rgba(255, 255, 255, 1);
 
-  --shadow-glass-sm: 0 1px 2px rgba(0,0,0,0.04), 0 4px 14px -2px rgba(0,0,0,0.05);
-  --shadow-glass: 0 2px 6px rgba(0,0,0,0.04), 0 14px 40px -10px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04) inset;
-  --shadow-glass-lg: 0 12px 60px -16px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.05), 0 0 0 1px rgba(255,255,255,0.5) inset;
-  --shadow-float: 0 24px 80px -24px rgba(0,0,0,0.22);
+  --shadow-glass-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-glass: 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-glass-lg: 0 12px 40px -16px rgba(0, 0, 0, 0.12);
+  --shadow-float: 0 24px 60px -24px rgba(0, 0, 0, 0.18);
 }
 
 .dark {
-  --background: oklch(0 0 0);
-  --foreground: oklch(1 0 0);
-  --card: oklch(0 0 0);
-  --card-foreground: oklch(1 0 0);
-  --popover: oklch(0.04 0 0);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(1 0 0);
-  --primary-foreground: oklch(0 0 0);
-  --secondary: oklch(0.08 0 0);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.08 0 0);
-  --muted-foreground: oklch(1 0 0 / 0.75);
-  --accent: oklch(0.1 0 0);
-  --accent-foreground: oklch(1 0 0);
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #000000;
+  --card-foreground: #ffffff;
+  --popover: #050505;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #0a0a0a;
+  --secondary-foreground: #ffffff;
+  --muted: #0a0a0a;
+  --muted-foreground: rgba(255, 255, 255, 0.7);
+  --accent: #101010;
+  --accent-foreground: #ffffff;
   --destructive: oklch(0.62 0.22 27);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(1 0 0 / 0.08);
-  --input: oklch(1 0 0 / 0.08);
-  --ring: oklch(1 0 0 / 0.3);
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: rgba(255, 255, 255, 0.3);
 
-  --glass: oklch(0 0 0 / 0.65);
-  --glass-strong: oklch(0 0 0 / 0.78);
+  --glass: rgba(0, 0, 0, 0.85);
+  --glass-strong: rgba(0, 0, 0, 0.92);
 
-  --shadow-glass-sm: 0 1px 2px rgba(0,0,0,0.6), 0 4px 14px -2px rgba(0,0,0,0.6);
-  --shadow-glass: 0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06) inset;
-  --shadow-glass-lg: 0 12px 48px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08) inset;
-  --shadow-float: 0 24px 80px -24px rgba(0,0,0,0.9);
+  --shadow-glass-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-glass-lg: 0 12px 48px -12px rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 24px 80px -24px rgba(0, 0, 0, 0.9);
 }
 
-
-/* ------------------------------------------------------------
-   Ambient aurora wash behind every page (very subtle)
-   ------------------------------------------------------------ */
 @layer base {
-  html, body { height: 100%; }
+  html,
+  body {
+    height: 100%;
+  }
   body {
     background: var(--color-background);
     color: var(--color-foreground);
@@ -122,200 +121,202 @@
     text-rendering: optimizeLegibility;
     letter-spacing: -0.011em;
   }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(60% 45% at 12% 8%, rgba(173, 216, 230, 0.18), transparent 70%),
-      radial-gradient(55% 50% at 92% 12%, rgba(255, 182, 193, 0.14), transparent 72%),
-      radial-gradient(70% 55% at 50% 110%, rgba(186, 200, 255, 0.18), transparent 70%);
-    filter: saturate(1.05);
+
+  * {
+    border-color: var(--color-border);
   }
-  .dark body { background: #000; }
-  .dark body::before { display: none; }
 
-  * { border-color: var(--color-border); }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+  }
 
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
-
-  ::selection { background: rgba(0,0,0,0.85); color: #fff; }
-  .dark ::selection { background: rgba(255,255,255,0.9); color: #000; }
+  ::selection {
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+  }
+  .dark ::selection {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+  }
 }
 
 /* ------------------------------------------------------------
-   Liquid Glass utilities
+   Matte glass surfaces (no shine, no reflections)
    ------------------------------------------------------------ */
 
 @utility glass {
   background: var(--glass);
-  backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-glass);
 }
-.dark .glass { border-color: rgba(255,255,255,0.08); }
 
 @utility glass-strong {
   background: var(--glass-strong);
-  backdrop-filter: blur(36px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-glass-lg);
 }
-.dark .glass-strong { border-color: rgba(255,255,255,0.1); }
 
 @utility glass-thin {
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border);
 }
-.dark .glass-thin { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.06); }
+.dark .glass-thin {
+  background: rgba(255, 255, 255, 0.05);
+}
 
 @utility glass-dock {
-  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72));
-  backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.9) inset,
-    0 -1px 0 rgba(0,0,0,0.03) inset,
-    0 12px 48px -12px rgba(0,0,0,0.18),
-    0 2px 8px rgba(0,0,0,0.04);
-}
-.dark .glass-dock {
-  background: rgba(0, 0, 0, 0.65);
-  border-color: rgba(255,255,255,0.08);
-  box-shadow:
-    0 8px 32px rgba(0,0,0,0.35),
-    0 0 0 1px rgba(255,255,255,0.04) inset;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-glass);
 }
 
-/* Dark Matte Liquid Glass — no shine, no reflections, no inner highlight.
-   Used for the chat composer in AMOLED mode. */
 @utility glass-matte {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
-}
-.dark .glass-matte {
-  background: rgba(0, 0, 0, 0.85);
-  border-color: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
-}
-
-/* Chat bubbles — driven by --chat-* CSS variables from ChatAppearanceProvider. */
-@utility chat-bubble {
-  border-radius: var(--chat-radius, 20px);
-  padding: var(--chat-padding, 10px 14px);
-  border: var(--chat-border-w, 1px) solid var(--chat-border, rgba(255,255,255,0.08));
-  color: var(--chat-text, #FFFFFF);
-  opacity: var(--chat-opacity, 1);
-  animation: chat-bubble-in var(--chat-anim-dur, 180ms) cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  word-wrap: break-word;
-}
-@utility chat-bubble-user {
-  background: var(--chat-user-bg, #2A2A2A);
-}
-@utility chat-bubble-ai {
-  background: var(--chat-ai-bg, #121212);
-}
-
-@keyframes chat-bubble-in {
-  from { opacity: 0; transform: translateY(var(--chat-anim-translate, 6px)); }
-  to { opacity: var(--chat-opacity, 1); transform: translateY(0); }
-}
-
-
-@utility glass-bubble-user {
-  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.78));
-  backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.9);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,1) inset,
-    0 8px 24px -8px rgba(0,0,0,0.12),
-    0 2px 6px rgba(0,0,0,0.04);
-}
-
-@utility glass-bubble-ai {
-  background: linear-gradient(180deg, rgba(250,250,252,0.7), rgba(245,245,250,0.55));
-  backdrop-filter: blur(30px) saturate(170%);
-  border: 1px solid rgba(0,0,0,0.04);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.8) inset,
-    0 6px 24px -10px rgba(0,0,0,0.08);
-}
-
-@utility liquid-shine {
-  position: relative;
-  overflow: hidden;
-}
-@utility liquid-shine-after {
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
-    transform: translateX(-100%);
-    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-  }
-  &:hover::after { transform: translateX(100%); }
+  background: var(--glass-strong);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-glass);
 }
 
 /* ------------------------------------------------------------
    Animations
    ------------------------------------------------------------ */
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes glass-pop {
-  0% { opacity: 0; transform: scale(0.96) translateY(6px); filter: blur(8px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+  0% {
+    opacity: 0;
+    transform: scale(0.98) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(0.6deg); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.05); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
 }
 @keyframes lightning-strike {
-  0% { opacity: 0; transform: scale(0.6) rotate(-12deg); filter: blur(8px); }
-  50% { opacity: 1; transform: scale(1.06) rotate(0deg); filter: blur(0); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
 }
 
-@utility animate-fade-up { animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-@utility animate-fade-in-soft { animation: fade-in 0.5s ease both; }
-@utility animate-glass-pop { animation: glass-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-@utility animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
-@utility animate-lightning { animation: lightning-strike 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
-@utility animate-pulse-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
+@utility animate-fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@utility animate-fade-in-soft {
+  animation: fade-in 0.4s ease both;
+}
+@utility animate-glass-pop {
+  animation: glass-pop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@utility animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+@utility animate-lightning {
+  animation: lightning-strike 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@utility animate-pulse-glow {
+  animation: pulse-glow 2.4s ease-in-out infinite;
+}
 
 @utility shimmer-text {
-  background: linear-gradient(90deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0.25) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.25) 0%,
+    rgba(0, 0, 0, 0.85) 50%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   animation: shimmer 2s linear infinite;
 }
+.dark .shimmer-text {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.25) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
 
-/* Custom scrollbar — almost invisible */
+/* Scrollbar — almost invisible */
 @layer base {
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.22); }
-  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.22);
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }

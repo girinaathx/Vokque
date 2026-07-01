@@ -6,11 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Open Intelligence" },
+      { title: "FeynCloud" },
       {
         name: "description",
         content:
-          "Your everyday AI companion — premium Liquid Glass design, built for travel, fitness, productivity, and life.",
+          "FeynCloud — a premium AI assistant by FeynCloud Technology.",
       },
     ],
   }),
@@ -25,17 +25,12 @@ function SplashIndex() {
     let cancelled = false;
     const run = async () => {
       const { data } = await supabase.auth.getSession();
-      // Hold splash for a beat for the animation to play
-      await new Promise((r) => setTimeout(r, 1400));
+      await new Promise((r) => setTimeout(r, 1200));
       if (cancelled) return;
       setPhase("leaving");
-      await new Promise((r) => setTimeout(r, 420));
+      await new Promise((r) => setTimeout(r, 380));
       if (cancelled) return;
-      if (data.session) {
-        navigate({ to: "/dashboard" });
-      } else {
-        navigate({ to: "/auth" });
-      }
+      navigate({ to: data.session ? "/dashboard" : "/auth" });
     };
     run();
     return () => {
@@ -56,16 +51,16 @@ function SplashIndex() {
           <Logo size={108} glow />
         </div>
         <h1 className="animate-fade-up mt-8 text-3xl font-semibold tracking-tight [animation-delay:200ms]">
-          Open Intelligence
+          FeynCloud
         </h1>
-        <p className="animate-fade-up mt-2 text-sm text-muted-foreground [animation-delay:380ms]">
-          Your everyday AI companion
+        <p className="animate-fade-up text-muted-foreground mt-2 text-sm [animation-delay:380ms]">
+          Your everyday AI
         </p>
         <div className="animate-fade-up mt-10 flex gap-1 [animation-delay:600ms]">
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="h-1.5 w-1.5 rounded-full bg-black/30"
+              className="bg-foreground/30 h-1.5 w-1.5 rounded-full"
               style={{
                 animation: `pulse-glow 1.2s ${i * 0.18}s ease-in-out infinite`,
               }}

@@ -21,11 +21,11 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/memory")({
   head: () => ({
     meta: [
-      { title: "Memory · Open Intelligence" },
+      { title: "Memory · FeynCloud" },
       {
         name: "description",
         content:
-          "Review, edit, export, and delete everything Open Intelligence remembers about you.",
+          "Review, edit, export, and delete everything FeynCloud remembers about you.",
       },
     ],
   }),
@@ -139,7 +139,7 @@ function MemoryPage() {
                 Memory
               </h1>
               <p className="text-muted-foreground text-sm">
-                Everything Open Intelligence remembers about you. Yours to edit,
+                Everything FeynCloud remembers about you. Yours to edit,
                 export, or delete — anytime.
               </p>
             </div>
@@ -224,7 +224,7 @@ function MemoryPage() {
           {filtered.length === 0 && (
             <div className="glass text-muted-foreground rounded-3xl p-8 text-center text-sm">
               {memories.length === 0
-                ? "No memories yet. Chat with Open Intelligence — it will start remembering. You can also add memories manually above."
+                ? "No memories yet. Chat with FeynCloud — it will start remembering. You can also add memories manually above."
                 : "No memories match your filter."}
             </div>
           )}

@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { I18nextProvider } from "react-i18next";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -16,8 +17,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/lib/theme";
 import { ChatAppearanceProvider } from "@/lib/chat-appearance";
+import i18n from "@/lib/i18n";
 
-const themeBootScript = `(function(){try{var t=localStorage.getItem('oi:theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
+const themeBootScript = `(function(){try{var t=localStorage.getItem('oi:theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('feyncloud:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
 
 function NotFoundComponent() {
   return (
@@ -85,21 +87,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
         },
-        { title: "Open Intelligence — Your Everyday AI Companion" },
+        { title: "FeynCloud — Your Everyday AI" },
         {
           name: "description",
           content:
-            "Open Intelligence is a premium AI companion for travel, fitness, productivity, and everyday life — built on the iOS 26 Liquid Glass design language.",
+            "FeynCloud is a premium AI assistant for study, work, and everyday life — built by FeynCloud Technology.",
         },
-        { name: "theme-color", content: "#ffffff" },
+        { name: "theme-color", content: "#000000" },
         {
           property: "og:title",
-          content: "Open Intelligence — Your Everyday AI Companion",
+          content: "FeynCloud — Your Everyday AI",
         },
         {
           property: "og:description",
           content:
-            "A premium Liquid Glass AI companion for travel, fitness, productivity, and life.",
+            "A premium AI assistant for study, work, and everyday life.",
         },
         { property: "og:type", content: "website" },
         { property: "og:image", content: logoUrl },
@@ -108,7 +110,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       ],
       links: [
         { rel: "stylesheet", href: appCss },
-        { rel: "icon", type: "image/png", href: logoUrl },
+        { rel: "icon", type: "image/jpeg", href: logoUrl },
         { rel: "apple-touch-icon", href: logoUrl },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         {
@@ -163,13 +165,15 @@ function RootComponent() {
   }, [queryClient, router]);
 
   return (
-    <ThemeProvider>
-      <ChatAppearanceProvider>
-        <QueryClientProvider client={queryClient}>
-          <Outlet />
-          <Toaster position="top-center" />
-        </QueryClientProvider>
-      </ChatAppearanceProvider>
-    </ThemeProvider>
+    <I18nextProvider i18n={i18n}>
+      <ThemeProvider>
+        <ChatAppearanceProvider>
+          <QueryClientProvider client={queryClient}>
+            <Outlet />
+            <Toaster position="top-center" />
+          </QueryClientProvider>
+        </ChatAppearanceProvider>
+      </ThemeProvider>
+    </I18nextProvider>
   );
 }

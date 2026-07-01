@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 import { AppShell } from "@/components/app/AppShell";
 import { ChatAppearanceSection } from "@/components/settings/ChatAppearanceSection";
 import { useTheme, type ThemePref } from "@/lib/theme";
@@ -33,7 +35,7 @@ import {
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Settings · Open Intelligence" },
+      { title: "Settings · FeynCloud" },
       {
         name: "description",
         content: "Manage appearance, memory, chats, account, and more.",
@@ -50,6 +52,7 @@ type SectionId =
   | "voice"
   | "memory"
   | "chats"
+  | "language"
   | "data"
   | "security"
   | "storage"
@@ -62,6 +65,7 @@ type SectionId =
 
 const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
   { id: "appearance", label: "Appearance", icon: Palette },
+  { id: "language", label: "Language", icon: SettingsIcon },
   { id: "general", label: "General", icon: SettingsIcon },
   { id: "personalization", label: "Personalization", icon: User },
   { id: "voice", label: "Voice", icon: Mic },
@@ -94,7 +98,7 @@ function SettingsPage() {
               Settings
             </h1>
             <p className="text-muted-foreground text-sm">
-              Everything Open Intelligence can do — in one place.
+              Everything FeynCloud can do — in one place.
             </p>
           </div>
         </div>
@@ -127,17 +131,18 @@ function SettingsPage() {
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
             {active === "appearance" && <AppearanceSection />}
+            {active === "language" && <LanguageSection />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
             {active === "chats" && <ChatsSection />}
             {active === "voice" && <VoiceSection />}
             {active === "account" && <AccountSection />}
             {active === "general" && <ChatAppearanceSection />}
             {active === "personalization" && <PlaceholderSection title="Personalization" description="Tone, persona, and response style — coming soon." />}
-            {active === "data" && <PlaceholderSection title="Data Controls" description="Manage how Open Intelligence handles your data, exports, and deletions." />}
+            {active === "data" && <PlaceholderSection title="Data Controls" description="Manage how FeynCloud handles your data, exports, and deletions." />}
             {active === "security" && <PlaceholderSection title="Security" description="Sessions, 2-factor authentication, and connected devices — coming soon." />}
             {active === "storage" && <PlaceholderSection title="Storage" description="Local cache, attachments, and usage stats — coming soon." />}
             {active === "notifications" && <PlaceholderSection title="Notifications" description="Push, email, and in-app notification preferences — coming soon." />}
-            {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how Open Intelligence handles your data, chats, and account." />}
+            {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how FeynCloud handles your data, chats, and account." />}
             {active === "billing" && <PlaceholderSection title="Billing" description="Plan, invoices, and payment methods — coming soon." />}
             {active === "help" && <PlaceholderSection title="Help & Support" description="Reach out anytime at support@o1platforms.com." />}
             {active === "about" && <AboutSection />}
@@ -165,13 +170,13 @@ function SectionTitle({ title, sub }: { title: string; sub?: string }) {
 function AppearanceSection() {
   const { theme, setTheme } = useTheme();
   const options: Array<{ id: ThemePref; label: string; desc: string; icon: typeof Sun }> = [
-    { id: "light", label: "Light", desc: "White background, black ink", icon: Sun },
-    { id: "dark", label: "Dark", desc: "Black background, white ink", icon: Moon },
     { id: "system", label: "System", desc: "Follow your device", icon: Monitor },
+    { id: "dark", label: "AMOLED Dark", desc: "Pure black, matte, no reflections", icon: Moon },
+    { id: "light", label: "Pure White", desc: "Pure white, black ink, no tint", icon: Sun },
   ];
   return (
     <Card>
-      <SectionTitle title="Appearance" sub="Choose how Open Intelligence looks." />
+      <SectionTitle title="Appearance" sub="Choose how FeynCloud looks." />
       <div className="grid gap-2 sm:grid-cols-3">
         {options.map((o) => {
           const Icon = o.icon;
@@ -204,6 +209,30 @@ function AppearanceSection() {
     </Card>
   );
 }
+
+function LanguageSection() {
+  const { i18n } = useTranslation();
+  return (
+    <Card>
+      <SectionTitle title="Language" sub="Choose your preferred language. Changes apply instantly." />
+      <select
+        value={i18n.language?.slice(0, 2) || "en"}
+        onChange={(e) => i18n.changeLanguage(e.target.value)}
+        className="glass w-full rounded-2xl px-4 py-3 text-sm outline-none"
+      >
+        {SUPPORTED_LANGUAGES.map((l) => (
+          <option key={l.code} value={l.code}>
+            {l.native} — {l.name}
+          </option>
+        ))}
+      </select>
+      <p className="text-muted-foreground mt-3 text-xs">
+        English is fully translated. Other languages will progressively fill in and safely fall back to English until then.
+      </p>
+    </Card>
+  );
+}
+
 
 function LinkSection({
   to,
@@ -326,18 +355,12 @@ function PlaceholderSection({
 function AboutSection() {
   return (
     <Card>
-      <SectionTitle title="About Open Intelligence" />
+      <SectionTitle title="About FeynCloud" />
       <div className="space-y-3 text-sm">
-        <p>
-          Open Intelligence was created and developed by the CEO of O1 Platforms,
-          Mokalla Girinaath.
-        </p>
-        <p className="text-muted-foreground">
-          A privacy-first AI operating system that remembers, collaborates, and helps
-          you achieve real outcomes.
-        </p>
+        <p>FeynCloud is created by FeynCloud Technology.</p>
         <p className="text-muted-foreground text-xs">Version 1.0</p>
       </div>
     </Card>
   );
 }
+

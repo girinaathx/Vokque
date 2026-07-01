@@ -20,7 +20,7 @@ import type { LucideIcon } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Home · Open Intelligence" },
+      { title: "Home · FeynCloud" },
       {
         name: "description",
         content:

@@ -1,0 +1,111 @@
+{
+  "brand": {
+    "name": "FeynCloud",
+    "tagline": "Your everyday AI"
+  },
+  "nav": {
+    "home": "Home",
+    "memory": "Memory",
+    "settings": "Settings",
+    "privacy": "Privacy Policy",
+    "newChat": "New conversation",
+    "recent": "Recent",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create your account",
+    "signInSubtitle": "Sign in to your AI companion",
+    "signUpSubtitle": "Start your journey with FeynCloud",
+    "email": "you@example.com",
+    "password": "••••••••",
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "newHere": "New here?",
+    "haveAccount": "Already have an account?",
+    "forgot": "Forgot password?",
+    "back": "← Back",
+    "welcomeToast": "Welcome to FeynCloud",
+    "welcomeBackToast": "Welcome back"
+  },
+  "chat": {
+    "placeholder": "Message FeynCloud…",
+    "thinking": "Thinking…",
+    "disclaimer": "FeynCloud can make mistakes. Verify important info.",
+    "emptyTitle": "What's on your mind?",
+    "emptySubtitle": "I'm here to help — ask me anything.",
+    "starters": {
+      "greet": "Hey! 👋 How has your day been so far?",
+      "study": "Help me plan a focused study session",
+      "workout": "Suggest a 30-min workout I can do at home",
+      "trip": "Plan a weekend trip somewhere unexpected"
+    },
+    "copy": "Copy",
+    "copied": "Copied",
+    "remember": "Remember",
+    "remembered": "Remembered",
+    "regenerate": "Regenerate",
+    "edit": "Edit",
+    "attach": "Attach file",
+    "attachImage": "Attach image",
+    "voice": "Voice input",
+    "voiceStop": "Stop listening",
+    "send": "Send",
+    "stop": "Stop"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Everything FeynCloud can do — in one place.",
+    "sections": {
+      "account": "Account",
+      "general": "General",
+      "appearance": "Appearance",
+      "language": "Language",
+      "notifications": "Notifications",
+      "voice": "Voice",
+      "memory": "Memory",
+      "chats": "Chats",
+      "privacy": "Privacy",
+      "security": "Security",
+      "data": "Data Controls",
+      "storage": "Storage",
+      "personalization": "Personalization",
+      "billing": "Billing",
+      "help": "Help & Support",
+      "about": "About"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "Choose how FeynCloud looks.",
+      "system": "System",
+      "systemDesc": "Follow your device",
+      "dark": "AMOLED Dark",
+      "darkDesc": "Pure black, matte, no reflections",
+      "light": "Pure White",
+      "lightDesc": "Pure white, black ink, no tint",
+      "active": "Active"
+    },
+    "language": {
+      "title": "Language",
+      "subtitle": "Choose your preferred language. Changes apply instantly."
+    },
+    "account": {
+      "signOut": "Sign out of this device",
+      "signOutAll": "Sign out everywhere",
+      "deleteNote": "To delete your account, contact support@feyncloud.tech.",
+      "changePassword": "Change password",
+      "sent": "Password reset email sent"
+    },
+    "about": {
+      "title": "About FeynCloud",
+      "body": "FeynCloud is created by FeynCloud Technology.",
+      "version": "Version 1.0"
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "notFound": "This page drifted somewhere else.",
+    "goHome": "Go home",
+    "retry": "Retry"
+  }
+}

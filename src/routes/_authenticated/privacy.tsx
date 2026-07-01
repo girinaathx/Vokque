@@ -5,11 +5,11 @@ import { ShieldCheck } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy · Open Intelligence" },
+      { title: "Privacy Policy · FeynCloud" },
       {
         name: "description",
         content:
-          "How Open Intelligence collects, uses, stores, and protects your information.",
+          "How FeynCloud collects, uses, stores, and protects your information.",
       },
     ],
   }),
@@ -18,10 +18,10 @@ export const Route = createFileRoute("/_authenticated/privacy")({
 
 const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
-    title: "1. About Open Intelligence",
+    title: "1. About FeynCloud",
     body: [
-      "Open Intelligence is an AI-powered educational assistant designed to help students and users learn, create, research, and solve problems safely and responsibly.",
-      "Open Intelligence is intended for users aged 13 years and older.",
+      "FeynCloud is an AI-powered educational assistant designed to help students and users learn, create, research, and solve problems safely and responsibly.",
+      "FeynCloud is intended for users aged 13 years and older.",
     ],
   },
   {
@@ -49,7 +49,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "4. Chat Privacy",
     body: [
-      "Open Intelligence is designed with privacy in mind.",
+      "FeynCloud is designed with privacy in mind.",
       "• User chats are not publicly visible.",
       "• We do not sell chat data to advertisers.",
       "• Conversations are protected using industry-standard security measures.",
@@ -59,7 +59,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "5. Student Safety",
     body: [
-      "Open Intelligence is committed to maintaining a safe environment for students. The platform does not promote, encourage, or exploit:",
+      "FeynCloud is committed to maintaining a safe environment for students. The platform does not promote, encourage, or exploit:",
       "• Violence",
       "• Self-harm",
       "• Illegal activities",
@@ -73,7 +73,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "6. Age Requirement",
     body: [
-      "Users must be at least 13 years old to use Open Intelligence.",
+      "Users must be at least 13 years old to use FeynCloud.",
       "Users under the applicable minimum age in their region may not create an account without appropriate permissions where required by law.",
     ],
   },
@@ -87,7 +87,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "8. Data Sharing",
     body: [
-      "Open Intelligence does not sell personal information. Information may be shared only when:",
+      "FeynCloud does not sell personal information. Information may be shared only when:",
       "• Required by law or legal process",
       "• Necessary to protect users or platform security",
       "• Required to operate trusted service providers supporting the platform",
@@ -115,7 +115,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "11. Compliance",
     body: [
-      "Open Intelligence follows applicable laws, regulations, and government requirements in jurisdictions where the service is provided.",
+      "FeynCloud follows applicable laws, regulations, and government requirements in jurisdictions where the service is provided.",
       "We cooperate with lawful requests from authorized government authorities when legally required.",
     ],
   },
@@ -129,7 +129,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
     title: "13. Contact",
     body: [
       "For privacy-related questions, concerns, or requests, please contact:",
-      "Open Intelligence Support",
+      "FeynCloud Support",
       "support: openiplatforms@gmail",
     ],
   },
@@ -153,8 +153,8 @@ function PrivacyPage() {
 
         <div className="glass-strong animate-fade-up rounded-3xl p-6 sm:p-8 [animation-delay:80ms]">
           <p className="text-sm leading-relaxed">
-            Welcome to Open Intelligence. Your privacy and trust are important to us.
-            This Privacy Policy explains how Open Intelligence collects, uses, stores,
+            Welcome to FeynCloud. Your privacy and trust are important to us.
+            This Privacy Policy explains how FeynCloud collects, uses, stores,
             and protects your information.
           </p>
 
@@ -174,7 +174,7 @@ function PrivacyPage() {
           </div>
 
           <p className="text-muted-foreground mt-8 border-t border-foreground/10 pt-6 text-xs">
-            By using Open Intelligence, you acknowledge that you have read and
+            By using FeynCloud, you acknowledge that you have read and
             understood this Privacy Policy.
           </p>
         </div>

@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -36,6 +37,7 @@ export function AppShell({
   const navigate = useNavigate();
   const router = useRouter();
   const qc = useQueryClient();
+  const { t } = useTranslation();
 
   const listFn = useServerFn(listThreads);
   const createFn = useServerFn(createThread);
@@ -69,7 +71,7 @@ export function AppShell({
     await supabase.auth.signOut();
     router.invalidate();
     navigate({ to: "/auth", replace: true });
-    toast.success("Signed out");
+    toast.success(t("nav.signOut"));
   };
 
   return (
@@ -84,6 +86,7 @@ export function AppShell({
           onSignOut={handleSignOut}
           creating={createMut.isPending}
           closeMobile={() => setMobileOpen(false)}
+          t={t}
         />
       </aside>
 
@@ -100,14 +103,14 @@ export function AppShell({
           <Link to="/dashboard" className="flex items-center gap-2">
             <Logo size={22} />
             <span className="text-sm font-semibold tracking-tight">
-              Open Intelligence
+              {t("brand.name")}
             </span>
           </Link>
           <button
             onClick={() => createMut.mutate()}
             disabled={createMut.isPending}
             className="glass flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
-            aria-label="New chat"
+            aria-label={t("nav.newChat")}
           >
             <Plus className="h-5 w-5" />
           </button>
@@ -138,6 +141,7 @@ export function AppShell({
                 onSignOut={handleSignOut}
                 creating={createMut.isPending}
                 closeMobile={() => setMobileOpen(false)}
+                t={t}
               />
             </div>
           </div>
@@ -163,6 +167,7 @@ function Sidebar({
   onSignOut,
   creating,
   closeMobile,
+  t,
 }: {
   threads: Thread[];
   activeThreadId?: string;
@@ -171,6 +176,7 @@ function Sidebar({
   onSignOut: () => void;
   creating: boolean;
   closeMobile: () => void;
+  t: (k: string) => string;
 }) {
   return (
     <div className="glass-strong flex h-full flex-col rounded-3xl p-4">
@@ -182,10 +188,10 @@ function Sidebar({
         <Logo size={28} />
         <div className="leading-tight">
           <div className="text-sm font-semibold tracking-tight">
-            Open Intelligence
+            {t("brand.name")}
           </div>
           <div className="text-muted-foreground text-[10px]">
-            Your everyday AI
+            {t("brand.tagline")}
           </div>
         </div>
       </Link>
@@ -196,7 +202,7 @@ function Sidebar({
         className="glass mb-3 flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition hover:-translate-y-px hover:shadow-md active:translate-y-0 disabled:opacity-50"
       >
         <Plus className="h-4 w-4" />
-        New conversation
+        {t("nav.newChat")}
       </button>
 
       <Link
@@ -210,7 +216,7 @@ function Sidebar({
         )}
       >
         <Home className="h-4 w-4" />
-        Home
+        {t("nav.home")}
       </Link>
       <Link
         to="/memory"
@@ -218,7 +224,7 @@ function Sidebar({
         className="text-muted-foreground hover:bg-foreground/5 mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <Brain className="h-4 w-4" />
-        Memory
+        {t("nav.memory")}
       </Link>
       <Link
         to="/settings"
@@ -226,7 +232,7 @@ function Sidebar({
         className="text-muted-foreground hover:bg-foreground/5 mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <SettingsIcon className="h-4 w-4" />
-        Settings
+        {t("nav.settings")}
       </Link>
       <Link
         to="/privacy"
@@ -234,41 +240,40 @@ function Sidebar({
         className="text-muted-foreground hover:bg-foreground/5 mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <ShieldCheck className="h-4 w-4" />
-        Privacy Policy
+        {t("nav.privacy")}
       </Link>
 
-
       <div className="text-muted-foreground mt-2 mb-1 px-3 text-[10px] font-semibold tracking-wider uppercase">
-        Recent
+        {t("nav.recent")}
       </div>
       <nav className="-mr-2 flex-1 overflow-y-auto pr-1">
         {threads.length === 0 && (
           <div className="text-muted-foreground px-3 py-6 text-center text-xs">
-            No conversations yet
+            —
           </div>
         )}
         <ul className="space-y-0.5">
-          {threads.map((t) => (
-            <li key={t.id} className="group relative">
+          {threads.map((thr) => (
+            <li key={thr.id} className="group relative">
               <Link
                 to="/chat/$threadId"
-                params={{ threadId: t.id }}
+                params={{ threadId: thr.id }}
                 onClick={closeMobile}
                 className={cn(
                   "flex items-center gap-2.5 rounded-2xl px-3 py-2 text-sm transition",
-                  activeThreadId === t.id
+                  activeThreadId === thr.id
                     ? "bg-foreground/8 font-medium"
                     : "hover:bg-foreground/5",
                 )}
               >
                 <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                <span className="truncate">{t.title}</span>
+                <span className="truncate">{thr.title}</span>
               </Link>
               <button
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  if (confirm("Delete this conversation?")) onDelete(t.id);
+                  if (confirm("Delete this conversation?")) onDelete(thr.id);
                 }}
                 className="hover:bg-foreground/10 absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg opacity-0 transition group-hover:opacity-100"
                 aria-label="Delete"
@@ -285,7 +290,7 @@ function Sidebar({
         className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground mt-3 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
       >
         <LogOut className="h-4 w-4" />
-        Sign out
+        {t("nav.signOut")}
       </button>
     </div>
   );

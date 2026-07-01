@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/open-intelligence-logo.png.asset.json";
+import logoAsset from "@/assets/feyncloud-logo.jpg.asset.json";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -18,17 +18,18 @@ export function Logo({ className, size = 40, glow = false }: LogoProps) {
           className="absolute inset-0 animate-pulse-glow rounded-full blur-2xl"
           style={{
             background:
-              "radial-gradient(circle, rgba(120,180,255,0.55), rgba(255,180,200,0.35) 60%, transparent 75%)",
+              "radial-gradient(circle, rgba(255,255,255,0.35), rgba(255,255,255,0.15) 60%, transparent 75%)",
           }}
           aria-hidden
         />
       )}
+      {/* Logo is white "h" on black. In Pure White mode we invert to black on white. */}
       <img
         src={logoAsset.url}
-        alt="Open Intelligence"
+        alt="FeynCloud"
         width={size}
         height={size}
-        className="relative h-full w-full object-contain dark:invert"
+        className="relative h-full w-full rounded-[22%] object-cover invert dark:invert-0"
         draggable={false}
       />
     </div>

@@ -1,15 +1,11 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/Logo";
 import { truncateThreadMessages } from "@/lib/threads.functions";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import {
   ArrowUp,
   Copy,
@@ -20,8 +16,6 @@ import {
   Mic,
   MicOff,
   Paperclip,
-  Quote,
-  ExternalLink,
   Brain,
   ImagePlus,
   X,
@@ -31,47 +25,6 @@ import { createMemory } from "@/lib/memories.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
 
-const AGENT_STYLES: Record<string, string> = {
-  Business: "bg-amber-100 text-amber-900",
-  Coding: "bg-sky-100 text-sky-900",
-  Design: "bg-pink-100 text-pink-900",
-  Research: "bg-emerald-100 text-emerald-900",
-  General: "bg-black/6 text-foreground",
-};
-
-function parseAgents(text: string): { agents: string[]; body: string } {
-  const m = text.match(/^\s*<!--\s*agents:([^>]*?)-->\s*\n?/i);
-  if (!m) return { agents: [], body: text };
-  const agents = m[1]
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return { agents, body: text.slice(m[0].length) };
-}
-
-type CitationSource = { n: number; title: string; url: string; snippet?: string };
-
-function parseSources(text: string): Map<number, CitationSource> {
-  const map = new Map<number, CitationSource>();
-  const idx = text.search(/^\s*##+\s*Sources\s*$/im);
-  if (idx < 0) return map;
-  const section = text.slice(idx);
-  // Match lines like: "1. [Title](url) — snippet" or "1. [Title](url): snippet"
-  const re =
-    /^\s*(\d+)\.\s*\[([^\]]+)\]\(([^)\s]+)\)(?:\s*[—\-:]\s*(.+))?$/gm;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(section)) !== null) {
-    const n = Number(m[1]);
-    map.set(n, {
-      n,
-      title: m[2].trim(),
-      url: m[3].trim(),
-      snippet: m[4]?.trim(),
-    });
-  }
-  return map;
-}
-
 export function ChatWindow({
   threadId,
   initialMessages,
@@ -79,17 +32,7 @@ export function ChatWindow({
   threadId: string;
   initialMessages: UIMessage[];
 }) {
-  const [citeOn, setCiteOn] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("oi:cite") === "1";
-  });
-  const citeRef = useRef(citeOn);
-  useEffect(() => {
-    citeRef.current = citeOn;
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("oi:cite", citeOn ? "1" : "0");
-    }
-  }, [citeOn]);
+  const { t } = useTranslation();
 
   const transport = useMemo(
     () =>
@@ -101,18 +44,7 @@ export function ChatWindow({
           const token = data.session?.access_token;
           const headers = new Headers(init?.headers);
           if (token) headers.set("Authorization", `Bearer ${token}`);
-          // Inject the live citations flag into the JSON body.
-          let body = init?.body;
-          if (typeof body === "string") {
-            try {
-              const parsed = JSON.parse(body);
-              parsed.cite = citeRef.current;
-              body = JSON.stringify(parsed);
-            } catch {
-              /* leave body as-is */
-            }
-          }
-          return fetch(url, { ...init, headers, body });
+          return fetch(url, { ...init, headers });
         },
       }),
     [threadId],
@@ -123,7 +55,7 @@ export function ChatWindow({
       id: threadId,
       messages: initialMessages,
       transport,
-      onError: (e) => toast.error(e.message || "Something went wrong"),
+      onError: (e) => toast.error(e.message || t("errors.generic")),
     });
 
   const [input, setInput] = useState("");
@@ -132,6 +64,7 @@ export function ChatWindow({
   const [attachments, setAttachments] = useState<File[]>([]);
   const [listening, setListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const composerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -139,7 +72,6 @@ export function ChatWindow({
   const recognitionRef = useRef<any>(null);
   const isLoading = status === "submitted" || status === "streaming";
 
-  // Auto-focus + auto-scroll
   useEffect(() => {
     textareaRef.current?.focus();
   }, [threadId]);
@@ -150,7 +82,30 @@ export function ChatWindow({
     });
   }, [messages, status]);
 
-  // Auto-send seed from dashboard quick-action
+  // Auto-grow textarea (ChatGPT-style): 1 line → up to 8 lines, then scroll
+  useLayoutEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    const lineHeight = 22; // px
+    const maxHeight = lineHeight * 8;
+    const next = Math.min(ta.scrollHeight, maxHeight);
+    ta.style.height = `${next}px`;
+    ta.style.overflowY = ta.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, [input]);
+
+  // Keep transcript bottom-padding equal to composer height
+  useLayoutEffect(() => {
+    const el = composerRef.current;
+    if (!el || !scrollRef.current) return;
+    const obs = new ResizeObserver(() => {
+      const h = el.offsetHeight;
+      scrollRef.current?.style.setProperty("padding-bottom", `${h + 32}px`);
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   useEffect(() => {
     const seed = sessionStorage.getItem(`oi:seed:${threadId}`);
     if (seed && messages.length === 0) {
@@ -204,13 +159,17 @@ export function ChatWindow({
     rec.interimResults = true;
     rec.continuous = false;
     let finalText = "";
-    rec.onresult = (e: { results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => {
+    rec.onresult = (e: {
+      results: ArrayLike<
+        ArrayLike<{ transcript: string }> & { isFinal: boolean }
+      >;
+    }) => {
       let interim = "";
       for (let i = 0; i < e.results.length; i++) {
         const r = e.results[i];
-        const t = r[0].transcript;
-        if (r.isFinal) finalText += t;
-        else interim += t;
+        const tx = r[0].transcript;
+        if (r.isFinal) finalText += tx;
+        else interim += tx;
       }
       setInput((finalText + interim).trim());
     };
@@ -220,7 +179,6 @@ export function ChatWindow({
     recognitionRef.current = rec;
     setListening(true);
   };
-
 
   const handleEditSave = async (id: string) => {
     const idx = messages.findIndex((m) => m.id === id);
@@ -233,14 +191,13 @@ export function ChatWindow({
     try {
       await truncateThreadMessages({ data: { threadId, keep: idx } });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to update");
+      toast.error(e instanceof Error ? e.message : t("errors.generic"));
       return;
     }
     sendMessage({ text });
   };
 
   const handleRegenerate = async () => {
-    // Drop the trailing assistant message locally + in DB, then regenerate.
     const last = messages[messages.length - 1];
     if (!last || last.role !== "assistant") return;
     const keep = messages.length - 1;
@@ -248,7 +205,7 @@ export function ChatWindow({
     try {
       await truncateThreadMessages({ data: { threadId, keep } });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to regenerate");
+      toast.error(e instanceof Error ? e.message : t("errors.generic"));
       return;
     }
     regenerate();
@@ -259,21 +216,19 @@ export function ChatWindow({
       {/* Transcript */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 pt-2 pb-44 lg:px-8 lg:pt-6"
+        className="flex-1 overflow-y-auto px-4 pt-2 lg:px-8 lg:pt-6"
+        style={{ paddingBottom: "180px" }}
       >
-        <div className="mx-auto w-full max-w-3xl space-y-5">
+        <div className="mx-auto w-full max-w-3xl space-y-6">
           {messages.length === 0 && (
-            <EmptyState onPick={(t) => sendMessage({ text: t })} />
+            <EmptyState onPick={(tx) => sendMessage({ text: tx })} />
           )}
 
           {messages.map((m, idx) => {
             const isUser = m.role === "user";
-            const rawText = m.parts
+            const text = m.parts
               .map((p) => (p.type === "text" ? p.text : ""))
               .join("");
-            const { agents, body: text } = isUser
-              ? { agents: [] as string[], body: rawText }
-              : parseAgents(rawText);
             const fileParts = m.parts.filter(
               (p) =>
                 p.type === "file" ||
@@ -287,22 +242,6 @@ export function ChatWindow({
                   isUser ? "items-end" : "items-start",
                 )}
               >
-                {!isUser && agents.length > 0 && (
-                  <div className="mb-1.5 flex flex-wrap gap-1">
-                    {agents.map((a) => (
-                      <span
-                        key={a}
-                        className={cn(
-                          "rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
-                          AGENT_STYLES[a] ?? AGENT_STYLES.General,
-                        )}
-                      >
-                        {a} AI
-                      </span>
-                    ))}
-                  </div>
-                )}
-
                 {fileParts.length > 0 && (
                   <div
                     className={cn(
@@ -316,7 +255,7 @@ export function ChatWindow({
                           key={i}
                           src={f.url}
                           alt={f.filename ?? "attachment"}
-                          className="max-h-56 max-w-[260px] rounded-2xl object-cover shadow-sm"
+                          className="max-h-56 max-w-[260px] rounded-2xl object-cover"
                         />
                       ) : (
                         <span
@@ -332,7 +271,7 @@ export function ChatWindow({
                 )}
 
                 {editingId === m.id && isUser ? (
-                  <div className="glass w-full max-w-[88%] rounded-3xl p-3">
+                  <div className="glass w-full max-w-[88%] rounded-2xl p-3">
                     <textarea
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
@@ -343,7 +282,7 @@ export function ChatWindow({
                     <div className="mt-2 flex justify-end gap-2">
                       <button
                         onClick={() => setEditingId(null)}
-                        className="hover:bg-black/5 rounded-full px-3 py-1 text-xs"
+                        className="hover:bg-foreground/5 rounded-full px-3 py-1 text-xs"
                       >
                         Cancel
                       </button>
@@ -351,17 +290,17 @@ export function ChatWindow({
                         onClick={() => handleEditSave(m.id)}
                         className="bg-primary text-primary-foreground rounded-full px-3 py-1 text-xs font-medium"
                       >
-                        Update & resend
+                        Update
                       </button>
                     </div>
                   </div>
                 ) : (
                   <div
                     className={cn(
-                      "min-w-0 text-[15px] leading-relaxed",
+                      "min-w-0 text-[15.5px] leading-relaxed",
                       isUser
-                        ? "chat-bubble chat-bubble-user max-w-[88%] whitespace-pre-wrap"
-                        : "chat-bubble chat-bubble-ai w-full max-w-full",
+                        ? "max-w-[88%] whitespace-pre-wrap text-right"
+                        : "w-full max-w-full text-left",
                     )}
                   >
                     {isUser ? (
@@ -372,12 +311,17 @@ export function ChatWindow({
                     {!isUser &&
                       idx === messages.length - 1 &&
                       status === "streaming" &&
-                      !text && <span className="shimmer-text">Thinking…</span>}
+                      !text && <span className="shimmer-text">{t("chat.thinking")}</span>}
                   </div>
                 )}
 
                 {!editingId && text && (
-                  <div className="mt-1.5 flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
+                  <div
+                    className={cn(
+                      "mt-1.5 flex items-center gap-1 opacity-0 transition group-hover:opacity-100",
+                      isUser ? "justify-end" : "justify-start",
+                    )}
+                  >
                     <CopyBtn text={text} />
                     <RememberBtn text={text} threadId={threadId} />
                     {isUser && (
@@ -386,17 +330,17 @@ export function ChatWindow({
                           setEditingId(m.id);
                           setEditValue(text);
                         }}
-                        className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+                        className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
                       >
-                        <Pencil className="h-3 w-3" /> Edit
+                        <Pencil className="h-3 w-3" /> {t("chat.edit")}
                       </button>
                     )}
                     {!isUser && idx === messages.length - 1 && !isLoading && (
                       <button
                         onClick={handleRegenerate}
-                        className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+                        className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
                       >
-                        <RotateCcw className="h-3 w-3" /> Regenerate
+                        <RotateCcw className="h-3 w-3" /> {t("chat.regenerate")}
                       </button>
                     )}
                   </div>
@@ -407,7 +351,7 @@ export function ChatWindow({
 
           {status === "submitted" && (
             <div className="animate-fade-up">
-              <span className="shimmer-text text-[15px]">Thinking…</span>
+              <span className="shimmer-text text-[15px]">{t("chat.thinking")}</span>
             </div>
           )}
 
@@ -419,27 +363,31 @@ export function ChatWindow({
         </div>
       </div>
 
-      {/* Floating Liquid Glass composer */}
-      <div className="pointer-events-none absolute right-0 bottom-0 left-0 px-3 pb-4 lg:px-8 lg:pb-6">
+      {/* Fixed composer — matte, no reflections */}
+      <div
+        ref={composerRef}
+        className="pointer-events-none fixed right-0 bottom-0 left-0 z-30 px-3 lg:left-72 lg:px-8"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)", paddingTop: "8px" }}
+      >
         <div className="pointer-events-auto mx-auto w-full max-w-3xl">
           {attachments.length > 0 && (
-            <div className="glass mb-2 flex flex-wrap gap-2 rounded-3xl p-2">
+            <div className="glass mb-2 flex flex-wrap gap-2 rounded-2xl p-2">
               {attachments.map((f, i) => {
                 const isImg = f.type.startsWith("image/");
                 const url = isImg ? URL.createObjectURL(f) : null;
                 return (
                   <div
                     key={`${f.name}-${i}`}
-                    className="relative flex items-center gap-2 rounded-2xl bg-white/70 py-1 pr-2 pl-1 text-[12px] shadow-sm"
+                    className="bg-foreground/5 relative flex items-center gap-2 rounded-xl py-1 pr-2 pl-1 text-[12px]"
                   >
                     {url ? (
                       <img
                         src={url}
                         alt={f.name}
-                        className="h-9 w-9 rounded-xl object-cover"
+                        className="h-9 w-9 rounded-lg object-cover"
                       />
                     ) : (
-                      <span className="bg-black/6 flex h-9 w-9 items-center justify-center rounded-xl">
+                      <span className="bg-foreground/5 flex h-9 w-9 items-center justify-center rounded-lg">
                         <Paperclip className="h-4 w-4" />
                       </span>
                     )}
@@ -449,7 +397,7 @@ export function ChatWindow({
                       onClick={() =>
                         setAttachments((p) => p.filter((_, j) => j !== i))
                       }
-                      className="hover:bg-black/10 flex h-5 w-5 items-center justify-center rounded-full"
+                      className="hover:bg-foreground/10 flex h-5 w-5 items-center justify-center rounded-full"
                       aria-label="Remove"
                     >
                       <X className="h-3 w-3" />
@@ -462,7 +410,7 @@ export function ChatWindow({
 
           <form
             onSubmit={handleSubmit}
-            className="glass-matte flex items-end gap-1 rounded-full p-1.5 transition-colors duration-200"
+            className="glass-matte flex items-end gap-1 rounded-3xl px-2 py-2"
           >
             <input
               ref={fileInputRef}
@@ -486,18 +434,18 @@ export function ChatWindow({
                 e.target.value = "";
               }}
             />
-            <GlassIconBtn
-              ariaLabel="Attach file"
+            <IconBtn
+              ariaLabel={t("chat.attach")}
               onClick={() => fileInputRef.current?.click()}
             >
               <Paperclip className="h-[18px] w-[18px]" />
-            </GlassIconBtn>
-            <GlassIconBtn
-              ariaLabel="Attach image"
+            </IconBtn>
+            <IconBtn
+              ariaLabel={t("chat.attachImage")}
               onClick={() => imageInputRef.current?.click()}
             >
               <ImagePlus className="h-[18px] w-[18px]" />
-            </GlassIconBtn>
+            </IconBtn>
 
             <textarea
               ref={textareaRef}
@@ -510,34 +458,19 @@ export function ChatWindow({
                 }
               }}
               rows={1}
-              placeholder="Message Open Intelligence…"
-              className="placeholder:text-muted-foreground/70 max-h-48 min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[15px] outline-none"
+              placeholder={t("chat.placeholder")}
+              className="placeholder:text-muted-foreground/70 flex-1 resize-none bg-transparent px-2 py-2 text-[15px] leading-[22px] outline-none"
+              style={{
+                minHeight: "22px",
+                maxHeight: "176px",
+                overflowX: "hidden",
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+              }}
             />
 
-            <button
-              type="button"
-              onClick={() => {
-                const next = !citeOn;
-                setCiteOn(next);
-                toast.success(
-                  next ? "Citations on — I'll cite sources." : "Citations off",
-                );
-              }}
-              aria-pressed={citeOn}
-              aria-label="Toggle citations"
-              className={cn(
-                "hidden h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition sm:flex",
-                citeOn
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-black/5 hover:text-foreground",
-              )}
-            >
-              <Quote className="h-3.5 w-3.5" />
-              Cite
-            </button>
-
-            <GlassIconBtn
-              ariaLabel={listening ? "Stop listening" : "Voice input"}
+            <IconBtn
+              ariaLabel={listening ? t("chat.voiceStop") : t("chat.voice")}
               onClick={toggleVoice}
               active={listening}
             >
@@ -546,14 +479,14 @@ export function ChatWindow({
               ) : (
                 <Mic className="h-[18px] w-[18px]" />
               )}
-            </GlassIconBtn>
+            </IconBtn>
 
             {isLoading ? (
               <button
                 type="button"
                 onClick={() => stop()}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-md transition active:scale-90"
-                aria-label="Stop"
+                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+                aria-label={t("chat.stop")}
               >
                 <Square className="h-3.5 w-3.5" fill="currentColor" />
               </button>
@@ -561,15 +494,15 @@ export function ChatWindow({
               <button
                 type="submit"
                 disabled={!input.trim() && attachments.length === 0}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-md transition hover:shadow-lg active:scale-90 disabled:opacity-40 disabled:shadow-none"
-                aria-label="Send"
+                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-40"
+                aria-label={t("chat.send")}
               >
                 <ArrowUp className="h-[18px] w-[18px]" />
               </button>
             )}
           </form>
           <p className="text-muted-foreground/60 mt-2 text-center text-[10px]">
-            Open Intelligence can make mistakes. Verify important info.
+            {t("chat.disclaimer")}
           </p>
         </div>
       </div>
@@ -579,6 +512,7 @@ export function ChatWindow({
 
 function RememberBtn({ text, threadId }: { text: string; threadId: string }) {
   const [saved, setSaved] = useState(false);
+  const { t } = useTranslation();
   const saveFn = useServerFn(createMemory);
   return (
     <button
@@ -599,22 +533,22 @@ function RememberBtn({ text, threadId }: { text: string; threadId: string }) {
           toast.error(e instanceof Error ? e.message : "Could not save");
         }
       }}
-      className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+      className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
     >
       {saved ? (
         <>
-          <Check className="h-3 w-3" /> Remembered
+          <Check className="h-3 w-3" /> {t("chat.remembered")}
         </>
       ) : (
         <>
-          <Brain className="h-3 w-3" /> Remember
+          <Brain className="h-3 w-3" /> {t("chat.remember")}
         </>
       )}
     </button>
   );
 }
 
-function GlassIconBtn({
+function IconBtn({
   ariaLabel,
   onClick,
   active,
@@ -633,8 +567,8 @@ function GlassIconBtn({
       className={cn(
         "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90",
         active
-          ? "bg-destructive text-destructive-foreground shadow-md animate-pulse"
-          : "text-muted-foreground hover:bg-white/60 hover:text-foreground hover:shadow-sm",
+          ? "bg-destructive text-destructive-foreground"
+          : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
       )}
     >
       {children}
@@ -644,6 +578,7 @@ function GlassIconBtn({
 
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
   return (
     <button
       onClick={() => {
@@ -651,15 +586,15 @@ function CopyBtn({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="text-muted-foreground hover:bg-black/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+      className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
     >
       {copied ? (
         <>
-          <Check className="h-3 w-3" /> Copied
+          <Check className="h-3 w-3" /> {t("chat.copied")}
         </>
       ) : (
         <>
-          <Copy className="h-3 w-3" /> Copy
+          <Copy className="h-3 w-3" /> {t("chat.copy")}
         </>
       )}
     </button>
@@ -667,115 +602,20 @@ function CopyBtn({ text }: { text: string }) {
 }
 
 function Markdown({ text }: { text: string }) {
-  const sources = useMemo(() => parseSources(text), [text]);
   return (
-    <div className="prose prose-sm prose-neutral max-w-none [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-black/6 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.85em] [&_p]:my-0 [&_p+p]:mt-2 [&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-black/90 [&_pre]:p-3 [&_pre]:text-[12.5px] [&_pre_code]:bg-transparent [&_pre_code]:text-white [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_h2]:mt-4 [&_h2]:mb-1 [&_h2]:text-[13px] [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:tracking-wide [&_h2]:text-muted-foreground">
-      <ReactMarkdown
-        components={{
-          a: ({ href, children }) => {
-            // Detect inline citation marker rendered as [[n]](url) → link text "[n]"
-            const raw =
-              typeof children === "string"
-                ? children
-                : Array.isArray(children)
-                  ? children.join("")
-                  : "";
-            const match = /^\[(\d+)\]$/.exec(raw.trim());
-            if (match && href) {
-              const n = Number(match[1]);
-              const src = sources.get(n) ?? {
-                n,
-                title: href,
-                url: href,
-                snippet: undefined,
-              };
-              return <CitationMarker n={n} source={src} />;
-            }
-            return (
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline-offset-2 hover:underline"
-              >
-                {children}
-              </a>
-            );
-          },
-        }}
-      >
-        {text}
-      </ReactMarkdown>
+    <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-foreground/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.85em] [&_p]:my-0 [&_p+p]:mt-2 [&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-black/90 [&_pre]:p-3 [&_pre]:text-[12.5px] [&_pre_code]:bg-transparent [&_pre_code]:text-white [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_h2]:mt-4 [&_h2]:mb-1 [&_h2]:text-[13px] [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:tracking-wide [&_h2]:text-muted-foreground [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-border [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1">
+      <ReactMarkdown>{text}</ReactMarkdown>
     </div>
   );
 }
 
-function CitationMarker({ n, source }: { n: number; source: CitationSource }) {
-  return (
-    <HoverCard openDelay={80} closeDelay={120}>
-      <HoverCardTrigger asChild>
-        <a
-          href={source.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="glass mx-0.5 inline-flex h-[18px] min-w-[18px] -translate-y-[1px] items-center justify-center rounded-full px-1 align-middle text-[10px] font-semibold text-foreground/80 no-underline transition hover:text-foreground hover:-translate-y-[2px]"
-          aria-label={`Source ${n}: ${source.title}`}
-        >
-          {n}
-        </a>
-      </HoverCardTrigger>
-      <HoverCardContent
-        side="top"
-        align="start"
-        className="glass-strong w-72 rounded-2xl border-black/5 p-3"
-      >
-        <div className="flex items-start justify-between gap-2">
-          <span className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wide">
-            Source {n}
-          </span>
-          <a
-            href={source.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground"
-            aria-label="Open source"
-          >
-            <ExternalLink className="h-3 w-3" />
-          </a>
-        </div>
-        <a
-          href={source.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-1 block text-[13px] font-medium leading-snug text-foreground hover:underline"
-        >
-          {source.title}
-        </a>
-        {source.snippet && (
-          <p className="text-muted-foreground mt-1.5 line-clamp-4 text-[12px] leading-relaxed">
-            {source.snippet}
-          </p>
-        )}
-        <p className="text-muted-foreground/70 mt-2 truncate text-[10.5px]">
-          {(() => {
-            try {
-              return new URL(source.url).hostname.replace(/^www\./, "");
-            } catch {
-              return source.url;
-            }
-          })()}
-        </p>
-      </HoverCardContent>
-    </HoverCard>
-  );
-}
-
 function EmptyState({ onPick }: { onPick: (t: string) => void }) {
+  const { t } = useTranslation();
   const starters = [
-    "Hey! 👋 How has your day been so far?",
-    "Help me plan a focused study session",
-    "Suggest a 30-min workout I can do at home",
-    "Plan a weekend trip somewhere unexpected",
+    t("chat.starters.greet"),
+    t("chat.starters.study"),
+    t("chat.starters.workout"),
+    t("chat.starters.trip"),
   ];
   return (
     <div className="animate-fade-up flex flex-col items-center pt-12 text-center">
@@ -783,17 +623,17 @@ function EmptyState({ onPick }: { onPick: (t: string) => void }) {
         <Logo size={56} glow />
       </div>
       <h2 className="font-display mt-5 text-2xl font-semibold tracking-tight">
-        What's on your mind?
+        {t("chat.emptyTitle")}
       </h2>
       <p className="text-muted-foreground mt-1 text-sm">
-        I'm here to help — ask me anything.
+        {t("chat.emptySubtitle")}
       </p>
       <div className="mt-6 grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-2">
         {starters.map((s) => (
           <button
             key={s}
             onClick={() => onPick(s)}
-            className="glass hover:bg-glass-strong rounded-2xl px-4 py-3 text-left text-sm transition hover:-translate-y-px"
+            className="glass rounded-2xl px-4 py-3 text-left text-sm transition hover:-translate-y-px"
           >
             {s}
           </button>

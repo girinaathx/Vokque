@@ -6,7 +6,7 @@ import { AppShell } from "@/components/app/AppShell";
 import { ChatAppearanceSection } from "@/components/settings/ChatAppearanceSection";
 import { useTheme, type ThemePref } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";

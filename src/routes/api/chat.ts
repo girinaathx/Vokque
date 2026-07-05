@@ -136,11 +136,16 @@ export const Route = createFileRoute("/api/chat")({
           "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
           AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");
 
+        const now = new Date();
+        const dateBlock = `\n\nCURRENT DATE & TIME (authoritative — always use this when the user asks the date, day, month, year, or time; never invent or use a stale date):\n- ISO: ${now.toISOString()}\n- Human (UTC): ${now.toUTCString()}\n- Year: ${now.getUTCFullYear()}`;
+
         const systemPrompt =
           CORE_SYSTEM +
           personaBlock +
+          dateBlock +
           buildMemoryBlock(mems) +
           (body.cite ? CITE_INSTRUCTIONS : "");
+
 
         try {
           const result = streamText({

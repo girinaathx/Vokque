@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/feyncloud-logo.jpg.asset.json";
+import logoUrl from "@/assets/feyncloud-mark.png";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -23,17 +23,18 @@ export function Logo({ className, size = 40, glow = false }: LogoProps) {
           aria-hidden
         />
       )}
-      {/* Logo is white "h" on black. In Pure White mode we invert to black on white. */}
+      {/* White geometric FeynCloud mark on transparent bg. Invert to black in light theme. */}
       <img
-        src={logoAsset.url}
+        src={logoUrl}
         alt="FeynCloud"
         width={size}
         height={size}
-        className="relative h-full w-full rounded-[22%] object-cover invert dark:invert-0"
+        className="relative h-full w-full object-contain invert dark:invert-0"
         draggable={false}
       />
     </div>
   );
 }
 
-export const logoUrl = logoAsset.url;
+export { logoUrl };
+

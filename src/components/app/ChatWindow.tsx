@@ -15,11 +15,11 @@ import {
   Pencil,
   Mic,
   MicOff,
-  Paperclip,
+  Plus,
   Brain,
-  ImagePlus,
   X,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { createMemory } from "@/lib/memories.functions";
 import { useServerFn } from "@tanstack/react-start";
@@ -262,12 +262,13 @@ export function ChatWindow({
                           key={i}
                           className="glass inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px]"
                         >
-                          <Paperclip className="h-3 w-3" />
+                          <Plus className="h-3 w-3" />
                           {f.filename ?? f.mediaType ?? "file"}
                         </span>
                       ),
                     )}
                   </div>
+
                 )}
 
                 {editingId === m.id && isUser ? (
@@ -388,7 +389,7 @@ export function ChatWindow({
                       />
                     ) : (
                       <span className="bg-foreground/5 flex h-9 w-9 items-center justify-center rounded-lg">
-                        <Paperclip className="h-4 w-4" />
+                        <Plus className="h-4 w-4" />
                       </span>
                     )}
                     <span className="max-w-[140px] truncate">{f.name}</span>
@@ -407,6 +408,7 @@ export function ChatWindow({
               })}
             </div>
           )}
+
 
           <form
             onSubmit={handleSubmit}

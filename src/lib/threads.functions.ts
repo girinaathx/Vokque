@@ -14,12 +14,63 @@ export const listThreads = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("threads")
-      .select("id, title, updated_at, created_at")
+      .select("id, title, updated_at, created_at, pinned_at")
+      .order("pinned_at", { ascending: false, nullsFirst: false })
       .order("updated_at", { ascending: false })
-      .limit(100);
+      .limit(200);
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
+export const pinThread = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ id: z.string().uuid(), pinned: z.boolean() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    if (data.pinned) {
+      // enforce max 5 pins per user
+      const { count } = await context.supabase
+        .from("threads")
+        .select("id", { count: "exact", head: true })
+        .not("pinned_at", "is", null);
+      if ((count ?? 0) >= 5) {
+        throw new Error("You can pin up to 5 chats.");
+      }
+    }
+    const { error } = await context.supabase
+      .from("threads")
+      .update({ pinned_at: data.pinned ? new Date().toISOString() : null })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteAllThreads = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { error } = await context.supabase
+      .from("threads")
+      .delete()
+      .eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteThreadsBulk = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("threads")
+      .delete()
+      .in("id", data.ids);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 
 export const createThread = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

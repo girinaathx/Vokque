@@ -15,11 +15,11 @@ import {
   Pencil,
   Mic,
   MicOff,
-  Paperclip,
+  Plus,
   Brain,
-  ImagePlus,
   X,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { createMemory } from "@/lib/memories.functions";
 import { useServerFn } from "@tanstack/react-start";
@@ -67,7 +67,7 @@ export function ChatWindow({
   const composerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
+  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const isLoading = status === "submitted" || status === "streaming";
@@ -262,12 +262,13 @@ export function ChatWindow({
                           key={i}
                           className="glass inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px]"
                         >
-                          <Paperclip className="h-3 w-3" />
+                          <Plus className="h-3 w-3" />
                           {f.filename ?? f.mediaType ?? "file"}
                         </span>
                       ),
                     )}
                   </div>
+
                 )}
 
                 {editingId === m.id && isUser ? (
@@ -388,7 +389,7 @@ export function ChatWindow({
                       />
                     ) : (
                       <span className="bg-foreground/5 flex h-9 w-9 items-center justify-center rounded-lg">
-                        <Paperclip className="h-4 w-4" />
+                        <Plus className="h-4 w-4" />
                       </span>
                     )}
                     <span className="max-w-[140px] truncate">{f.name}</span>
@@ -408,27 +409,17 @@ export function ChatWindow({
             </div>
           )}
 
+
           <form
             onSubmit={handleSubmit}
-            className="glass-matte flex items-end gap-1 rounded-3xl px-2 py-2"
+            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-background/70 px-1.5 py-1.5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
           >
             <input
               ref={fileInputRef}
               type="file"
               hidden
               multiple
-              accept=".pdf,.txt,.md,.csv,.json,.docx,.xlsx,.pptx"
-              onChange={(e) => {
-                addFiles(e.target.files);
-                e.target.value = "";
-              }}
-            />
-            <input
-              ref={imageInputRef}
-              type="file"
-              hidden
-              multiple
-              accept="image/*"
+              accept="image/*,.pdf,.txt,.md,.csv,.json,.docx,.xlsx,.pptx"
               onChange={(e) => {
                 addFiles(e.target.files);
                 e.target.value = "";
@@ -438,19 +429,22 @@ export function ChatWindow({
               ariaLabel={t("chat.attach")}
               onClick={() => fileInputRef.current?.click()}
             >
-              <Paperclip className="h-[18px] w-[18px]" />
-            </IconBtn>
-            <IconBtn
-              ariaLabel={t("chat.attachImage")}
-              onClick={() => imageInputRef.current?.click()}
-            >
-              <ImagePlus className="h-[18px] w-[18px]" />
+              <Plus className="h-[20px] w-[20px]" />
             </IconBtn>
 
             <textarea
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onFocus={() => {
+                // Ensure the latest message stays visible when the keyboard opens.
+                setTimeout(() => {
+                  scrollRef.current?.scrollTo({
+                    top: scrollRef.current.scrollHeight,
+                    behavior: "smooth",
+                  });
+                }, 250);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -459,27 +453,29 @@ export function ChatWindow({
               }}
               rows={1}
               placeholder={t("chat.placeholder")}
-              className="placeholder:text-muted-foreground/70 flex-1 resize-none bg-transparent px-2 py-2 text-[15px] leading-[22px] outline-none"
+              className="placeholder:text-muted-foreground/60 flex-1 resize-none self-center bg-transparent px-2 py-2 text-[15.5px] leading-[22px] outline-none"
               style={{
                 minHeight: "22px",
-                maxHeight: "176px",
+                maxHeight: "132px",
                 overflowX: "hidden",
                 whiteSpace: "pre-wrap",
                 wordWrap: "break-word",
               }}
             />
 
-            <IconBtn
-              ariaLabel={listening ? t("chat.voiceStop") : t("chat.voice")}
-              onClick={toggleVoice}
-              active={listening}
-            >
-              {listening ? (
-                <MicOff className="h-[18px] w-[18px]" />
-              ) : (
-                <Mic className="h-[18px] w-[18px]" />
-              )}
-            </IconBtn>
+            {!input.trim() && attachments.length === 0 && (
+              <IconBtn
+                ariaLabel={listening ? t("chat.voiceStop") : t("chat.voice")}
+                onClick={toggleVoice}
+                active={listening}
+              >
+                {listening ? (
+                  <MicOff className="h-[19px] w-[19px]" />
+                ) : (
+                  <Mic className="h-[19px] w-[19px]" />
+                )}
+              </IconBtn>
+            )}
 
             {isLoading ? (
               <button
@@ -494,13 +490,15 @@ export function ChatWindow({
               <button
                 type="submit"
                 disabled={!input.trim() && attachments.length === 0}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-40"
+                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90 disabled:pointer-events-none disabled:opacity-0"
                 aria-label={t("chat.send")}
+                style={{ transition: "opacity 150ms ease" }}
               >
                 <ArrowUp className="h-[18px] w-[18px]" />
               </button>
             )}
           </form>
+
           <p className="text-muted-foreground/60 mt-2 text-center text-[10px]">
             {t("chat.disclaimer")}
           </p>

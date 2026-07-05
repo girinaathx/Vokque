@@ -6,10 +6,23 @@ import { AppShell } from "@/components/app/AppShell";
 import { ChatAppearanceSection } from "@/components/settings/ChatAppearanceSection";
 import { useTheme, type ThemePref } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteAllThreads } from "@/lib/threads.functions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Palette,
   Settings as SettingsIcon,
@@ -30,7 +43,9 @@ import {
   ChevronRight,
   Bell,
   Lock,
+  Trash2,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -257,19 +272,66 @@ function LinkSection({
 }
 
 function ChatsSection() {
+  const qc = useQueryClient();
+  const router = useRouter();
+  const navigate = useNavigate();
+  const deleteAllFn = useServerFn(deleteAllThreads);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const mut = useMutation({
+    mutationFn: () => deleteAllFn({ data: undefined as never }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["threads"] });
+      router.invalidate();
+      navigate({ to: "/dashboard" });
+      toast.success("All conversations deleted");
+      setConfirmOpen(false);
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
   return (
     <Card>
       <SectionTitle
         title="Chats"
-        sub="Manage your conversations. Use the sidebar to open, rename, or delete individual chats."
+        sub="Manage your conversations. Rename, pin, delete, or clear them all."
       />
-      <div className="text-muted-foreground text-sm">
-        Open the sidebar to view all conversations. Tap a chat to open it, or use the
-        delete icon to remove it.
-      </div>
+      <ul className="text-muted-foreground mb-4 space-y-1.5 text-sm">
+        <li>• Long-press a chat to enter multi-select mode.</li>
+        <li>• Tap the three-dot menu for Rename, Pin, Share, or Delete.</li>
+        <li>• Pin up to 5 chats to keep them at the top.</li>
+      </ul>
+      <button
+        onClick={() => setConfirmOpen(true)}
+        className="flex items-center gap-2 rounded-full bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground transition hover:opacity-90"
+      >
+        <Trash2 className="h-4 w-4" /> Delete all conversations
+      </button>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent className="rounded-3xl border-white/10 bg-background/85 backdrop-blur-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete all conversations?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. Every chat and message will be
+              permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => mut.mutate()}
+              disabled={mut.isPending}
+              className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {mut.isPending ? "Deleting…" : "Delete All"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
+
 
 function VoiceSection() {
   return (

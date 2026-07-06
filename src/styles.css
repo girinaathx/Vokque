@@ -154,33 +154,39 @@
   background: var(--glass);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(28px) saturate(180%);
 }
 
 @utility glass-strong {
   background: var(--glass-strong);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-glass-lg);
+  backdrop-filter: blur(40px) saturate(200%);
 }
 
 @utility glass-thin {
   background: rgba(0, 0, 0, 0.03);
   border: 1px solid var(--border);
+  backdrop-filter: blur(20px) saturate(160%);
 }
 .dark .glass-thin {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 @utility glass-dock {
   background: var(--glass);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(28px) saturate(180%);
 }
 
 @utility glass-matte {
   background: var(--glass-strong);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(32px) saturate(180%);
 }
+
 
 /* ------------------------------------------------------------
    Animations

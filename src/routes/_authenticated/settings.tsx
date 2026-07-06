@@ -1,50 +1,25 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { useTranslation } from "react-i18next";
-import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 import { AppShell } from "@/components/app/AppShell";
-import { ChatAppearanceSection } from "@/components/settings/ChatAppearanceSection";
 import { useTheme, type ThemePref } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { deleteAllThreads } from "@/lib/threads.functions";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Palette,
-  Settings as SettingsIcon,
-  User,
-  Mic,
   Brain,
-  MessageSquare,
   ShieldCheck,
-  Database,
-  HardDrive,
-  CreditCard,
-  LifeBuoy,
   Info,
   Sun,
   Moon,
   Monitor,
   LogOut,
   ChevronRight,
-  Bell,
-  Lock,
-  Trash2,
 } from "lucide-react";
+
 
 
 export const Route = createFileRoute("/_authenticated/settings")({

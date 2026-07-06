@@ -24,7 +24,7 @@ import {
   Brain,
   Settings as SettingsIcon,
 
-  ShieldCheck,
+  
   Search,
   MoreHorizontal,
   Pin,

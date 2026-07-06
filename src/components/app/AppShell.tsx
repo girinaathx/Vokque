@@ -338,16 +338,8 @@ function Sidebar({
         </Link>
 
 
-        {/* Search */}
-        <div className="relative mt-2 mb-2">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search chats"
-            className="glass w-full rounded-full py-2 pr-3 pl-9 text-[13px] outline-none placeholder:text-muted-foreground/60"
-          />
-        </div>
+
+
 
         {/* Selection toolbar */}
         {inSelection && (

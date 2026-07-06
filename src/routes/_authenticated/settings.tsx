@@ -62,40 +62,23 @@ export const Route = createFileRoute("/_authenticated/settings")({
 
 type SectionId =
   | "appearance"
-  | "general"
-  | "personalization"
-  | "voice"
+  | "model"
   | "memory"
-  | "chats"
-  | "language"
-  | "data"
-  | "security"
-  | "storage"
-  | "account"
-  | "notifications"
   | "privacy"
-  | "billing"
-  | "help"
-  | "about";
+  | "terms"
+  | "about"
+  | "account";
 
 const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
   { id: "appearance", label: "Appearance", icon: Palette },
-  { id: "language", label: "Language", icon: SettingsIcon },
-  { id: "general", label: "General", icon: SettingsIcon },
-  { id: "personalization", label: "Personalization", icon: User },
-  { id: "voice", label: "Voice", icon: Mic },
+  { id: "model", label: "AI Model", icon: Brain },
   { id: "memory", label: "Memory", icon: Brain },
-  { id: "chats", label: "Chats", icon: MessageSquare },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "data", label: "Data Controls", icon: Database },
-  { id: "security", label: "Security", icon: Lock },
-  { id: "storage", label: "Storage", icon: HardDrive },
-  { id: "account", label: "Account", icon: User },
   { id: "privacy", label: "Privacy Policy", icon: ShieldCheck },
-  { id: "billing", label: "Billing", icon: CreditCard },
-  { id: "help", label: "Help & Support", icon: LifeBuoy },
+  { id: "terms", label: "Terms of Service", icon: Info },
   { id: "about", label: "About", icon: Info },
+  { id: "account", label: "Sign Out", icon: LogOut },
 ];
+
 
 
 function SettingsPage() {

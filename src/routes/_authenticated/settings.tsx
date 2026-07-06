@@ -401,3 +401,30 @@ function AboutSection() {
   );
 }
 
+function TermsSection() {
+  return (
+    <Card>
+      <SectionTitle
+        title="Terms of Service"
+        sub="By using FeynCloud you agree to the following terms."
+      />
+      <div className="text-muted-foreground space-y-3 text-sm leading-relaxed">
+        <p>
+          FeynCloud is provided by O1 Platforms. You are responsible for the
+          content you submit and for complying with applicable laws.
+        </p>
+        <p>
+          FeynCloud may use third-party AI models to generate responses. Outputs
+          can be inaccurate — verify important information independently.
+        </p>
+        <p>
+          We may update these terms at any time. Continued use of the service
+          means you accept the latest version.
+        </p>
+        <p>Contact: support@o1platforms.com</p>
+      </div>
+    </Card>
+  );
+}
+
+

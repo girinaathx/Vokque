@@ -64,7 +64,7 @@ function SettingsPage() {
       <div className="mx-auto w-full max-w-5xl px-5 pt-6 pb-32 lg:pt-12">
         <div className="animate-fade-up mb-6 flex items-center gap-3">
           <div className="glass flex h-11 w-11 items-center justify-center rounded-2xl">
-            <SettingsIcon className="h-5 w-5" />
+            <Palette className="h-5 w-5" />
           </div>
           <div>
             <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">

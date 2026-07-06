@@ -23,6 +23,7 @@ import {
   Home,
   Brain,
   Settings as SettingsIcon,
+
   ShieldCheck,
   Search,
   MoreHorizontal,

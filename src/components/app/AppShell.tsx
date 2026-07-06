@@ -166,35 +166,27 @@ export function AppShell({
         <Sidebar {...sidebarProps} />
       </aside>
 
-      {/* Mobile top bar — dark matte liquid glass (no shine) */}
-      <header
-        className="fixed right-3 left-3 z-40 lg:hidden"
-        style={{ top: "calc(env(safe-area-inset-top, 0px) + 10px)" }}
+      {/* Mobile floating glass buttons — no top bar */}
+      <div
+        className="pointer-events-none fixed inset-x-0 z-40 flex items-center justify-between px-4 lg:hidden"
+        style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
       >
-        <div className="flex items-center justify-between rounded-full border border-white/10 bg-background/60 px-2 py-2 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:bg-foreground/5"
-            aria-label="Menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <Logo size={22} />
-            <span className="text-sm font-semibold tracking-tight">
-              {t("brand.name")}
-            </span>
-          </Link>
-          <button
-            onClick={() => createMut.mutate()}
-            disabled={createMut.isPending}
-            className="flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:bg-foreground/5 disabled:opacity-50"
-            aria-label={t("nav.newChat")}
-          >
-            <Plus className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90"
+          aria-label="Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => createMut.mutate()}
+          disabled={createMut.isPending}
+          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
+          aria-label={t("nav.newChat")}
+        >
+          <Plus className="h-5 w-5" />
+        </button>
+      </div>
 
       {/* Mobile drawer */}
       {mobileOpen && (
@@ -219,12 +211,13 @@ export function AppShell({
       )}
 
       {/* Main */}
-      <main className="flex min-w-0 flex-1 flex-col pt-16 lg:pt-0">
+      <main className="flex min-w-0 flex-1 flex-col">
         {children}
       </main>
     </div>
   );
 }
+
 
 function Sidebar({
   threads,

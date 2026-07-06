@@ -52,7 +52,10 @@ type ChatBody = {
   messages?: UIMessage[];
   threadId?: string;
   cite?: boolean;
+  tz?: string;
+  clientNow?: string;
 };
+
 
 function buildMemoryBlock(
   mems: { content: string; category: string }[] | null | undefined,

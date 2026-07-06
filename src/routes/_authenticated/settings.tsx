@@ -129,21 +129,13 @@ function SettingsPage() {
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
             {active === "appearance" && <AppearanceSection />}
-            {active === "language" && <LanguageSection />}
+            {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers FeynCloud responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
-            {active === "chats" && <ChatsSection />}
-            {active === "voice" && <VoiceSection />}
-            {active === "account" && <AccountSection />}
-            {active === "general" && <ChatAppearanceSection />}
-            {active === "personalization" && <PlaceholderSection title="Personalization" description="Tone, persona, and response style — coming soon." />}
-            {active === "data" && <PlaceholderSection title="Data Controls" description="Manage how FeynCloud handles your data, exports, and deletions." />}
-            {active === "security" && <PlaceholderSection title="Security" description="Sessions, 2-factor authentication, and connected devices — coming soon." />}
-            {active === "storage" && <PlaceholderSection title="Storage" description="Local cache, attachments, and usage stats — coming soon." />}
-            {active === "notifications" && <PlaceholderSection title="Notifications" description="Push, email, and in-app notification preferences — coming soon." />}
             {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how FeynCloud handles your data, chats, and account." />}
-            {active === "billing" && <PlaceholderSection title="Billing" description="Plan, invoices, and payment methods — coming soon." />}
-            {active === "help" && <PlaceholderSection title="Help & Support" description="Reach out anytime at support@o1platforms.com." />}
+            {active === "terms" && <TermsSection />}
             {active === "about" && <AboutSection />}
+            {active === "account" && <AccountSection />}
+
 
           </div>
         </div>

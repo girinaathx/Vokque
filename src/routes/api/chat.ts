@@ -139,8 +139,25 @@ export const Route = createFileRoute("/api/chat")({
           "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
           AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");
 
-        const now = new Date();
-        const dateBlock = `\n\nCURRENT DATE & TIME (authoritative — always use this when the user asks the date, day, month, year, or time; never invent or use a stale date):\n- ISO: ${now.toISOString()}\n- Human (UTC): ${now.toUTCString()}\n- Year: ${now.getUTCFullYear()}`;
+        const now = body.clientNow ? new Date(body.clientNow) : new Date();
+        const tz = body.tz || "UTC";
+        let localHuman = "";
+        try {
+          localHuman = new Intl.DateTimeFormat("en-US", {
+            timeZone: tz,
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            timeZoneName: "short",
+          }).format(now);
+        } catch {
+          localHuman = now.toUTCString();
+        }
+        const dateBlock = `\n\nCURRENT DATE & TIME (authoritative — always use this when the user asks the date, day, month, year, or time; never invent or use a stale date). Answer in the user's LOCAL timezone (${tz}):\n- User local: ${localHuman}\n- ISO (UTC): ${now.toISOString()}\n- Year: ${now.getUTCFullYear()}`;
+
 
         const systemPrompt =
           CORE_SYSTEM +

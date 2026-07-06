@@ -38,7 +38,11 @@ export function ChatWindow({
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: { threadId },
+        body: {
+          threadId,
+          tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          clientNow: new Date().toISOString(),
+        },
         fetch: async (url, init) => {
           const { data } = await supabase.auth.getSession();
           const token = data.session?.access_token;
@@ -49,6 +53,7 @@ export function ChatWindow({
       }),
     [threadId],
   );
+
 
   const { messages, sendMessage, status, stop, regenerate, setMessages, error } =
     useChat({

@@ -1,50 +1,25 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { useTranslation } from "react-i18next";
-import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 import { AppShell } from "@/components/app/AppShell";
-import { ChatAppearanceSection } from "@/components/settings/ChatAppearanceSection";
 import { useTheme, type ThemePref } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { deleteAllThreads } from "@/lib/threads.functions";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Palette,
-  Settings as SettingsIcon,
-  User,
-  Mic,
   Brain,
-  MessageSquare,
   ShieldCheck,
-  Database,
-  HardDrive,
-  CreditCard,
-  LifeBuoy,
   Info,
   Sun,
   Moon,
   Monitor,
   LogOut,
   ChevronRight,
-  Bell,
-  Lock,
-  Trash2,
 } from "lucide-react";
+
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -62,40 +37,23 @@ export const Route = createFileRoute("/_authenticated/settings")({
 
 type SectionId =
   | "appearance"
-  | "general"
-  | "personalization"
-  | "voice"
+  | "model"
   | "memory"
-  | "chats"
-  | "language"
-  | "data"
-  | "security"
-  | "storage"
-  | "account"
-  | "notifications"
   | "privacy"
-  | "billing"
-  | "help"
-  | "about";
+  | "terms"
+  | "about"
+  | "account";
 
 const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
   { id: "appearance", label: "Appearance", icon: Palette },
-  { id: "language", label: "Language", icon: SettingsIcon },
-  { id: "general", label: "General", icon: SettingsIcon },
-  { id: "personalization", label: "Personalization", icon: User },
-  { id: "voice", label: "Voice", icon: Mic },
+  { id: "model", label: "AI Model", icon: Brain },
   { id: "memory", label: "Memory", icon: Brain },
-  { id: "chats", label: "Chats", icon: MessageSquare },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "data", label: "Data Controls", icon: Database },
-  { id: "security", label: "Security", icon: Lock },
-  { id: "storage", label: "Storage", icon: HardDrive },
-  { id: "account", label: "Account", icon: User },
   { id: "privacy", label: "Privacy Policy", icon: ShieldCheck },
-  { id: "billing", label: "Billing", icon: CreditCard },
-  { id: "help", label: "Help & Support", icon: LifeBuoy },
+  { id: "terms", label: "Terms of Service", icon: Info },
   { id: "about", label: "About", icon: Info },
+  { id: "account", label: "Sign Out", icon: LogOut },
 ];
+
 
 
 function SettingsPage() {
@@ -106,7 +64,7 @@ function SettingsPage() {
       <div className="mx-auto w-full max-w-5xl px-5 pt-6 pb-32 lg:pt-12">
         <div className="animate-fade-up mb-6 flex items-center gap-3">
           <div className="glass flex h-11 w-11 items-center justify-center rounded-2xl">
-            <SettingsIcon className="h-5 w-5" />
+            <Palette className="h-5 w-5" />
           </div>
           <div>
             <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -146,21 +104,13 @@ function SettingsPage() {
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
             {active === "appearance" && <AppearanceSection />}
-            {active === "language" && <LanguageSection />}
+            {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers FeynCloud responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
-            {active === "chats" && <ChatsSection />}
-            {active === "voice" && <VoiceSection />}
-            {active === "account" && <AccountSection />}
-            {active === "general" && <ChatAppearanceSection />}
-            {active === "personalization" && <PlaceholderSection title="Personalization" description="Tone, persona, and response style — coming soon." />}
-            {active === "data" && <PlaceholderSection title="Data Controls" description="Manage how FeynCloud handles your data, exports, and deletions." />}
-            {active === "security" && <PlaceholderSection title="Security" description="Sessions, 2-factor authentication, and connected devices — coming soon." />}
-            {active === "storage" && <PlaceholderSection title="Storage" description="Local cache, attachments, and usage stats — coming soon." />}
-            {active === "notifications" && <PlaceholderSection title="Notifications" description="Push, email, and in-app notification preferences — coming soon." />}
             {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how FeynCloud handles your data, chats, and account." />}
-            {active === "billing" && <PlaceholderSection title="Billing" description="Plan, invoices, and payment methods — coming soon." />}
-            {active === "help" && <PlaceholderSection title="Help & Support" description="Reach out anytime at support@o1platforms.com." />}
+            {active === "terms" && <TermsSection />}
             {active === "about" && <AboutSection />}
+            {active === "account" && <AccountSection />}
+
 
           </div>
         </div>
@@ -225,30 +175,6 @@ function AppearanceSection() {
   );
 }
 
-function LanguageSection() {
-  const { i18n } = useTranslation();
-  return (
-    <Card>
-      <SectionTitle title="Language" sub="Choose your preferred language. Changes apply instantly." />
-      <select
-        value={i18n.language?.slice(0, 2) || "en"}
-        onChange={(e) => i18n.changeLanguage(e.target.value)}
-        className="glass w-full rounded-2xl px-4 py-3 text-sm outline-none"
-      >
-        {SUPPORTED_LANGUAGES.map((l) => (
-          <option key={l.code} value={l.code}>
-            {l.native} — {l.name}
-          </option>
-        ))}
-      </select>
-      <p className="text-muted-foreground mt-3 text-xs">
-        English is fully translated. Other languages will progressively fill in and safely fall back to English until then.
-      </p>
-    </Card>
-  );
-}
-
-
 function LinkSection({
   to,
   label,
@@ -271,83 +197,6 @@ function LinkSection({
   );
 }
 
-function ChatsSection() {
-  const qc = useQueryClient();
-  const router = useRouter();
-  const navigate = useNavigate();
-  const deleteAllFn = useServerFn(deleteAllThreads);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const mut = useMutation({
-    mutationFn: () => deleteAllFn({ data: undefined as never }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["threads"] });
-      router.invalidate();
-      navigate({ to: "/dashboard" });
-      toast.success("All conversations deleted");
-      setConfirmOpen(false);
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-
-  return (
-    <Card>
-      <SectionTitle
-        title="Chats"
-        sub="Manage your conversations. Rename, pin, delete, or clear them all."
-      />
-      <ul className="text-muted-foreground mb-4 space-y-1.5 text-sm">
-        <li>• Long-press a chat to enter multi-select mode.</li>
-        <li>• Tap the three-dot menu for Rename, Pin, Share, or Delete.</li>
-        <li>• Pin up to 5 chats to keep them at the top.</li>
-      </ul>
-      <button
-        onClick={() => setConfirmOpen(true)}
-        className="flex items-center gap-2 rounded-full bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground transition hover:opacity-90"
-      >
-        <Trash2 className="h-4 w-4" /> Delete all conversations
-      </button>
-
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent className="rounded-3xl border-white/10 bg-background/85 backdrop-blur-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete all conversations?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. Every chat and message will be
-              permanently removed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => mut.mutate()}
-              disabled={mut.isPending}
-              className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {mut.isPending ? "Deleting…" : "Delete All"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </Card>
-  );
-}
-
-
-function VoiceSection() {
-  return (
-    <Card>
-      <SectionTitle
-        title="Voice"
-        sub="Voice input uses your device's secure speech recognition."
-      />
-      <ul className="text-muted-foreground space-y-2 text-sm">
-        <li>• Tap the mic in the composer to dictate.</li>
-        <li>• No startup, connection, or notification sounds.</li>
-        <li>• Audio stays on-device — only the transcript is sent.</li>
-      </ul>
-    </Card>
-  );
-}
 
 function AccountSection() {
   const navigate = useNavigate();
@@ -425,4 +274,31 @@ function AboutSection() {
     </Card>
   );
 }
+
+function TermsSection() {
+  return (
+    <Card>
+      <SectionTitle
+        title="Terms of Service"
+        sub="By using FeynCloud you agree to the following terms."
+      />
+      <div className="text-muted-foreground space-y-3 text-sm leading-relaxed">
+        <p>
+          FeynCloud is provided by O1 Platforms. You are responsible for the
+          content you submit and for complying with applicable laws.
+        </p>
+        <p>
+          FeynCloud may use third-party AI models to generate responses. Outputs
+          can be inaccurate — verify important information independently.
+        </p>
+        <p>
+          We may update these terms at any time. Continued use of the service
+          means you accept the latest version.
+        </p>
+        <p>Contact: support@o1platforms.com</p>
+      </div>
+    </Card>
+  );
+}
+
 

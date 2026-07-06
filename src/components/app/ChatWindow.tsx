@@ -38,7 +38,11 @@ export function ChatWindow({
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: { threadId },
+        body: {
+          threadId,
+          tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          clientNow: new Date().toISOString(),
+        },
         fetch: async (url, init) => {
           const { data } = await supabase.auth.getSession();
           const token = data.session?.access_token;
@@ -49,6 +53,7 @@ export function ChatWindow({
       }),
     [threadId],
   );
+
 
   const { messages, sendMessage, status, stop, regenerate, setMessages, error } =
     useChat({
@@ -610,36 +615,17 @@ function Markdown({ text }: { text: string }) {
 }
 
 
-function EmptyState({ onPick }: { onPick: (t: string) => void }) {
+function EmptyState({ onPick: _onPick }: { onPick: (t: string) => void }) {
   const { t } = useTranslation();
-  const starters = [
-    t("chat.starters.greet"),
-    t("chat.starters.study"),
-    t("chat.starters.workout"),
-    t("chat.starters.trip"),
-  ];
   return (
-    <div className="animate-fade-up flex flex-col items-center pt-12 text-center">
-      <div className="animate-float-slow">
-        <Logo size={56} glow />
-      </div>
-      <h2 className="font-display mt-5 text-2xl font-semibold tracking-tight">
+    <div className="animate-fade-up flex flex-col items-center pt-24 text-center">
+      <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
         {t("chat.emptyTitle")}
       </h2>
-      <p className="text-muted-foreground mt-1 text-sm">
+      <p className="text-muted-foreground mt-2 text-sm">
         {t("chat.emptySubtitle")}
       </p>
-      <div className="mt-6 grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-2">
-        {starters.map((s) => (
-          <button
-            key={s}
-            onClick={() => onPick(s)}
-            className="glass rounded-2xl px-4 py-3 text-left text-sm transition hover:-translate-y-px"
-          >
-            {s}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
+

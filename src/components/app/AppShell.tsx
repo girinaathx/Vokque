@@ -23,7 +23,8 @@ import {
   Home,
   Brain,
   Settings as SettingsIcon,
-  ShieldCheck,
+
+  
   Search,
   MoreHorizontal,
   Pin,
@@ -166,35 +167,27 @@ export function AppShell({
         <Sidebar {...sidebarProps} />
       </aside>
 
-      {/* Mobile top bar — dark matte liquid glass (no shine) */}
-      <header
-        className="fixed right-3 left-3 z-40 lg:hidden"
-        style={{ top: "calc(env(safe-area-inset-top, 0px) + 10px)" }}
+      {/* Mobile floating glass buttons — no top bar */}
+      <div
+        className="pointer-events-none fixed inset-x-0 z-40 flex items-center justify-between px-4 lg:hidden"
+        style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
       >
-        <div className="flex items-center justify-between rounded-full border border-white/10 bg-background/60 px-2 py-2 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:bg-foreground/5"
-            aria-label="Menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <Logo size={22} />
-            <span className="text-sm font-semibold tracking-tight">
-              {t("brand.name")}
-            </span>
-          </Link>
-          <button
-            onClick={() => createMut.mutate()}
-            disabled={createMut.isPending}
-            className="flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 hover:bg-foreground/5 disabled:opacity-50"
-            aria-label={t("nav.newChat")}
-          >
-            <Plus className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90"
+          aria-label="Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => createMut.mutate()}
+          disabled={createMut.isPending}
+          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
+          aria-label={t("nav.newChat")}
+        >
+          <Plus className="h-5 w-5" />
+        </button>
+      </div>
 
       {/* Mobile drawer */}
       {mobileOpen && (
@@ -219,12 +212,13 @@ export function AppShell({
       )}
 
       {/* Main */}
-      <main className="flex min-w-0 flex-1 flex-col pt-16 lg:pt-0">
+      <main className="flex min-w-0 flex-1 flex-col">
         {children}
       </main>
     </div>
   );
 }
+
 
 function Sidebar({
   threads,
@@ -286,23 +280,29 @@ function Sidebar({
         <Link
           to="/dashboard"
           onClick={closeMobile}
-          className="mb-4 flex items-center gap-2.5 px-1.5"
+          className="mb-3 flex items-center gap-2.5 px-1.5"
         >
-          <Logo size={28} />
-          <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight">
-              {t("brand.name")}
-            </div>
-            <div className="text-muted-foreground text-[10px]">
-              {t("brand.tagline")}
-            </div>
+          <Logo size={26} />
+          <div className="text-sm font-semibold tracking-tight">
+            {t("brand.name")}
           </div>
         </Link>
+
+        {/* Search — directly below brand */}
+        <div className="relative mb-3">
+          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search chats"
+            className="glass w-full rounded-full py-2 pr-3 pl-9 text-[13px] outline-none placeholder:text-muted-foreground/60"
+          />
+        </div>
 
         <button
           onClick={onNew}
           disabled={creating}
-          className="glass mb-3 flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition hover:-translate-y-px hover:shadow-md active:translate-y-0 disabled:opacity-50"
+          className="glass mb-3 flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition hover:-translate-y-px active:translate-y-0 disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
           {t("nav.newChat")}
@@ -312,7 +312,7 @@ function Sidebar({
           to="/dashboard"
           onClick={closeMobile}
           className={cn(
-            "mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition",
+            "mb-1 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition",
             !activeThreadId
               ? "bg-foreground/8 font-medium"
               : "text-muted-foreground hover:bg-foreground/5",
@@ -324,7 +324,7 @@ function Sidebar({
         <Link
           to="/memory"
           onClick={closeMobile}
-          className="text-muted-foreground hover:bg-foreground/5 mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+          className="text-muted-foreground hover:bg-foreground/5 mb-1 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
         >
           <Brain className="h-4 w-4" />
           {t("nav.memory")}
@@ -332,30 +332,15 @@ function Sidebar({
         <Link
           to="/settings"
           onClick={closeMobile}
-          className="text-muted-foreground hover:bg-foreground/5 mb-1.5 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+          className="text-muted-foreground hover:bg-foreground/5 mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
         >
           <SettingsIcon className="h-4 w-4" />
           {t("nav.settings")}
         </Link>
-        <Link
-          to="/privacy"
-          onClick={closeMobile}
-          className="text-muted-foreground hover:bg-foreground/5 mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
-        >
-          <ShieldCheck className="h-4 w-4" />
-          {t("nav.privacy")}
-        </Link>
 
-        {/* Search */}
-        <div className="relative mt-2 mb-2">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search chats"
-            className="glass w-full rounded-full py-2 pr-3 pl-9 text-[13px] outline-none placeholder:text-muted-foreground/60"
-          />
-        </div>
+
+
+
 
         {/* Selection toolbar */}
         {inSelection && (

@@ -82,30 +82,32 @@
   --foreground: #ffffff;
   --card: #000000;
   --card-foreground: #ffffff;
-  --popover: #050505;
+  --popover: rgba(12, 12, 14, 0.72);
   --popover-foreground: #ffffff;
   --primary: #ffffff;
   --primary-foreground: #000000;
   --secondary: #0a0a0a;
   --secondary-foreground: #ffffff;
   --muted: #0a0a0a;
-  --muted-foreground: rgba(255, 255, 255, 0.7);
+  --muted-foreground: rgba(255, 255, 255, 0.65);
   --accent: #101010;
   --accent-foreground: #ffffff;
   --destructive: oklch(0.62 0.22 27);
   --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.10);
+  --input: rgba(255, 255, 255, 0.10);
   --ring: rgba(255, 255, 255, 0.3);
 
-  --glass: rgba(0, 0, 0, 0.85);
-  --glass-strong: rgba(0, 0, 0, 0.92);
+  /* iOS 26 Liquid Glass — translucent, real backdrop blur */
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(255, 255, 255, 0.09);
 
   --shadow-glass-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
-  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.35);
-  --shadow-glass-lg: 0 12px 48px -12px rgba(0, 0, 0, 0.6);
-  --shadow-float: 0 24px 80px -24px rgba(0, 0, 0, 0.9);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glass-lg: 0 20px 60px -12px rgba(0, 0, 0, 0.8);
+  --shadow-float: 0 30px 80px -24px rgba(0, 0, 0, 0.95);
 }
+
 
 @layer base {
   html,
@@ -152,33 +154,39 @@
   background: var(--glass);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(28px) saturate(180%);
 }
 
 @utility glass-strong {
   background: var(--glass-strong);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-glass-lg);
+  backdrop-filter: blur(40px) saturate(200%);
 }
 
 @utility glass-thin {
   background: rgba(0, 0, 0, 0.03);
   border: 1px solid var(--border);
+  backdrop-filter: blur(20px) saturate(160%);
 }
 .dark .glass-thin {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 @utility glass-dock {
   background: var(--glass);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(28px) saturate(180%);
 }
 
 @utility glass-matte {
   background: var(--glass-strong);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(32px) saturate(180%);
 }
+
 
 /* ------------------------------------------------------------
    Animations

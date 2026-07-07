@@ -239,14 +239,15 @@ export const Route = createFileRoute("/api/chat")({
 });
 
 async function extractAndStoreMemories({
-  gateway,
+  model,
   supa,
   userId,
   threadId,
   userText,
   assistantText,
 }: {
-  gateway: ReturnType<typeof createLovableAiGatewayProvider>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  model: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supa: any;
   userId: string;
@@ -255,7 +256,7 @@ async function extractAndStoreMemories({
   assistantText: string;
 }) {
   const { text } = await generateText({
-    model: gateway("google/gemini-2.5-flash"),
+    model,
     system: `You extract durable, user-specific memories from a chat exchange.
 Return ONLY a JSON object: {"memories":[{"content":"...","category":"preference|project|goal|style|fact|general"}]}
 Rules:

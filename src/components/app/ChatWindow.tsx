@@ -60,7 +60,7 @@ export function ChatWindow({
       id: threadId,
       messages: initialMessages,
       transport,
-      onError: (e) => toast.error(e.message || t("errors.generic")),
+      onError: () => toast.error("Unable to contact OpenAI. Please try again."),
     });
 
   const [input, setInput] = useState("");

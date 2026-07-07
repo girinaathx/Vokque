@@ -18,7 +18,7 @@ export const listThreads = createServerFn({ method: "GET" })
       .order("pinned_at", { ascending: false, nullsFirst: false })
       .order("updated_at", { ascending: false })
       .limit(200);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return data ?? [];
   });
 
@@ -42,7 +42,7 @@ export const pinThread = createServerFn({ method: "POST" })
       .from("threads")
       .update({ pinned_at: data.pinned ? new Date().toISOString() : null })
       .eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return { ok: true };
   });
 
@@ -53,7 +53,7 @@ export const deleteAllThreads = createServerFn({ method: "POST" })
       .from("threads")
       .delete()
       .eq("user_id", context.userId);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return { ok: true };
   });
 
@@ -67,7 +67,7 @@ export const deleteThreadsBulk = createServerFn({ method: "POST" })
       .from("threads")
       .delete()
       .in("id", data.ids);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return { ok: true };
   });
 
@@ -86,7 +86,7 @@ export const createThread = createServerFn({ method: "POST" })
       })
       .select("id, title, updated_at, created_at")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return row;
   });
 
@@ -98,7 +98,7 @@ export const deleteThread = createServerFn({ method: "POST" })
       .from("threads")
       .delete()
       .eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return { ok: true };
   });
 
@@ -112,7 +112,7 @@ export const renameThread = createServerFn({ method: "POST" })
       .from("threads")
       .update({ title: data.title, updated_at: new Date().toISOString() })
       .eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return { ok: true };
   });
 
@@ -127,7 +127,7 @@ export const getThreadMessages = createServerFn({ method: "GET" })
       .select("id, role, parts, created_at")
       .eq("thread_id", data.threadId)
       .order("created_at", { ascending: true });
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     const messages: StoredMessage[] = (rows ?? []).map((r) => ({
       id: r.id,
       role: r.role as StoredMessage["role"],
@@ -149,7 +149,7 @@ export const truncateThreadMessages = createServerFn({ method: "POST" })
       .select("id, created_at")
       .eq("thread_id", data.threadId)
       .order("created_at", { ascending: true });
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     const toDelete = (rows ?? []).slice(data.keep).map((r) => r.id);
     if (toDelete.length > 0) {
       const { error: delErr } = await context.supabase

@@ -33,7 +33,7 @@ export const listMemories = createServerFn({ method: "GET" })
       .select("id, content, category, source, thread_id, created_at, updated_at")
       .order("created_at", { ascending: false })
       .limit(500);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return (data ?? []) as Memory[];
   });
 
@@ -61,7 +61,7 @@ export const createMemory = createServerFn({ method: "POST" })
       })
       .select("id, content, category, source, thread_id, created_at, updated_at")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return row as Memory;
   });
 
@@ -84,7 +84,7 @@ export const updateMemory = createServerFn({ method: "POST" })
         ...(data.category ? { category: data.category } : {}),
       })
       .eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return { ok: true };
   });
 
@@ -98,7 +98,7 @@ export const deleteMemory = createServerFn({ method: "POST" })
       .from("memories")
       .delete()
       .eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return { ok: true };
   });
 
@@ -109,7 +109,7 @@ export const deleteAllMemories = createServerFn({ method: "POST" })
       .from("memories")
       .delete()
       .eq("user_id", context.userId);
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return { ok: true };
   });
 
@@ -120,7 +120,7 @@ export const exportMemories = createServerFn({ method: "GET" })
       .from("memories")
       .select("content, category, source, created_at, updated_at")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
+    if (error) console.error(error); throw new Error("Something went wrong, please try again.");
     return {
       exported_at: new Date().toISOString(),
       count: data?.length ?? 0,

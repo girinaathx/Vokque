@@ -5,8 +5,10 @@ import {
   streamText,
   type UIMessage,
 } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { createClient } from "@supabase/supabase-js";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+
+const OPENAI_MODEL = "gpt-4o-mini";
 
 const AGENTS = ["Business", "Coding", "Design", "Research", "General"] as const;
 type Agent = (typeof AGENTS)[number];

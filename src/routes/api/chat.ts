@@ -215,7 +215,7 @@ export const Route = createFileRoute("/api/chat")({
                     .slice(0, 2000);
                   if (userText) {
                     await extractAndStoreMemories({
-                      gateway,
+                      model,
                       supa,
                       userId,
                       threadId,

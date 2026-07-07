@@ -218,10 +218,15 @@ export function ChatWindow({
 
   return (
     <div className="relative flex h-[100dvh] min-h-0 flex-1 flex-col">
+      {/* Top liquid-glass fade — messages dissolve under floating buttons */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 z-30 h-24 bg-gradient-to-b from-background via-background/70 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_bottom,black,transparent)]"
+      />
       {/* Transcript */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 pt-2 lg:px-8 lg:pt-6"
+        className="flex-1 overflow-y-auto px-4 pt-20 lg:px-8 lg:pt-24 [mask-image:linear-gradient(to_bottom,transparent_0,black_72px,black_calc(100%-96px),transparent_100%)]"
         style={{ paddingBottom: "180px" }}
       >
         <div className="mx-auto w-full max-w-3xl space-y-6">

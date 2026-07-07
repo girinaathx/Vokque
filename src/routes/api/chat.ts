@@ -75,7 +75,11 @@ export const Route = createFileRoute("/api/chat")({
         if (!apiKey) {
           return new Response("Missing OPENAI_API_KEY", { status: 500 });
         }
-        const openai = createOpenAI({ apiKey });
+        const openai = createOpenAICompatible({
+          name: "openai",
+          baseURL: "https://api.openai.com/v1",
+          headers: { Authorization: `Bearer ${apiKey}` },
+        });
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
 

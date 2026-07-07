@@ -5,8 +5,10 @@ import {
   streamText,
   type UIMessage,
 } from "ai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createClient } from "@supabase/supabase-js";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+
+const OPENAI_MODEL = "gpt-4o-mini";
 
 const AGENTS = ["Business", "Coding", "Design", "Research", "General"] as const;
 type Agent = (typeof AGENTS)[number];
@@ -69,10 +71,15 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY;
+        const apiKey = process.env.OPENAI_API_KEY;
         if (!apiKey) {
-          return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+          return new Response("Missing OPENAI_API_KEY", { status: 500 });
         }
+        const openai = createOpenAICompatible({
+          name: "openai",
+          baseURL: "https://api.openai.com/v1",
+          headers: { Authorization: `Bearer ${apiKey}` },
+        });
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
 
@@ -134,7 +141,7 @@ export const Route = createFileRoute("/api/chat")({
           .order("created_at", { ascending: false })
           .limit(40);
 
-        const gateway = createLovableAiGatewayProvider(apiKey);
+        const model = openai(OPENAI_MODEL);
         const personaBlock =
           "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
           AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");
@@ -169,7 +176,7 @@ export const Route = createFileRoute("/api/chat")({
 
         try {
           const result = streamText({
-            model: gateway("google/gemini-2.5-flash"),
+            model,
             system: systemPrompt,
             messages: await convertToModelMessages(messages),
             abortSignal: request.signal,
@@ -208,7 +215,7 @@ export const Route = createFileRoute("/api/chat")({
                     .slice(0, 2000);
                   if (userText) {
                     await extractAndStoreMemories({
-                      gateway,
+                      model,
                       supa,
                       userId,
                       threadId,
@@ -232,14 +239,15 @@ export const Route = createFileRoute("/api/chat")({
 });
 
 async function extractAndStoreMemories({
-  gateway,
+  model,
   supa,
   userId,
   threadId,
   userText,
   assistantText,
 }: {
-  gateway: ReturnType<typeof createLovableAiGatewayProvider>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  model: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supa: any;
   userId: string;
@@ -248,7 +256,7 @@ async function extractAndStoreMemories({
   assistantText: string;
 }) {
   const { text } = await generateText({
-    model: gateway("google/gemini-2.5-flash"),
+    model,
     system: `You extract durable, user-specific memories from a chat exchange.
 Return ONLY a JSON object: {"memories":[{"content":"...","category":"preference|project|goal|style|fact|general"}]}
 Rules:

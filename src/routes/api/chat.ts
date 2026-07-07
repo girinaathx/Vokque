@@ -5,7 +5,7 @@ import {
   streamText,
   type UIMessage,
 } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createClient } from "@supabase/supabase-js";
 
 const OPENAI_MODEL = "gpt-4o-mini";

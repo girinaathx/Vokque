@@ -239,8 +239,8 @@ export const Route = createFileRoute("/api/chat")({
             },
           });
         } catch (err) {
-          const msg = err instanceof Error ? err.message : "AI error";
-          return new Response(msg, { status: 500 });
+          console.error("Chat AI error:", err);
+          return new Response("Something went wrong. Please try again.", { status: 500 });
         }
       },
     },

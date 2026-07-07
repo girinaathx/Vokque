@@ -156,7 +156,7 @@ export const truncateThreadMessages = createServerFn({ method: "POST" })
         .from("messages")
         .delete()
         .in("id", toDelete);
-      if (delErr) throw new Error(delErr.message);
+      if (delErr) { console.error(delErr); throw new Error("Something went wrong, please try again."); }
     }
     return { ok: true, deleted: toDelete.length };
   });

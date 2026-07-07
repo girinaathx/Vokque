@@ -137,7 +137,7 @@ export const Route = createFileRoute("/api/chat")({
           .order("created_at", { ascending: false })
           .limit(40);
 
-        const gateway = createLovableAiGatewayProvider(apiKey);
+        const model = openai(OPENAI_MODEL);
         const personaBlock =
           "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
           AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");

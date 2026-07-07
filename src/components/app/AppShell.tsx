@@ -90,7 +90,7 @@ export function AppShell({
     onSuccess: (t) => {
       qc.invalidateQueries({ queryKey: ["threads"] });
       setMobileOpen(false);
-      navigate({ to: "/chat/$threadId", params: { threadId: t.id } });
+      if (t) navigate({ to: "/chat/$threadId", params: { threadId: t.id } });
     },
   });
 

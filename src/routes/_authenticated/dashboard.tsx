@@ -114,13 +114,14 @@ function Dashboard() {
       const isQuick = "label" in q;
       const title = isQuick ? q.label : q.custom.slice(0, 60);
       const t = await createFn({ data: { title } });
+      if (!t) throw new Error("Something went wrong, please try again.");
       const seed = isQuick ? q.prompt : q.custom;
       sessionStorage.setItem(`oi:seed:${t.id}`, seed);
       return t;
     },
     onSuccess: (t) => {
       qc.invalidateQueries({ queryKey: ["threads"] });
-      navigate({ to: "/chat/$threadId", params: { threadId: t.id } });
+      if (t) navigate({ to: "/chat/$threadId", params: { threadId: t.id } });
     },
   });
 

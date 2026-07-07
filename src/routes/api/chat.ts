@@ -105,6 +105,15 @@ export const Route = createFileRoute("/api/chat")({
         const threadId = body.threadId;
         if (!threadId) return new Response("Missing threadId", { status: 400 });
 
+        // Verify the thread belongs to the authenticated user before any writes.
+        const { data: ownedThread } = await supa
+          .from("threads")
+          .select("id")
+          .eq("id", threadId)
+          .eq("user_id", userId)
+          .maybeSingle();
+        if (!ownedThread) return new Response("Forbidden", { status: 403 });
+
         // Persist the latest user message (last item) before streaming.
         const last = messages[messages.length - 1];
         if (last && last.role === "user") {
@@ -230,8 +239,8 @@ export const Route = createFileRoute("/api/chat")({
             },
           });
         } catch (err) {
-          const msg = err instanceof Error ? err.message : "AI error";
-          return new Response(msg, { status: 500 });
+          console.error("Chat AI error:", err);
+          return new Response("Something went wrong. Please try again.", { status: 500 });
         }
       },
     },

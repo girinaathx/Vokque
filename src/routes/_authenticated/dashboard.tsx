@@ -129,7 +129,11 @@ function Dashboard() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-3xl px-5 pt-6 pb-32 lg:pt-14">
+      <div
+        className="mx-auto w-full max-w-3xl px-5 pb-32 lg:pt-14"
+        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)" }}
+      >
+
         <div className="animate-fade-up">
           <p className="text-muted-foreground text-sm">
             {new Date().toLocaleDateString(undefined, {

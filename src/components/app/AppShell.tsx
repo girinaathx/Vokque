@@ -17,12 +17,14 @@ import {
   Plus,
   MessageSquare,
   Trash2,
-  LogOut,
+  
   Menu,
   X,
   Home,
   Brain,
   Settings as SettingsIcon,
+  UserCircle2,
+
 
   
   Search,
@@ -332,11 +334,20 @@ function Sidebar({
         <Link
           to="/settings"
           onClick={closeMobile}
-          className="text-muted-foreground hover:bg-foreground/5 mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+          className="text-muted-foreground hover:bg-foreground/5 mb-1 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
         >
           <SettingsIcon className="h-4 w-4" />
           {t("nav.settings")}
         </Link>
+        <Link
+          to="/account"
+          onClick={closeMobile}
+          className="text-muted-foreground hover:bg-foreground/5 mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+        >
+          <UserCircle2 className="h-4 w-4" />
+          Account
+        </Link>
+
 
 
 
@@ -435,13 +446,6 @@ function Sidebar({
           )}
         </nav>
 
-        <button
-          onClick={onSignOut}
-          className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground mt-3 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
-        >
-          <LogOut className="h-4 w-4" />
-          {t("nav.signOut")}
-        </button>
       </div>
 
       <AlertDialog

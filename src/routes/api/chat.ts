@@ -7,6 +7,85 @@ import {
 } from "ai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createClient } from "@supabase/supabase-js";
+import Firecrawl from "@mendable/firecrawl-js";
+
+// Heuristic: does this user turn need fresh web info?
+const FACTUAL_HINTS =
+  /\b(today|tonight|tomorrow|yesterday|current|currently|now|latest|breaking|news|score|scores|weather|forecast|temperature|stock|share price|market|nasdaq|dow|s&p|bitcoin|crypto|price of|who won|who is (the )?(president|prime minister|ceo|pm|chancellor)|when is|when did|release date|launched|released|update on|status of|schedule)\b/i;
+const QUESTION_HINTS = /[?]|^(what|when|where|who|which|how much|how many|is|are|does|do|did)\b/i;
+
+function needsSearch(text: string): boolean {
+  if (!text || text.length < 3) return false;
+  if (text.length > 800) return false;
+  if (FACTUAL_HINTS.test(text)) return true;
+  // Year mentions like "2025", "2026" often mean current events
+  if (/\b20(2[4-9]|3\d)\b/.test(text) && QUESTION_HINTS.test(text)) return true;
+  return false;
+}
+
+type SearchHit = { title: string; url: string; snippet: string };
+
+async function maybeWebSearch(
+  query: string,
+): Promise<{ block: string; forceCite: boolean }> {
+  if (!needsSearch(query)) return { block: "", forceCite: false };
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  if (!apiKey) {
+    return {
+      block:
+        "\n\nLIVE WEB SEARCH: unavailable (search provider not configured). If the user asks about current events, news, weather, stocks, sports, prices, dates, or public officials, tell them plainly that live internet search is currently unavailable — do NOT guess or fabricate.",
+      forceCite: false,
+    };
+  }
+  try {
+    const fc = new Firecrawl({ apiKey });
+    const res = await fc.search(query, { limit: 6 });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw: any = res as any;
+    const list: SearchHit[] = (
+      raw?.web ??
+      raw?.data?.web ??
+      raw?.data ??
+      raw?.results ??
+      []
+    )
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((r: any) => ({
+        title: String(r?.title ?? r?.name ?? "").slice(0, 200),
+        url: String(r?.url ?? r?.link ?? ""),
+        snippet: String(r?.description ?? r?.snippet ?? r?.content ?? "").slice(
+          0,
+          400,
+        ),
+      }))
+      .filter((h: SearchHit) => h.url);
+    if (list.length === 0) {
+      return {
+        block:
+          "\n\nLIVE WEB SEARCH: no results returned. If you can't answer confidently from general knowledge, say so instead of guessing.",
+        forceCite: false,
+      };
+    }
+    const formatted = list
+      .slice(0, 6)
+      .map(
+        (h, i) =>
+          `[${i + 1}] ${h.title}\nURL: ${h.url}\nSnippet: ${h.snippet}`,
+      )
+      .join("\n\n");
+    return {
+      block: `\n\nLIVE WEB SEARCH RESULTS (Google-style, fetched just now for the user's query — TREAT AS AUTHORITATIVE OVER YOUR TRAINING DATA for anything time-sensitive):\n${formatted}\n\nRULES FOR USING THESE RESULTS:\n- Base factual claims about current events, news, weather, prices, dates, sports, or people-in-office ONLY on these results.\n- Never fabricate a URL, headline, number, or date. If the results don't cover it, say so.\n- Summarize in your own words, don't dump the snippets verbatim.\n- Cite sources inline as [[n]](URL) matching the numbered results, and end with a "## Sources" section listing the ones you used.`,
+      forceCite: true,
+    };
+  } catch (err) {
+    console.error("Firecrawl search failed:", err);
+    return {
+      block:
+        "\n\nLIVE WEB SEARCH: unavailable right now (search provider error). Tell the user internet search is temporarily unavailable rather than guessing about current events.",
+      forceCite: false,
+    };
+  }
+}
 
 const OPENAI_MODEL = "gpt-4o-mini";
 
@@ -174,13 +253,24 @@ export const Route = createFileRoute("/api/chat")({
         }
         const dateBlock = `\n\nCURRENT DATE & TIME (authoritative — always use this when the user asks the date, day, month, year, or time; never invent or use a stale date). Answer in the user's LOCAL timezone (${tz}):\n- User local: ${localHuman}\n- ISO (UTC): ${now.toISOString()}\n- Year: ${now.getUTCFullYear()}`;
 
+        // Live Google-style web search via Firecrawl for factual queries.
+        const userQueryText =
+          last && last.role === "user"
+            ? last.parts
+                .map((p) => (p.type === "text" ? p.text : ""))
+                .join(" ")
+                .trim()
+            : "";
+        const { block: searchBlock, forceCite } = await maybeWebSearch(userQueryText);
 
         const systemPrompt =
           CORE_SYSTEM +
           personaBlock +
           dateBlock +
           buildMemoryBlock(mems) +
-          (body.cite ? CITE_INSTRUCTIONS : "");
+          searchBlock +
+          (body.cite || forceCite ? CITE_INSTRUCTIONS : "");
+
 
 
         try {

@@ -446,13 +446,6 @@ function Sidebar({
           )}
         </nav>
 
-        <button
-          onClick={onSignOut}
-          className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground mt-3 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
-        >
-          <LogOut className="h-4 w-4" />
-          {t("nav.signOut")}
-        </button>
       </div>
 
       <AlertDialog

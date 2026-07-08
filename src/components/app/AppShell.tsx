@@ -23,6 +23,8 @@ import {
   Home,
   Brain,
   Settings as SettingsIcon,
+  UserCircle2,
+
 
   
   Search,

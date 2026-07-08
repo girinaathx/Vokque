@@ -17,7 +17,7 @@ import {
   Plus,
   MessageSquare,
   Trash2,
-  LogOut,
+  
   Menu,
   X,
   Home,

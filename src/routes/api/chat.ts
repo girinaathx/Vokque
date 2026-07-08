@@ -174,13 +174,24 @@ export const Route = createFileRoute("/api/chat")({
         }
         const dateBlock = `\n\nCURRENT DATE & TIME (authoritative — always use this when the user asks the date, day, month, year, or time; never invent or use a stale date). Answer in the user's LOCAL timezone (${tz}):\n- User local: ${localHuman}\n- ISO (UTC): ${now.toISOString()}\n- Year: ${now.getUTCFullYear()}`;
 
+        // Live Google-style web search via Firecrawl for factual queries.
+        const userQueryText =
+          last && last.role === "user"
+            ? last.parts
+                .map((p) => (p.type === "text" ? p.text : ""))
+                .join(" ")
+                .trim()
+            : "";
+        const { block: searchBlock, forceCite } = await maybeWebSearch(userQueryText);
 
         const systemPrompt =
           CORE_SYSTEM +
           personaBlock +
           dateBlock +
           buildMemoryBlock(mems) +
-          (body.cite ? CITE_INSTRUCTIONS : "");
+          searchBlock +
+          (body.cite || forceCite ? CITE_INSTRUCTIONS : "");
+
 
 
         try {

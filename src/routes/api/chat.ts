@@ -5,7 +5,7 @@ import {
   streamText,
   type UIMessage,
 } from "ai";
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { createClient } from "@supabase/supabase-js";
 import Firecrawl from "@mendable/firecrawl-js";
 
@@ -87,7 +87,7 @@ async function maybeWebSearch(
   }
 }
 
-const OPENAI_MODEL = "gpt-4o-mini";
+const CHAT_MODEL = "google/gemini-3-flash-preview";
 
 const AGENTS = ["Business", "Coding", "Design", "Research", "General"] as const;
 type Agent = (typeof AGENTS)[number];

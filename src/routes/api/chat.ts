@@ -150,15 +150,11 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) {
-          return new Response("Missing OPENAI_API_KEY", { status: 500 });
+          return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         }
-        const openai = createOpenAICompatible({
-          name: "openai",
-          baseURL: "https://api.openai.com/v1",
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
+        const gateway = createLovableAiGatewayProvider(apiKey);
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
 
@@ -229,7 +225,7 @@ export const Route = createFileRoute("/api/chat")({
           .order("created_at", { ascending: false })
           .limit(40);
 
-        const model = openai(OPENAI_MODEL);
+        const model = gateway(CHAT_MODEL);
         const personaBlock =
           "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
           AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");

@@ -314,37 +314,37 @@ function Sidebar({
           to="/dashboard"
           onClick={closeMobile}
           className={cn(
-            "mb-1 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition",
+            "mb-0.5 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition",
             !activeThreadId
-              ? "bg-foreground/8 font-medium"
-              : "text-muted-foreground hover:bg-foreground/5",
+              ? "bg-foreground/8 text-foreground font-medium"
+              : "text-foreground/85 hover:bg-foreground/5",
           )}
         >
-          <Home className="h-4 w-4" />
+          <Home className="h-3.5 w-3.5" />
           {t("nav.home")}
         </Link>
         <Link
           to="/memory"
           onClick={closeMobile}
-          className="text-muted-foreground hover:bg-foreground/5 mb-1 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+          className="text-foreground/85 hover:bg-foreground/5 mb-0.5 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
         >
-          <Brain className="h-4 w-4" />
+          <Brain className="h-3.5 w-3.5" />
           {t("nav.memory")}
         </Link>
         <Link
           to="/settings"
           onClick={closeMobile}
-          className="text-muted-foreground hover:bg-foreground/5 mb-1 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+          className="text-foreground/85 hover:bg-foreground/5 mb-0.5 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
         >
-          <SettingsIcon className="h-4 w-4" />
+          <SettingsIcon className="h-3.5 w-3.5" />
           {t("nav.settings")}
         </Link>
         <Link
           to="/account"
           onClick={closeMobile}
-          className="text-muted-foreground hover:bg-foreground/5 mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition"
+          className="text-foreground/85 hover:bg-foreground/5 mb-2 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
         >
-          <UserCircle2 className="h-4 w-4" />
+          <UserCircle2 className="h-3.5 w-3.5" />
           Account
         </Link>
 
@@ -518,14 +518,8 @@ function ThreadRow({
   const [draft, setDraft] = useState(thread.title);
   const isPinned = !!thread.pinned_at;
 
-  // Long-press to enter selection mode.
-  const pressTimer = { current: null as ReturnType<typeof setTimeout> | null };
-  const startPress = () => {
-    pressTimer.current = setTimeout(() => onSelect(), 450);
-  };
-  const cancelPress = () => {
-    if (pressTimer.current) clearTimeout(pressTimer.current);
-  };
+  // Mistouch prevention: deletion is ONLY available through the ⋯ menu → Delete
+  // (which opens a confirmation dialog). No long-press, no swipe, no accidental delete.
 
   const commitRename = () => {
     const title = draft.trim();
@@ -595,19 +589,6 @@ function ThreadRow({
         </button>
       ) : (
         <div
-          onTouchStart={startPress}
-          onTouchEnd={cancelPress}
-          onTouchMove={cancelPress}
-          onPointerDown={(e) => {
-            if (e.pointerType === "mouse" && e.button !== 0) return;
-            startPress();
-          }}
-          onPointerUp={cancelPress}
-          onPointerLeave={cancelPress}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            onSelect();
-          }}
           className={cn(
             "flex items-center gap-1 rounded-2xl pr-1 transition",
             active ? "bg-foreground/8" : "hover:bg-foreground/5",

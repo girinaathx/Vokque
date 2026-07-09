@@ -5,7 +5,7 @@ import {
   streamText,
   type UIMessage,
 } from "ai";
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { createClient } from "@supabase/supabase-js";
 import Firecrawl from "@mendable/firecrawl-js";
 
@@ -87,7 +87,7 @@ async function maybeWebSearch(
   }
 }
 
-const OPENAI_MODEL = "gpt-4o-mini";
+const CHAT_MODEL = "google/gemini-3-flash-preview";
 
 const AGENTS = ["Business", "Coding", "Design", "Research", "General"] as const;
 type Agent = (typeof AGENTS)[number];
@@ -150,15 +150,11 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) {
-          return new Response("Missing OPENAI_API_KEY", { status: 500 });
+          return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         }
-        const openai = createOpenAICompatible({
-          name: "openai",
-          baseURL: "https://api.openai.com/v1",
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
+        const gateway = createLovableAiGatewayProvider(apiKey);
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
 
@@ -229,7 +225,7 @@ export const Route = createFileRoute("/api/chat")({
           .order("created_at", { ascending: false })
           .limit(40);
 
-        const model = openai(OPENAI_MODEL);
+        const model = gateway(CHAT_MODEL);
         const personaBlock =
           "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
           AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");

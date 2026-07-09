@@ -100,12 +100,10 @@ function Dashboard() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      const meta = data.user?.user_metadata ?? {};
-      const name =
-        (meta.full_name as string | undefined) ??
-        (meta.name as string | undefined) ??
-        data.user?.email?.split("@")[0];
-      setDisplayName(name?.split(" ")[0]);
+      const local = data.user?.email?.split("@")[0] ?? "";
+      const first = local.split(/[._\-+]/)[0] ?? "";
+      const pretty = first ? first[0].toUpperCase() + first.slice(1).toLowerCase() : undefined;
+      setDisplayName(pretty);
     });
   }, []);
 

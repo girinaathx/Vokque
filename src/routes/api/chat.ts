@@ -159,40 +159,53 @@ export const Route = createFileRoute("/api/chat")({
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
 
+        const body = (await request.json()) as ChatBody;
+        const messages = body.messages ?? [];
+        const isGuest = body.guest === true;
+
         const authHeader = request.headers.get("authorization") ?? "";
         const token = authHeader.startsWith("Bearer ")
           ? authHeader.slice(7)
           : "";
-        if (!token) return new Response("Unauthorized", { status: 401 });
-
-        const supa = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-          global: { headers: { Authorization: `Bearer ${token}` } },
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-        const { data: claimsData, error: claimsErr } =
-          await supa.auth.getClaims(token);
-        if (claimsErr || !claimsData?.claims?.sub) {
+        if (!token && !isGuest) {
           return new Response("Unauthorized", { status: 401 });
         }
-        const userId = claimsData.claims.sub;
 
-        const body = (await request.json()) as ChatBody;
-        const messages = body.messages ?? [];
-        const threadId = body.threadId;
-        if (!threadId) return new Response("Missing threadId", { status: 400 });
+        // Guest mode: no account, no persistence, no memory. Capped client-side.
+        type Supa = ReturnType<typeof createClient>;
+        let supa: Supa | null = null;
+        let userId = "";
+        let threadId = body.threadId ?? "";
+        let mems: { content: string; category: string }[] | null = null;
 
-        // Verify the thread belongs to the authenticated user before any writes.
-        const { data: ownedThread } = await supa
-          .from("threads")
-          .select("id")
-          .eq("id", threadId)
-          .eq("user_id", userId)
-          .maybeSingle();
-        if (!ownedThread) return new Response("Forbidden", { status: 403 });
+        if (!isGuest) {
+          supa = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+            global: { headers: { Authorization: `Bearer ${token}` } },
+            auth: { persistSession: false, autoRefreshToken: false },
+          });
+          const { data: claimsData, error: claimsErr } =
+            await supa.auth.getClaims(token);
+          if (claimsErr || !claimsData?.claims?.sub) {
+            return new Response("Unauthorized", { status: 401 });
+          }
+          userId = claimsData.claims.sub;
+
+          if (!threadId)
+            return new Response("Missing threadId", { status: 400 });
+
+          // Verify the thread belongs to the authenticated user before any writes.
+          const { data: ownedThread } = await supa
+            .from("threads")
+            .select("id")
+            .eq("id", threadId)
+            .eq("user_id", userId)
+            .maybeSingle();
+          if (!ownedThread) return new Response("Forbidden", { status: 403 });
+        }
 
         // Persist the latest user message (last item) before streaming.
         const last = messages[messages.length - 1];
-        if (last && last.role === "user") {
+        if (supa && last && last.role === "user") {
           await supa.from("messages").insert({
             thread_id: threadId,
             user_id: userId,
@@ -220,11 +233,15 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         // Load user memories to inject as context.
-        const { data: mems } = await supa
-          .from("memories")
-          .select("content, category")
-          .order("created_at", { ascending: false })
-          .limit(40);
+        if (supa) {
+          const { data } = await supa
+            .from("memories")
+            .select("content, category")
+            .order("created_at", { ascending: false })
+            .limit(40);
+          mems = (data as { content: string; category: string }[]) ?? null;
+        }
+
 
         const model = gateway(CHAT_MODEL);
         const personaBlock =

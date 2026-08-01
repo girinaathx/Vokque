@@ -2,8 +2,10 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
+import { guestStore } from "@/lib/guest";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock } from "lucide-react";
+import { Loader2, Mail, Lock, UserRound } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/auth")({
@@ -14,10 +16,40 @@ export const Route = createFileRoute("/auth")({
         name: "description",
         content: "Sign in to Avenxa, your premium AI assistant.",
       },
+      { property: "og:title", content: "Sign in · Avenxa" },
+      {
+        property: "og:description",
+        content: "Sign in to Avenxa with Google, email, or continue as guest.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,
 });
+
+function GoogleGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
+      <path
+        fill="#4285F4"
+        d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1A12 12 0 0 0 12 24Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.4 14.4a7.2 7.2 0 0 1 0-4.6V6.7H1.4a12 12 0 0 0 0 10.8l4-3.1Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.8c1.8 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.4 6.7l4 3.1C6.3 6.9 8.9 4.8 12 4.8Z"
+      />
+    </svg>
+  );
+}
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -26,12 +58,38 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard" });
     });
   }, [navigate]);
+
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error(result.error.message ?? t("errors.generic"));
+        return;
+      }
+      if (result.redirected) return;
+      navigate({ to: "/dashboard" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("errors.generic"));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGuest = () => {
+    guestStore.activate();
+    navigate({ to: "/guest" });
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -132,6 +132,7 @@ const CITE_INSTRUCTIONS = `\n\nCITATIONS MODE — ON.
 type ChatBody = {
   messages?: UIMessage[];
   threadId?: string;
+  guest?: boolean;
   cite?: boolean;
   tz?: string;
   clientNow?: string;

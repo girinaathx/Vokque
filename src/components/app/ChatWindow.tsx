@@ -391,7 +391,7 @@ export function ChatWindow({
       {/* Fixed composer — matte, no reflections */}
       <div
         ref={composerRef}
-        className="pointer-events-none fixed right-0 bottom-0 left-0 z-30 px-3 lg:left-72 lg:px-8"
+        className={cn("pointer-events-none fixed right-0 bottom-0 left-0 z-30 px-3 lg:px-8", !guest && "lg:left-72")}
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)", paddingTop: "8px" }}
       >
         <div className="pointer-events-auto mx-auto w-full max-w-3xl">

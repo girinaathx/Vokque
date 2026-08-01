@@ -156,7 +156,39 @@ function AuthPage() {
         </div>
 
         <div className="glass-strong rounded-3xl p-7">
+          <button
+            type="button"
+            onClick={handleGoogle}
+            disabled={googleLoading}
+            className="glass-thin hover:bg-foreground/5 flex w-full items-center justify-center gap-2.5 rounded-2xl px-5 py-3.5 text-sm font-medium transition active:scale-[0.99] disabled:opacity-60"
+          >
+            {googleLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <GoogleGlyph />
+            )}
+            Continue with Google
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGuest}
+            className="text-muted-foreground hover:text-foreground hover:bg-foreground/5 mt-2 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium transition active:scale-[0.99]"
+          >
+            <UserRound className="h-4 w-4" />
+            Continue as guest
+          </button>
+
+          <div className="my-5 flex items-center gap-3">
+            <span className="bg-border h-px flex-1" />
+            <span className="text-muted-foreground text-[11px] tracking-wider uppercase">
+              or
+            </span>
+            <span className="bg-border h-px flex-1" />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-3">
+
             <div className="glass-thin focus-within:ring-foreground/20 flex items-center gap-2.5 rounded-2xl px-4 py-3 ring-1 ring-transparent transition focus-within:ring-2">
               <Mail className="text-muted-foreground h-4 w-4" />
               <input

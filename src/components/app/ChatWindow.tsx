@@ -208,7 +208,7 @@ export function ChatWindow({
     setMessages(truncated);
     setEditingId(null);
     try {
-      await truncateThreadMessages({ data: { threadId, keep: idx } });
+      if (!guest) await truncateThreadMessages({ data: { threadId, keep: idx } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("errors.generic"));
       return;
@@ -222,7 +222,7 @@ export function ChatWindow({
     const keep = messages.length - 1;
     setMessages(messages.slice(0, keep));
     try {
-      await truncateThreadMessages({ data: { threadId, keep } });
+      if (!guest) await truncateThreadMessages({ data: { threadId, keep } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("errors.generic"));
       return;
@@ -348,7 +348,7 @@ export function ChatWindow({
                     )}
                   >
                     <CopyBtn text={text} />
-                    <RememberBtn text={text} threadId={threadId} />
+                    {!guest && <RememberBtn text={text} threadId={threadId} />}
                     {isUser && (
                       <button
                         onClick={() => {

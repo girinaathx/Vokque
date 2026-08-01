@@ -175,7 +175,7 @@ export const Route = createFileRoute("/api/chat")({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let supa: any = null;
         let userId = "";
-        let threadId = body.threadId ?? "";
+        const threadId = body.threadId ?? "";
         let mems: { content: string; category: string }[] | null = null;
 
         if (!isGuest) {

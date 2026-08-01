@@ -6,10 +6,12 @@ import { AppShell } from "@/components/app/AppShell";
 import { createThread } from "@/lib/threads.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Train,
-  Plane,
-  CalendarDays,
-  Dumbbell,
+  Sigma,
+  Lightbulb,
+  Code2,
+  PenLine,
+  Languages,
+  FileText,
   BookOpen,
   Compass,
   MessageCircle,
@@ -20,12 +22,19 @@ import type { LucideIcon } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Home · FeynCloud" },
+      { title: "Home · Avenxa" },
       {
         name: "description",
         content:
-          "Your personalized home for travel, fitness, productivity, and intelligent conversation.",
+          "Your personalized Avenxa home — math, code, writing, study, and intelligent conversation.",
       },
+      { property: "og:title", content: "Home · Avenxa" },
+      {
+        property: "og:description",
+        content: "Quick chat shortcuts for math, code, writing, and study.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
@@ -40,29 +49,46 @@ type Quick = {
 
 const QUICK_ACTIONS: Quick[] = [
   {
-    label: "Find Train Tickets",
-    hint: "Plan your route",
-    prompt: "Help me find train tickets. Ask me where I'm going and when.",
-    icon: Train,
-  },
-  {
-    label: "Find Flights",
-    hint: "Search & compare",
-    prompt: "I'd like help finding flights. Ask me the details you need.",
-    icon: Plane,
-  },
-  {
-    label: "Plan My Day",
-    hint: "A calm schedule",
-    prompt: "Help me plan my day. Start by asking what's on my mind.",
-    icon: CalendarDays,
-  },
-  {
-    label: "Gym Assistant",
-    hint: "Workout & habits",
+    label: "Math",
+    hint: "Solve step by step",
     prompt:
-      "Be my gym assistant. Ask my goals and build me a workout for today.",
-    icon: Dumbbell,
+      "You are in math mode. Ask me for the problem, then solve it step by step with full LaTeX formatting ($...$ inline, $$...$$ display) for every equation, matrix, integral, or derivative.",
+    icon: Sigma,
+  },
+  {
+    label: "Explain",
+    hint: "Make it simple",
+    prompt:
+      "Explain a concept to me clearly, from first principles, with an analogy and a short example. Ask me what to explain.",
+    icon: Lightbulb,
+  },
+  {
+    label: "Code",
+    hint: "Build & debug",
+    prompt:
+      "Be my coding assistant. Ask what I'm building or what's broken, then give working code with a short explanation.",
+    icon: Code2,
+  },
+  {
+    label: "Write",
+    hint: "Drafts & polish",
+    prompt:
+      "Help me write something. Ask what it is, the audience, and the tone, then draft it.",
+    icon: PenLine,
+  },
+  {
+    label: "Summarize",
+    hint: "Long → short",
+    prompt:
+      "Summarize something for me. Ask me to paste the text or upload the file, then give key points and takeaways.",
+    icon: FileText,
+  },
+  {
+    label: "Translate",
+    hint: "Any language",
+    prompt:
+      "Be my translator. Ask what text and which target language, then translate naturally and note any nuance.",
+    icon: Languages,
   },
   {
     label: "Study Planner",
@@ -84,6 +110,7 @@ const QUICK_ACTIONS: Quick[] = [
     icon: MessageCircle,
   },
 ];
+
 
 function greeting(name?: string) {
   const h = new Date().getHours();

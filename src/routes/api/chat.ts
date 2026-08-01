@@ -105,13 +105,13 @@ const AGENT_PERSONAS: Record<Agent, string> = {
     "General assistant — everyday help: travel, fitness, productivity, daily planning, conversation.",
 };
 
-const CORE_SYSTEM = `You are FeynCloud — the official AI assistant of the FeynCloud platform. You are a premium AI operating system that combines a team of specialist agents into one unified voice. You are warm, accurate, professional, and proactive. You don't just answer — you take action, produce artifacts (plans, drafts, docs, code, designs), and help the user reach real outcomes.
+const CORE_SYSTEM = `You are Avenxa — the official AI assistant of the Avenxa platform. You are a premium AI operating system that combines a team of specialist agents into one unified voice. You are warm, accurate, professional, and proactive. You don't just answer — you take action, produce artifacts (plans, drafts, docs, code, designs), and help the user reach real outcomes.
 
 IDENTITY:
-- Your name and identity is "FeynCloud".
-- If asked "Who created you?" or "Who made you?", reply EXACTLY: "FeynCloud was created and developed by the CEO of O1 Platforms, Mokalla Girinaath. I am the AI assistant experience provided through the FeynCloud platform."
-- If asked about the technology, models, or what powers you, reply: "FeynCloud may use multiple AI models, APIs, and technologies to provide its capabilities. The platform and user experience are developed by O1 Platforms."
-- Never claim O1 Platforms trained the underlying foundation model from scratch. Be transparent about the distinction between the FeynCloud platform and any underlying AI technologies. Always represent the FeynCloud brand professionally.
+- Your name and identity is "Avenxa".
+- If asked "Who created you?" or "Who made you?", reply EXACTLY: "Avenxa was created and developed by the CEO of O1 Platforms, Mokalla Girinaath. I am the AI assistant experience provided through the Avenxa platform."
+- If asked about the technology, models, or what powers you, reply: "Avenxa may use multiple AI models, APIs, and technologies to provide its capabilities. The platform and user experience are developed by O1 Platforms."
+- Never claim O1 Platforms trained the underlying foundation model from scratch. Be transparent about the distinction between the Avenxa platform and any underlying AI technologies. Always represent the Avenxa brand professionally.
 
 GOLDEN RULE: behave like an AI operating system, not a chatbot. Remember the user, collaborate across specialties, execute, and ship outcomes.
 
@@ -120,6 +120,8 @@ VOICE: thoughtful, concise, kind. Use clean markdown. Emojis sparingly. Acknowle
 ROUTING: At the very start of every reply, output a hidden HTML comment naming the specialist(s) you are channeling, picked from: Business, Coding, Design, Research, General. Format EXACTLY:
 <!--agents:X,Y-->
 Pick 1–3 of the most relevant agents. Do not mention this comment to the user. After the comment, continue with your normal markdown reply on a new line. Never wrap the comment in code fences.
+
+MATHEMATICS: Avenxa has full LaTeX rendering (KaTeX). Always write mathematics in LaTeX — never plain-text approximations. Use $...$ for inline math and $$...$$ on their own lines for display math. Use proper commands: \\frac, \\sqrt, \\int, \\sum, \\lim, \\begin{pmatrix}...\\end{pmatrix}, \\begin{cases}...\\end{cases}, \\vec, \\partial. For any calculation, show the steps in order, each on its own display line, then state the final answer clearly. Cover arithmetic, algebra, geometry, trigonometry, calculus, linear algebra, statistics, probability, and physics-style derivations.
 
 PROACTIVE: when the user has a goal, break it into steps, name obstacles, recommend actions, and offer to execute (draft the email, build the plan, write the code, outline the design).`;
 
@@ -132,6 +134,7 @@ const CITE_INSTRUCTIONS = `\n\nCITATIONS MODE — ON.
 type ChatBody = {
   messages?: UIMessage[];
   threadId?: string;
+  guest?: boolean;
   cite?: boolean;
   tz?: string;
   clientNow?: string;
@@ -158,40 +161,53 @@ export const Route = createFileRoute("/api/chat")({
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
 
+        const body = (await request.json()) as ChatBody;
+        const messages = body.messages ?? [];
+        const isGuest = body.guest === true;
+
         const authHeader = request.headers.get("authorization") ?? "";
         const token = authHeader.startsWith("Bearer ")
           ? authHeader.slice(7)
           : "";
-        if (!token) return new Response("Unauthorized", { status: 401 });
-
-        const supa = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-          global: { headers: { Authorization: `Bearer ${token}` } },
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-        const { data: claimsData, error: claimsErr } =
-          await supa.auth.getClaims(token);
-        if (claimsErr || !claimsData?.claims?.sub) {
+        if (!token && !isGuest) {
           return new Response("Unauthorized", { status: 401 });
         }
-        const userId = claimsData.claims.sub;
 
-        const body = (await request.json()) as ChatBody;
-        const messages = body.messages ?? [];
-        const threadId = body.threadId;
-        if (!threadId) return new Response("Missing threadId", { status: 400 });
+        // Guest mode: no account, no persistence, no memory. Capped client-side.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let supa: any = null;
+        let userId = "";
+        const threadId = body.threadId ?? "";
+        let mems: { content: string; category: string }[] | null = null;
 
-        // Verify the thread belongs to the authenticated user before any writes.
-        const { data: ownedThread } = await supa
-          .from("threads")
-          .select("id")
-          .eq("id", threadId)
-          .eq("user_id", userId)
-          .maybeSingle();
-        if (!ownedThread) return new Response("Forbidden", { status: 403 });
+        if (!isGuest) {
+          supa = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+            global: { headers: { Authorization: `Bearer ${token}` } },
+            auth: { persistSession: false, autoRefreshToken: false },
+          });
+          const { data: claimsData, error: claimsErr } =
+            await supa.auth.getClaims(token);
+          if (claimsErr || !claimsData?.claims?.sub) {
+            return new Response("Unauthorized", { status: 401 });
+          }
+          userId = claimsData.claims.sub;
+
+          if (!threadId)
+            return new Response("Missing threadId", { status: 400 });
+
+          // Verify the thread belongs to the authenticated user before any writes.
+          const { data: ownedThread } = await supa
+            .from("threads")
+            .select("id")
+            .eq("id", threadId)
+            .eq("user_id", userId)
+            .maybeSingle();
+          if (!ownedThread) return new Response("Forbidden", { status: 403 });
+        }
 
         // Persist the latest user message (last item) before streaming.
         const last = messages[messages.length - 1];
-        if (last && last.role === "user") {
+        if (supa && last && last.role === "user") {
           await supa.from("messages").insert({
             thread_id: threadId,
             user_id: userId,
@@ -219,11 +235,15 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         // Load user memories to inject as context.
-        const { data: mems } = await supa
-          .from("memories")
-          .select("content, category")
-          .order("created_at", { ascending: false })
-          .limit(40);
+        if (supa) {
+          const { data } = await supa
+            .from("memories")
+            .select("content, category")
+            .order("created_at", { ascending: false })
+            .limit(40);
+          mems = (data as { content: string; category: string }[]) ?? null;
+        }
+
 
         const model = gateway(CHAT_MODEL);
         const personaBlock =
@@ -282,7 +302,7 @@ export const Route = createFileRoute("/api/chat")({
             onFinish: async ({ messages: finalMessages, isAborted }) => {
               if (isAborted) return;
               const assistant = finalMessages[finalMessages.length - 1];
-              if (assistant && assistant.role === "assistant") {
+              if (supa && assistant && assistant.role === "assistant") {
                 await supa.from("messages").insert({
                   thread_id: threadId,
                   user_id: userId,

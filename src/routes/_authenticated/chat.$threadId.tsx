@@ -10,7 +10,7 @@ import { Logo } from "@/components/brand/Logo";
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   head: () => ({
     meta: [
-      { title: "Chat · FeynCloud" },
+      { title: "Chat · Avenxa" },
       {
         name: "description",
         content: "Chat with your premium AI companion.",

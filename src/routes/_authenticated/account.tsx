@@ -16,8 +16,8 @@ import {
 export const Route = createFileRoute("/_authenticated/account")({
   head: () => ({
     meta: [
-      { title: "Account · FeynCloud" },
-      { name: "description", content: "Manage your FeynCloud account, plan, and security." },
+      { title: "Account · Avenxa" },
+      { name: "description", content: "Manage your Avenxa account, plan, and security." },
     ],
   }),
   component: AccountPage,

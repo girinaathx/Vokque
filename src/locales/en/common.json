@@ -1,6 +1,6 @@
 {
   "brand": {
-    "name": "FeynCloud",
+    "name": "Avenxa",
     "tagline": "Your everyday AI"
   },
   "nav": {
@@ -16,7 +16,7 @@
     "welcomeBack": "Welcome back",
     "createAccount": "Create your account",
     "signInSubtitle": "Sign in to your AI companion",
-    "signUpSubtitle": "Start your journey with FeynCloud",
+    "signUpSubtitle": "Start your journey with Avenxa",
     "email": "you@example.com",
     "password": "••••••••",
     "signIn": "Sign in",
@@ -25,13 +25,13 @@
     "haveAccount": "Already have an account?",
     "forgot": "Forgot password?",
     "back": "← Back",
-    "welcomeToast": "Welcome to FeynCloud",
+    "welcomeToast": "Welcome to Avenxa",
     "welcomeBackToast": "Welcome back"
   },
   "chat": {
-    "placeholder": "Message FeynCloud…",
+    "placeholder": "Message Avenxa…",
     "thinking": "Thinking…",
-    "disclaimer": "FeynCloud can make mistakes. Verify important info.",
+    "disclaimer": "Avenxa can make mistakes. Verify important info.",
     "emptyTitle": "What's on your mind?",
     "emptySubtitle": "I'm here to help — ask me anything.",
     "starters": {
@@ -55,7 +55,7 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Everything FeynCloud can do — in one place.",
+    "subtitle": "Everything Avenxa can do — in one place.",
     "sections": {
       "account": "Account",
       "general": "General",
@@ -76,7 +76,7 @@
     },
     "appearance": {
       "title": "Appearance",
-      "subtitle": "Choose how FeynCloud looks.",
+      "subtitle": "Choose how Avenxa looks.",
       "system": "System",
       "systemDesc": "Follow your device",
       "dark": "AMOLED Dark",
@@ -92,13 +92,13 @@
     "account": {
       "signOut": "Sign out of this device",
       "signOutAll": "Sign out everywhere",
-      "deleteNote": "To delete your account, contact support@feyncloud.tech.",
+      "deleteNote": "To delete your account, contact support@avenxa.tech.",
       "changePassword": "Change password",
       "sent": "Password reset email sent"
     },
     "about": {
-      "title": "About FeynCloud",
-      "body": "FeynCloud is created by FeynCloud Technology.",
+      "title": "About Avenxa",
+      "body": "Avenxa is created by Avenxa Technology.",
       "version": "Version 1.0"
     }
   },

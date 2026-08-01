@@ -6,11 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FeynCloud" },
+      { title: "Avenxa" },
       {
         name: "description",
         content:
-          "FeynCloud — a premium AI assistant by FeynCloud Technology.",
+          "Avenxa — a premium AI assistant by Avenxa Technology.",
       },
     ],
   }),

@@ -21,11 +21,11 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/memory")({
   head: () => ({
     meta: [
-      { title: "Memory · FeynCloud" },
+      { title: "Memory · Avenxa" },
       {
         name: "description",
         content:
-          "Review, edit, export, and delete everything FeynCloud remembers about you.",
+          "Review, edit, export, and delete everything Avenxa remembers about you.",
       },
     ],
   }),
@@ -139,7 +139,7 @@ function MemoryPage() {
                 Memory
               </h1>
               <p className="text-muted-foreground text-sm">
-                Everything FeynCloud remembers about you. Yours to edit,
+                Everything Avenxa remembers about you. Yours to edit,
                 export, or delete — anytime.
               </p>
             </div>
@@ -224,7 +224,7 @@ function MemoryPage() {
           {filtered.length === 0 && (
             <div className="glass text-muted-foreground rounded-3xl p-8 text-center text-sm">
               {memories.length === 0
-                ? "No memories yet. Chat with FeynCloud — it will start remembering. You can also add memories manually above."
+                ? "No memories yet. Chat with Avenxa — it will start remembering. You can also add memories manually above."
                 : "No memories match your filter."}
             </div>
           )}

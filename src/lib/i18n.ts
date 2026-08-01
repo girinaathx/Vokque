@@ -50,7 +50,7 @@ if (!i18n.isInitialized) {
       interpolation: { escapeValue: false },
       detection: {
         order: ["localStorage", "navigator"],
-        lookupLocalStorage: "feyncloud:lang",
+        lookupLocalStorage: "avenxa:lang",
         caches: ["localStorage"],
       },
     });

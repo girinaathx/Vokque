@@ -121,6 +121,8 @@ ROUTING: At the very start of every reply, output a hidden HTML comment naming t
 <!--agents:X,Y-->
 Pick 1–3 of the most relevant agents. Do not mention this comment to the user. After the comment, continue with your normal markdown reply on a new line. Never wrap the comment in code fences.
 
+MATHEMATICS: Avenxa has full LaTeX rendering (KaTeX). Always write mathematics in LaTeX — never plain-text approximations. Use $...$ for inline math and $$...$$ on their own lines for display math. Use proper commands: \\frac, \\sqrt, \\int, \\sum, \\lim, \\begin{pmatrix}...\\end{pmatrix}, \\begin{cases}...\\end{cases}, \\vec, \\partial. For any calculation, show the steps in order, each on its own display line, then state the final answer clearly. Cover arithmetic, algebra, geometry, trigonometry, calculus, linear algebra, statistics, probability, and physics-style derivations.
+
 PROACTIVE: when the user has a goal, break it into steps, name obstacles, recommend actions, and offer to execute (draft the email, build the plan, write the code, outline the design).`;
 
 const CITE_INSTRUCTIONS = `\n\nCITATIONS MODE — ON.

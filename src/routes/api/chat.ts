@@ -172,8 +172,8 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         // Guest mode: no account, no persistence, no memory. Capped client-side.
-        type Supa = ReturnType<typeof createClient>;
-        let supa: Supa | null = null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let supa: any = null;
         let userId = "";
         let threadId = body.threadId ?? "";
         let mems: { content: string; category: string }[] | null = null;
@@ -300,7 +300,7 @@ export const Route = createFileRoute("/api/chat")({
             onFinish: async ({ messages: finalMessages, isAborted }) => {
               if (isAborted) return;
               const assistant = finalMessages[finalMessages.length - 1];
-              if (assistant && assistant.role === "assistant") {
+              if (supa && assistant && assistant.role === "assistant") {
                 await supa.from("messages").insert({
                   thread_id: threadId,
                   user_id: userId,

@@ -9,10 +9,10 @@ import { useTranslation } from "react-i18next";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in · FeynCloud" },
+      { title: "Sign in · Avenxa" },
       {
         name: "description",
-        content: "Sign in to FeynCloud, your premium AI assistant.",
+        content: "Sign in to Avenxa, your premium AI assistant.",
       },
     ],
   }),

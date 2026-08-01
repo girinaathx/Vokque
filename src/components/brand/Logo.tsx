@@ -1,4 +1,4 @@
-import logoUrl from "@/assets/feyncloud-mark.png";
+import logoUrl from "@/assets/avenxa-mark.png";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -23,10 +23,10 @@ export function Logo({ className, size = 40, glow = false }: LogoProps) {
           aria-hidden
         />
       )}
-      {/* White geometric FeynCloud mark on transparent bg. Invert to black in light theme. */}
+      {/* White geometric Avenxa mark on transparent bg. Invert to black in light theme. */}
       <img
         src={logoUrl}
-        alt="FeynCloud"
+        alt="Avenxa"
         width={size}
         height={size}
         className="relative h-full w-full object-contain invert dark:invert-0"

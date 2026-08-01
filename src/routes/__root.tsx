@@ -19,7 +19,7 @@ import { ThemeProvider } from "@/lib/theme";
 import { ChatAppearanceProvider } from "@/lib/chat-appearance";
 import i18n from "@/lib/i18n";
 
-const themeBootScript = `(function(){try{var t=localStorage.getItem('oi:theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('feyncloud:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
+const themeBootScript = `(function(){try{var t=localStorage.getItem('oi:theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
 
 function NotFoundComponent() {
   return (
@@ -87,16 +87,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
         },
-        { title: "FeynCloud — Your Everyday AI" },
+        { title: "Avenxa — Your Everyday AI" },
         {
           name: "description",
           content:
-            "FeynCloud is a premium AI assistant for study, work, and everyday life — built by FeynCloud Technology.",
+            "Avenxa is a premium AI assistant for study, work, and everyday life — built by Avenxa Technology.",
         },
         { name: "theme-color", content: "#000000" },
         {
           property: "og:title",
-          content: "FeynCloud — Your Everyday AI",
+          content: "Avenxa — Your Everyday AI",
         },
         {
           property: "og:description",

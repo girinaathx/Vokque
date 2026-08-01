@@ -25,7 +25,7 @@ import {
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Settings · FeynCloud" },
+      { title: "Settings · Avenxa" },
       {
         name: "description",
         content: "Manage appearance, memory, chats, account, and more.",
@@ -71,7 +71,7 @@ function SettingsPage() {
               Settings
             </h1>
             <p className="text-muted-foreground text-sm">
-              Everything FeynCloud can do — in one place.
+              Everything Avenxa can do — in one place.
             </p>
           </div>
         </div>
@@ -104,9 +104,9 @@ function SettingsPage() {
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
             {active === "appearance" && <AppearanceSection />}
-            {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers FeynCloud responses — coming soon." />}
+            {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Avenxa responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
-            {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how FeynCloud handles your data, chats, and account." />}
+            {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how Avenxa handles your data, chats, and account." />}
             {active === "terms" && <TermsSection />}
             {active === "about" && <AboutSection />}
             {active === "account" && <AccountSection />}
@@ -141,7 +141,7 @@ function AppearanceSection() {
   ];
   return (
     <Card>
-      <SectionTitle title="Appearance" sub="Choose how FeynCloud looks." />
+      <SectionTitle title="Appearance" sub="Choose how Avenxa looks." />
       <div className="grid gap-2 sm:grid-cols-3">
         {options.map((o) => {
           const Icon = o.icon;
@@ -266,9 +266,9 @@ function PlaceholderSection({
 function AboutSection() {
   return (
     <Card>
-      <SectionTitle title="About FeynCloud" />
+      <SectionTitle title="About Avenxa" />
       <div className="space-y-3 text-sm">
-        <p>FeynCloud is created by FeynCloud Technology.</p>
+        <p>Avenxa is created by Avenxa Technology.</p>
         <p className="text-muted-foreground text-xs">Version 1.0</p>
       </div>
     </Card>
@@ -280,15 +280,15 @@ function TermsSection() {
     <Card>
       <SectionTitle
         title="Terms of Service"
-        sub="By using FeynCloud you agree to the following terms."
+        sub="By using Avenxa you agree to the following terms."
       />
       <div className="text-muted-foreground space-y-3 text-sm leading-relaxed">
         <p>
-          FeynCloud is provided by O1 Platforms. You are responsible for the
+          Avenxa is provided by O1 Platforms. You are responsible for the
           content you submit and for complying with applicable laws.
         </p>
         <p>
-          FeynCloud may use third-party AI models to generate responses. Outputs
+          Avenxa may use third-party AI models to generate responses. Outputs
           can be inaccurate — verify important information independently.
         </p>
         <p>

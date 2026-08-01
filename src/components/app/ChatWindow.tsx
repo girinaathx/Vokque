@@ -31,9 +31,13 @@ import { cn } from "@/lib/utils";
 export function ChatWindow({
   threadId,
   initialMessages,
+  guest = false,
+  onMessagesChange,
 }: {
   threadId: string;
   initialMessages: UIMessage[];
+  guest?: boolean;
+  onMessagesChange?: (messages: UIMessage[]) => void;
 }) {
   const { t } = useTranslation();
 
@@ -43,18 +47,21 @@ export function ChatWindow({
         api: "/api/chat",
         body: {
           threadId,
+          guest,
           tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
           clientNow: new Date().toISOString(),
         },
         fetch: async (url, init) => {
-          const { data } = await supabase.auth.getSession();
-          const token = data.session?.access_token;
           const headers = new Headers(init?.headers);
-          if (token) headers.set("Authorization", `Bearer ${token}`);
+          if (!guest) {
+            const { data } = await supabase.auth.getSession();
+            const token = data.session?.access_token;
+            if (token) headers.set("Authorization", `Bearer ${token}`);
+          }
           return fetch(url, { ...init, headers });
         },
       }),
-    [threadId],
+    [threadId, guest],
   );
 
 
@@ -63,8 +70,12 @@ export function ChatWindow({
       id: threadId,
       messages: initialMessages,
       transport,
-      onError: () => toast.error("Unable to contact OpenAI. Please try again."),
+      onError: () => toast.error("Unable to reach Avenxa. Please try again."),
     });
+
+  useEffect(() => {
+    onMessagesChange?.(messages);
+  }, [messages, onMessagesChange]);
 
   const [input, setInput] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);

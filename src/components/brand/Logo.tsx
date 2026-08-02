@@ -26,7 +26,7 @@ export function Logo({ className, size = 40, glow = false }: LogoProps) {
       {/* White geometric Avenxa mark on transparent bg. Invert to black in light theme. */}
       <img
         src={logoUrl}
-        alt="Avenxa"
+        alt="Avenxa logo"
         width={size}
         height={size}
         className="relative h-full w-full object-contain invert dark:invert-0"

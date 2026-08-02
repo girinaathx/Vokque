@@ -48,6 +48,7 @@ function SplashIndex() {
 
   return (
     <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-black">
+      <h1 className="sr-only">Avenxa — Your Everyday AI Assistant</h1>
       <div
         className={`transition-all duration-500 ease-out ${
           phase === "out"

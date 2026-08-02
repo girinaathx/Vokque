@@ -6,13 +6,21 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Avenxa" },
+      { title: "Avenxa — Your Everyday AI Assistant" },
       {
         name: "description",
         content:
-          "Avenxa — a premium AI assistant by Avenxa Technology.",
+          "Avenxa is a premium AI assistant by Avenxa Technology for study, work, math, code, and everyday questions.",
       },
+      { property: "og:title", content: "Avenxa — Your Everyday AI Assistant" },
+      {
+        property: "og:description",
+        content:
+          "A premium AI assistant for study, work, math, code, and everyday questions.",
+      },
+      { property: "og:url", content: "https://feyncloud.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://feyncloud.lovable.app/" }],
   }),
   component: SplashIndex,
 });

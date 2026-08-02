@@ -104,9 +104,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "A premium AI assistant for study, work, and everyday life.",
         },
         { property: "og:type", content: "website" },
-        { property: "og:image", content: logoUrl },
+        { property: "og:site_name", content: "Avenxa" },
+        { property: "og:image", content: `${SITE_URL}${logoUrl}` },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:image", content: logoUrl },
+        { name: "twitter:image", content: `${SITE_URL}${logoUrl}` },
       ],
       links: [
         { rel: "stylesheet", href: appCss },
@@ -126,6 +127,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           rel: "stylesheet",
           href: "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css",
           crossOrigin: "anonymous",
+        },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                name: "Avenxa",
+                url: `${SITE_URL}/`,
+                description:
+                  "Avenxa is a premium AI assistant for study, work, and everyday life.",
+                publisher: { "@id": `${SITE_URL}/#organization` },
+              },
+              {
+                "@type": "Organization",
+                "@id": `${SITE_URL}/#organization`,
+                name: "Avenxa Technology",
+                url: `${SITE_URL}/`,
+                logo: `${SITE_URL}${logoUrl}`,
+              },
+            ],
+          }),
         },
       ],
     }),

@@ -14,7 +14,8 @@ export const Route = createFileRoute("/auth")({
       { title: "Sign in · Avenxa" },
       {
         name: "description",
-        content: "Sign in to Avenxa, your premium AI assistant.",
+        content:
+          "Sign in to Avenxa, your premium AI assistant for study, work, and everyday life — with Google, email, or guest mode.",
       },
       { property: "og:title", content: "Sign in · Avenxa" },
       {
@@ -22,8 +23,10 @@ export const Route = createFileRoute("/auth")({
         content: "Sign in to Avenxa with Google, email, or continue as guest.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://feyncloud.lovable.app/auth" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://feyncloud.lovable.app/auth" }],
   }),
   component: AuthPage,
 });
@@ -194,6 +197,7 @@ function AuthPage() {
               <input
                 type="email"
                 required
+                aria-label="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t("auth.email")}
@@ -205,6 +209,7 @@ function AuthPage() {
               <input
                 type="password"
                 required
+                aria-label="Password"
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

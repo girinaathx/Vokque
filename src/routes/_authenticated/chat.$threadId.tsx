@@ -13,8 +13,16 @@ export const Route = createFileRoute("/_authenticated/chat/$threadId")({
       { title: "Chat · Avenxa" },
       {
         name: "description",
-        content: "Chat with your premium AI companion.",
+        content:
+          "Chat with Avenxa about study, work, code, and everyday questions — with math, image, file, and voice support.",
       },
+      { property: "og:title", content: "Chat · Avenxa" },
+      {
+        property: "og:description",
+        content:
+          "Continue your Avenxa conversation with multimodal text, image, file, and voice support.",
+      },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: ChatPage,

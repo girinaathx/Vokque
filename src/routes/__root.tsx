@@ -19,6 +19,8 @@ import { ThemeProvider } from "@/lib/theme";
 import { ChatAppearanceProvider } from "@/lib/chat-appearance";
 import i18n from "@/lib/i18n";
 
+const SITE_URL = "https://feyncloud.lovable.app";
+
 const themeBootScript = `(function(){try{var t=localStorage.getItem('oi:theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
 
 function NotFoundComponent() {
@@ -104,9 +106,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "A premium AI assistant for study, work, and everyday life.",
         },
         { property: "og:type", content: "website" },
-        { property: "og:image", content: logoUrl },
+        { property: "og:site_name", content: "Avenxa" },
+        { property: "og:image", content: `${SITE_URL}${logoUrl}` },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:image", content: logoUrl },
+        { name: "twitter:image", content: `${SITE_URL}${logoUrl}` },
       ],
       links: [
         { rel: "stylesheet", href: appCss },
@@ -126,6 +129,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           rel: "stylesheet",
           href: "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css",
           crossOrigin: "anonymous",
+        },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                name: "Avenxa",
+                url: `${SITE_URL}/`,
+                description:
+                  "Avenxa is a premium AI assistant for study, work, and everyday life.",
+                publisher: { "@id": `${SITE_URL}/#organization` },
+              },
+              {
+                "@type": "Organization",
+                "@id": `${SITE_URL}/#organization`,
+                name: "Avenxa Technology",
+                url: `${SITE_URL}/`,
+                logo: `${SITE_URL}${logoUrl}`,
+              },
+            ],
+          }),
         },
       ],
     }),

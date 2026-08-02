@@ -6,13 +6,21 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Avenxa" },
+      { title: "Avenxa — Your Everyday AI Assistant" },
       {
         name: "description",
         content:
-          "Avenxa — a premium AI assistant by Avenxa Technology.",
+          "Avenxa is a premium AI assistant by Avenxa Technology for study, work, math, code, and everyday questions.",
       },
+      { property: "og:title", content: "Avenxa — Your Everyday AI Assistant" },
+      {
+        property: "og:description",
+        content:
+          "A premium AI assistant for study, work, math, code, and everyday questions.",
+      },
+      { property: "og:url", content: "https://feyncloud.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://feyncloud.lovable.app/" }],
   }),
   component: SplashIndex,
 });
@@ -40,6 +48,7 @@ function SplashIndex() {
 
   return (
     <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-black">
+      <h1 className="sr-only">Avenxa — Your Everyday AI Assistant</h1>
       <div
         className={`transition-all duration-500 ease-out ${
           phase === "out"

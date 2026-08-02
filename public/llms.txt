@@ -1,0 +1,11 @@
+# Avenxa
+
+> Avenxa is a premium AI assistant for study, work, and everyday life — built by Avenxa Technology.
+
+Avenxa supports text, images, files, and voice input, renders advanced mathematics with LaTeX, and remembers useful context across conversations. Guest mode lets anyone try it without an account.
+
+## Pages
+
+- [Avenxa home](/): Product entry point for the Avenxa AI assistant.
+- [Sign in](/auth): Sign in with Google or email, or continue as a guest.
+- [Guest mode](/guest): Try Avenxa without an account, with conversations stored locally.

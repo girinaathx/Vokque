@@ -20,14 +20,9 @@ import {
   
   Menu,
   X,
-  Home,
-  Brain,
-  Settings as SettingsIcon,
-  UserCircle2,
 
 
   
-  Search,
   MoreHorizontal,
   Pin,
   PinOff,
@@ -151,13 +146,11 @@ export function AppShell({
   const sidebarProps = {
     threads,
     activeThreadId,
-    onNew: () => createMut.mutate(),
     onDelete: (id: string) => deleteMut.mutate(id),
     onBulkDelete: (ids: string[]) => bulkDeleteMut.mutate(ids),
     onPin: (id: string, pinned: boolean) => pinMut.mutate({ id, pinned }),
     onRename: (id: string, title: string) => renameMut.mutate({ id, title }),
     onSignOut: handleSignOut,
-    creating: createMut.isPending,
     closeMobile: () => setMobileOpen(false),
     t,
   };
@@ -225,25 +218,21 @@ export function AppShell({
 function Sidebar({
   threads,
   activeThreadId,
-  onNew,
   onDelete,
   onBulkDelete,
   onPin,
   onRename,
   onSignOut,
-  creating,
   closeMobile,
   t,
 }: {
   threads: Thread[];
   activeThreadId?: string;
-  onNew: () => void;
   onDelete: (id: string) => void;
   onBulkDelete: (ids: string[]) => void;
   onPin: (id: string, pinned: boolean) => void;
   onRename: (id: string, title: string) => void;
   onSignOut: () => void;
-  creating: boolean;
   closeMobile: () => void;
   t: (k: string) => string;
 }) {

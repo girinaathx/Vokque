@@ -94,12 +94,31 @@ export function ChatWindow({
   useEffect(() => {
     textareaRef.current?.focus();
   }, [threadId]);
+
+  // Auto-scroll: stick to the bottom while streaming, but respect the user
+  // scrolling up to read older messages.
+  const stickToBottom = useRef(true);
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+      stickToBottom.current = distance < 120;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!stickToBottom.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const id = requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
     });
+    return () => cancelAnimationFrame(id);
   }, [messages, status]);
+
 
   // Auto-grow textarea (ChatGPT-style): 1 line → up to 8 lines, then scroll
   useLayoutEffect(() => {

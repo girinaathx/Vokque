@@ -313,36 +313,9 @@ export const Route = createFileRoute("/api/chat")({
                   .from("threads")
                   .update({ updated_at: new Date().toISOString() })
                   .eq("id", threadId);
-
-                // Auto-capture memories from this exchange (best-effort).
-                try {
-                  const userText =
-                    last && last.role === "user"
-                      ? last.parts
-                          .map((p) => (p.type === "text" ? p.text : ""))
-                          .join(" ")
-                          .slice(0, 2000)
-                      : "";
-                  const assistantText = assistant.parts
-                    .map((p) => (p.type === "text" ? p.text : ""))
-                    .join(" ")
-                    .replace(/<!--agents:[^>]*-->/g, "")
-                    .slice(0, 2000);
-                  if (userText) {
-                    await extractAndStoreMemories({
-                      model,
-                      supa,
-                      userId,
-                      threadId,
-                      userText,
-                      assistantText,
-                    });
-                  }
-                } catch {
-                  /* extraction is best-effort */
-                }
               }
             },
+
           });
         } catch (err) {
           console.error("Chat AI error:", err);

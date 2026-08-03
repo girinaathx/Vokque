@@ -16,32 +16,41 @@ export type Database = {
     Tables: {
       memories: {
         Row: {
+          archived_at: string | null
           category: string
           content: string
           created_at: string
           id: string
+          pinned_at: string | null
           source: string
           thread_id: string | null
+          title: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          archived_at?: string | null
           category?: string
           content: string
           created_at?: string
           id?: string
+          pinned_at?: string | null
           source?: string
           thread_id?: string | null
+          title?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          archived_at?: string | null
           category?: string
           content?: string
           created_at?: string
           id?: string
+          pinned_at?: string | null
           source?: string
           thread_id?: string | null
+          title?: string | null
           updated_at?: string
           user_id?: string
         }

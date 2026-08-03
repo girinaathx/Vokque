@@ -292,7 +292,9 @@ function Sidebar({
 
         {/* Search — directly below brand */}
         <div className="relative mb-3">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
+          <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 opacity-70">
+            <Logo size={14} />
+          </span>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -300,15 +302,6 @@ function Sidebar({
             className="glass w-full rounded-full py-2 pr-3 pl-9 text-[13px] outline-none placeholder:text-muted-foreground/60"
           />
         </div>
-
-        <button
-          onClick={onNew}
-          disabled={creating}
-          className="glass mb-3 flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition hover:-translate-y-px active:translate-y-0 disabled:opacity-50"
-        >
-          <Plus className="h-4 w-4" />
-          {t("nav.newChat")}
-        </button>
 
         <Link
           to="/dashboard"
@@ -320,7 +313,7 @@ function Sidebar({
               : "text-foreground/85 hover:bg-foreground/5",
           )}
         >
-          <Home className="h-3.5 w-3.5" />
+          <Logo size={14} />
           {t("nav.home")}
         </Link>
         <Link
@@ -328,7 +321,7 @@ function Sidebar({
           onClick={closeMobile}
           className="text-foreground/85 hover:bg-foreground/5 mb-0.5 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
         >
-          <Brain className="h-3.5 w-3.5" />
+          <Logo size={14} />
           {t("nav.memory")}
         </Link>
         <Link
@@ -336,7 +329,7 @@ function Sidebar({
           onClick={closeMobile}
           className="text-foreground/85 hover:bg-foreground/5 mb-0.5 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
         >
-          <SettingsIcon className="h-3.5 w-3.5" />
+          <Logo size={14} />
           {t("nav.settings")}
         </Link>
         <Link
@@ -344,9 +337,10 @@ function Sidebar({
           onClick={closeMobile}
           className="text-foreground/85 hover:bg-foreground/5 mb-2 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
         >
-          <UserCircle2 className="h-3.5 w-3.5" />
+          <Logo size={14} />
           Account
         </Link>
+
 
 
 

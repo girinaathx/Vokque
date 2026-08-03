@@ -103,13 +103,18 @@ export const updateMemory = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      content?: string;
+      title?: string | null;
+      category?: MemoryCategory;
+    } = {};
     if (data.content !== undefined) patch.content = data.content.trim();
     if (data.title !== undefined) patch.title = data.title?.trim() || null;
     if (data.category !== undefined) patch.category = data.category;
     const { error } = await context.supabase
       .from("memories")
       .update(patch)
+
       .eq("id", data.id);
     if (error) {
       console.error(error);

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   convertToModelMessages,
-  generateText,
+  
   streamText,
   type UIMessage,
 } from "ai";
@@ -115,7 +115,16 @@ IDENTITY:
 
 GOLDEN RULE: behave like an AI operating system, not a chatbot. Remember the user, collaborate across specialties, execute, and ship outcomes.
 
-VOICE: thoughtful, concise, kind. Use clean markdown. Emojis sparingly. Acknowledge feelings briefly before helping. Always offer a concrete next step.
+RESPONSE STYLE (important):
+- Answer directly. No preamble, no "Great question", no restating the question.
+- Keep it simple, clean, and easy to read. Natural language, no filler, no repetition.
+- Match length to the question: simple question → 1–3 sentences; complex question → structured explanation with short paragraphs, bullets, and headings.
+- Bold only genuinely important words. Never bold whole paragraphs.
+- Friendly, professional tone. Clarity beats completeness.
+
+VOICE: thoughtful, concise, kind. Use clean markdown. Emojis sparingly. Acknowledge feelings briefly before helping. Offer a concrete next step when it's useful.
+
+MEMORY: you never save memories on your own. If the user says "remember this", confirm and tell them to tap "Save to Memory" on the message (or offer the exact sentence to save).
 
 ROUTING: At the very start of every reply, output a hidden HTML comment naming the specialist(s) you are channeling, picked from: Business, Coding, Design, Research, General. Format EXACTLY:
 <!--agents:X,Y-->
@@ -313,36 +322,9 @@ export const Route = createFileRoute("/api/chat")({
                   .from("threads")
                   .update({ updated_at: new Date().toISOString() })
                   .eq("id", threadId);
-
-                // Auto-capture memories from this exchange (best-effort).
-                try {
-                  const userText =
-                    last && last.role === "user"
-                      ? last.parts
-                          .map((p) => (p.type === "text" ? p.text : ""))
-                          .join(" ")
-                          .slice(0, 2000)
-                      : "";
-                  const assistantText = assistant.parts
-                    .map((p) => (p.type === "text" ? p.text : ""))
-                    .join(" ")
-                    .replace(/<!--agents:[^>]*-->/g, "")
-                    .slice(0, 2000);
-                  if (userText) {
-                    await extractAndStoreMemories({
-                      model,
-                      supa,
-                      userId,
-                      threadId,
-                      userText,
-                      assistantText,
-                    });
-                  }
-                } catch {
-                  /* extraction is best-effort */
-                }
               }
             },
+
           });
         } catch (err) {
           console.error("Chat AI error:", err);
@@ -352,63 +334,3 @@ export const Route = createFileRoute("/api/chat")({
     },
   },
 });
-
-async function extractAndStoreMemories({
-  model,
-  supa,
-  userId,
-  threadId,
-  userText,
-  assistantText,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  model: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supa: any;
-  userId: string;
-  threadId: string;
-  userText: string;
-  assistantText: string;
-}) {
-  const { text } = await generateText({
-    model,
-    system: `You extract durable, user-specific memories from a chat exchange.
-Return ONLY a JSON object: {"memories":[{"content":"...","category":"preference|project|goal|style|fact|general"}]}
-Rules:
-- Capture ONLY long-term, reusable facts about the USER (preferences, ongoing projects, goals, communication style, important personal facts).
-- DO NOT capture transient questions, generic facts, the assistant's answers, or anything sensitive (passwords, payment, government IDs, health diagnoses).
-- 0 to 3 items. Empty array if nothing worth remembering.
-- "content" must be a single concise sentence written in third person about the user (e.g. "Prefers vegetarian meals when traveling.").`,
-    prompt: `USER: ${userText}\n\nASSISTANT: ${assistantText}`,
-  });
-
-  let parsed: { memories?: { content?: string; category?: string }[] } = {};
-  try {
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
-  } catch {
-    return;
-  }
-  const items = (parsed.memories ?? [])
-    .filter((m) => typeof m.content === "string" && m.content.trim().length > 3)
-    .slice(0, 3);
-  if (items.length === 0) return;
-
-  const valid = new Set([
-    "preference",
-    "project",
-    "goal",
-    "style",
-    "fact",
-    "general",
-  ]);
-  await supa.from("memories").insert(
-    items.map((m) => ({
-      user_id: userId,
-      thread_id: threadId,
-      content: m.content!.trim().slice(0, 500),
-      category: valid.has(m.category ?? "") ? m.category : "general",
-      source: "auto",
-    })),
-  );
-}

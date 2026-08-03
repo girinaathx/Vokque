@@ -1,6 +1,13 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -94,12 +101,31 @@ export function ChatWindow({
   useEffect(() => {
     textareaRef.current?.focus();
   }, [threadId]);
+
+  // Auto-scroll: stick to the bottom while streaming, but respect the user
+  // scrolling up to read older messages.
+  const stickToBottom = useRef(true);
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+      stickToBottom.current = distance < 120;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!stickToBottom.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const id = requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
     });
+    return () => cancelAnimationFrame(id);
   }, [messages, status]);
+
 
   // Auto-grow textarea (ChatGPT-style): 1 line → up to 8 lines, then scroll
   useLayoutEffect(() => {
@@ -153,6 +179,7 @@ export function ChatWindow({
     e?.preventDefault();
     const text = input.trim();
     if ((!text && attachments.length === 0) || isLoading) return;
+    stickToBottom.current = true;
     sendMessage({
       text: text || "(attached)",
       files: attachments.length ? toFileList(attachments) : undefined,
@@ -336,14 +363,17 @@ export function ChatWindow({
                     {!isUser &&
                       idx === messages.length - 1 &&
                       status === "streaming" &&
-                      !text && <span className="shimmer-text">{t("chat.thinking")}</span>}
+                      !text && <TypingIndicator label={t("chat.thinking")} />}
                   </div>
                 )}
 
                 {!editingId && text && (
                   <div
                     className={cn(
-                      "mt-1.5 flex items-center gap-1 opacity-0 transition group-hover:opacity-100",
+                      "mt-1.5 flex items-center gap-1 transition",
+                      isUser
+                        ? "opacity-0 group-hover:opacity-100"
+                        : "opacity-70 group-hover:opacity-100",
                       isUser ? "justify-end" : "justify-start",
                     )}
                   >
@@ -376,7 +406,7 @@ export function ChatWindow({
 
           {status === "submitted" && (
             <div className="animate-fade-up">
-              <span className="shimmer-text text-[15px]">{t("chat.thinking")}</span>
+              <TypingIndicator label={t("chat.thinking")} />
             </div>
           )}
 
@@ -462,6 +492,7 @@ export function ChatWindow({
               onChange={(e) => setInput(e.target.value)}
               onFocus={() => {
                 // Ensure the latest message stays visible when the keyboard opens.
+                stickToBottom.current = true;
                 setTimeout(() => {
                   scrollRef.current?.scrollTo({
                     top: scrollRef.current.scrollHeight,
@@ -570,6 +601,21 @@ function RememberBtn({ text, threadId }: { text: string; threadId: string }) {
   );
 }
 
+const TypingIndicator = memo(function TypingIndicator({
+  label,
+}: {
+  label: string;
+}) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span className="animate-pulse-glow inline-flex">
+        <Logo size={16} />
+      </span>
+      <span className="shimmer-text text-[15px]">{label}</span>
+    </span>
+  );
+});
+
 function IconBtn({
   ariaLabel,
   onClick,
@@ -630,7 +676,7 @@ function normalizeMath(input: string) {
     .replace(/\\\(([\s\S]+?)\\\)/g, (_m, body) => `$${body}$`);
 }
 
-function Markdown({ text }: { text: string }) {
+const Markdown = memo(function Markdown({ text }: { text: string }) {
   // Strip internal routing comments like <!--agents:General,Coding--> so they never render.
   const clean = normalizeMath(text.replace(/<!--\s*agents:[^>]*-->\s*/gi, ""));
   return (
@@ -643,13 +689,14 @@ function Markdown({ text }: { text: string }) {
       </ReactMarkdown>
     </div>
   );
-}
+});
 
 
 function EmptyState({ onPick: _onPick }: { onPick: (t: string) => void }) {
   const { t } = useTranslation();
   return (
     <div className="animate-fade-up flex flex-col items-center pt-24 text-center">
+      <Logo size={44} glow className="mb-4" />
       <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
         {t("chat.emptyTitle")}
       </h2>

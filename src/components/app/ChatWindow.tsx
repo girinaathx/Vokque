@@ -689,7 +689,7 @@ const Markdown = memo(function Markdown({ text }: { text: string }) {
       </ReactMarkdown>
     </div>
   );
-}
+});
 
 
 function EmptyState({ onPick: _onPick }: { onPick: (t: string) => void }) {

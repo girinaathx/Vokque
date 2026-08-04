@@ -188,6 +188,39 @@
   backdrop-filter: blur(32px) saturate(180%);
 }
 
+/* Brighter, higher-contrast interactive glass */
+@utility glass-bright {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  box-shadow: var(--shadow-glass-sm);
+  backdrop-filter: blur(28px) saturate(180%);
+  color: var(--foreground);
+}
+.dark .glass-bright {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 6px 20px -10px rgba(0, 0, 0, 0.8);
+}
+
+/* Single-layer floating sidebar panel */
+@utility glass-panel {
+  background: var(--glass-strong);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-glass-lg);
+  backdrop-filter: blur(40px) saturate(200%);
+}
+
+@utility glass-menu {
+  background: color-mix(in oklab, var(--background) 88%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-glass-lg);
+  backdrop-filter: blur(32px) saturate(180%);
+  border-radius: 1rem;
+}
+
+
 
 /* ------------------------------------------------------------
    Animations

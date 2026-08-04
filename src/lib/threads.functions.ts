@@ -14,7 +14,8 @@ export const listThreads = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("threads")
-      .select("id, title, updated_at, created_at, pinned_at")
+      .select("id, title, updated_at, created_at, pinned_at, archived_at")
+      .is("archived_at", null)
       .order("pinned_at", { ascending: false, nullsFirst: false })
       .order("updated_at", { ascending: false })
       .limit(200);
@@ -111,6 +112,20 @@ export const renameThread = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("threads")
       .update({ title: data.title, updated_at: new Date().toISOString() })
+      .eq("id", data.id);
+    if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
+    return { ok: true };
+  });
+
+export const archiveThread = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ id: z.string().uuid(), archived: z.boolean() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("threads")
+      .update({ archived_at: data.archived ? new Date().toISOString() : null })
       .eq("id", data.id);
     if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
     return { ok: true };

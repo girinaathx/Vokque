@@ -14,7 +14,8 @@ export const listThreads = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("threads")
-      .select("id, title, updated_at, created_at, pinned_at")
+      .select("id, title, updated_at, created_at, pinned_at, archived_at")
+      .is("archived_at", null)
       .order("pinned_at", { ascending: false, nullsFirst: false })
       .order("updated_at", { ascending: false })
       .limit(200);

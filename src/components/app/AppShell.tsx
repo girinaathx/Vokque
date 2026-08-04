@@ -1,7 +1,15 @@
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState, type ReactNode } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,23 +20,29 @@ import {
   deleteThreadsBulk,
   pinThread,
   renameThread,
+  archiveThread,
 } from "@/lib/threads.functions";
 import {
   Plus,
   MessageSquare,
   Trash2,
-  
   Menu,
   X,
-
-
-  
   MoreHorizontal,
+  MoreVertical,
   Pin,
   PinOff,
   Pencil,
   Share2,
   Check,
+  Search,
+  Home,
+  Brain,
+  Settings as SettingsIcon,
+  User as UserIcon,
+  Archive,
+  LogOut,
+  Shield,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -57,6 +71,21 @@ type Thread = {
   pinned_at?: string | null;
 };
 
+const DRAWER_MAX = 360;
+const AI_MODEL_LABEL = "Gemini 2.5 Flash";
+
+function useDrawerWidth() {
+  const [w, setW] = useState(320);
+  useEffect(() => {
+    const calc = () =>
+      setW(Math.min(Math.round(window.innerWidth * 0.85), DRAWER_MAX));
+    calc();
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
+  }, []);
+  return w;
+}
+
 export function AppShell({
   children,
   activeThreadId,
@@ -65,10 +94,12 @@ export function AppShell({
   activeThreadId?: string;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [drag, setDrag] = useState<number | null>(null); // px offset while dragging
   const navigate = useNavigate();
   const router = useRouter();
   const qc = useQueryClient();
   const { t } = useTranslation();
+  const width = useDrawerWidth();
 
   const listFn = useServerFn(listThreads);
   const createFn = useServerFn(createThread);
@@ -76,18 +107,35 @@ export function AppShell({
   const bulkDeleteFn = useServerFn(deleteThreadsBulk);
   const pinFn = useServerFn(pinThread);
   const renameFn = useServerFn(renameThread);
+  const archiveFn = useServerFn(archiveThread);
 
   const { data: threads = [] } = useQuery({
     queryKey: ["threads"],
     queryFn: () => listFn({ data: undefined as never }),
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ["shell-user"],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getUser();
+      const u = data.user;
+      if (!u) return null;
+      const meta = (u.user_metadata ?? {}) as Record<string, string>;
+      return {
+        name: meta.full_name || meta.name || u.email?.split("@")[0] || "You",
+        email: u.email ?? "",
+        avatar: meta.avatar_url || meta.picture || "",
+      };
+    },
+    staleTime: 5 * 60_000,
+  });
+
   const createMut = useMutation({
     mutationFn: () => createFn({ data: {} }),
-    onSuccess: (t) => {
+    onSuccess: (th) => {
       qc.invalidateQueries({ queryKey: ["threads"] });
       setMobileOpen(false);
-      if (t) navigate({ to: "/chat/$threadId", params: { threadId: t.id } });
+      if (th) navigate({ to: "/chat/$threadId", params: { threadId: th.id } });
     },
   });
 
@@ -97,7 +145,7 @@ export function AppShell({
       await qc.cancelQueries({ queryKey: ["threads"] });
       const prev = qc.getQueryData<Thread[]>(["threads"]) ?? [];
       qc.setQueryData<Thread[]>(["threads"], (old) =>
-        (old ?? []).filter((t) => t.id !== id),
+        (old ?? []).filter((x) => x.id !== id),
       );
       return { prev };
     },
@@ -134,6 +182,27 @@ export function AppShell({
     onError: () => toast.error("Couldn't rename"),
   });
 
+  const archiveMut = useMutation({
+    mutationFn: (id: string) => archiveFn({ data: { id, archived: true } }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ["threads"] });
+      const prev = qc.getQueryData<Thread[]>(["threads"]) ?? [];
+      qc.setQueryData<Thread[]>(["threads"], (old) =>
+        (old ?? []).filter((x) => x.id !== id),
+      );
+      return { prev };
+    },
+    onError: (_e, _id, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["threads"], ctx.prev);
+      toast.error("Couldn't archive chat");
+    },
+    onSuccess: (_, id) => {
+      qc.invalidateQueries({ queryKey: ["threads"] });
+      toast.success("Chat archived");
+      if (id === activeThreadId) navigate({ to: "/dashboard" });
+    },
+  });
+
   const handleSignOut = async () => {
     await qc.cancelQueries();
     qc.clear();
@@ -143,33 +212,119 @@ export function AppShell({
     toast.success(t("nav.signOut"));
   };
 
+  /* ---------------- native edge / drawer gestures ---------------- */
+  const gesture = useRef<{
+    startX: number;
+    startY: number;
+    active: boolean;
+    decided: boolean;
+    from: "edge" | "drawer";
+  } | null>(null);
+
+  const onTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      const tch = e.touches[0];
+      if (!tch) return;
+      if (!mobileOpen && tch.clientX <= 28) {
+        gesture.current = {
+          startX: tch.clientX,
+          startY: tch.clientY,
+          active: true,
+          decided: false,
+          from: "edge",
+        };
+      } else if (mobileOpen) {
+        gesture.current = {
+          startX: tch.clientX,
+          startY: tch.clientY,
+          active: true,
+          decided: false,
+          from: "drawer",
+        };
+      }
+    },
+    [mobileOpen],
+  );
+
+  const onTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      const g = gesture.current;
+      const tch = e.touches[0];
+      if (!g?.active || !tch) return;
+      const dx = tch.clientX - g.startX;
+      const dy = tch.clientY - g.startY;
+      if (!g.decided) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        if (Math.abs(dy) > Math.abs(dx)) {
+          // vertical scroll wins — never interfere
+          gesture.current = null;
+          return;
+        }
+        g.decided = true;
+      }
+      if (g.from === "edge") {
+        setDrag(Math.max(0, Math.min(width, dx)));
+      } else {
+        setDrag(Math.max(0, Math.min(width, width + dx)));
+      }
+    },
+    [width],
+  );
+
+  const endGesture = useCallback(() => {
+    const g = gesture.current;
+    gesture.current = null;
+    if (!g?.decided) {
+      setDrag(null);
+      return;
+    }
+    setDrag((d) => {
+      const offset = d ?? 0;
+      setMobileOpen(offset > width * 0.4);
+      return null;
+    });
+  }, [width]);
+
+  const dragging = drag !== null;
+  const progress = dragging ? (drag as number) / width : mobileOpen ? 1 : 0;
+  const drawerVisible = mobileOpen || dragging;
+
   const sidebarProps = {
     threads,
     activeThreadId,
+    profile: profile ?? null,
     onDelete: (id: string) => deleteMut.mutate(id),
     onBulkDelete: (ids: string[]) => bulkDeleteMut.mutate(ids),
     onPin: (id: string, pinned: boolean) => pinMut.mutate({ id, pinned }),
     onRename: (id: string, title: string) => renameMut.mutate({ id, title }),
+    onArchive: (id: string) => archiveMut.mutate(id),
+    onNewChat: () => createMut.mutate(),
     onSignOut: handleSignOut,
     closeMobile: () => setMobileOpen(false),
     t,
   };
 
   return (
-    <div className="relative flex min-h-[100dvh]">
+    <div
+      className="relative flex min-h-[100dvh]"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={endGesture}
+      onTouchCancel={endGesture}
+    >
       {/* Sidebar — desktop */}
-      <aside className="sticky top-0 hidden h-[100dvh] w-72 shrink-0 flex-col p-4 lg:flex">
+      <aside className="sticky top-0 hidden h-[100dvh] w-72 shrink-0 flex-col p-3 lg:flex">
         <Sidebar {...sidebarProps} />
       </aside>
 
-      {/* Mobile floating glass buttons — no top bar */}
+      {/* Mobile floating glass buttons */}
       <div
         className="pointer-events-none fixed inset-x-0 z-40 flex items-center justify-between px-4 lg:hidden"
         style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
       >
         <button
           onClick={() => setMobileOpen(true)}
-          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90"
+          className="glass-bright pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90"
           aria-label="Menu"
         >
           <Menu className="h-5 w-5" />
@@ -177,171 +332,231 @@ export function AppShell({
         <button
           onClick={() => createMut.mutate()}
           disabled={createMut.isPending}
-          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
+          className="glass-bright pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
           aria-label={t("nav.newChat")}
         >
           <Plus className="h-5 w-5" />
         </button>
       </div>
 
-      {/* Mobile drawer */}
-      {mobileOpen && (
+      {/* Mobile drawer + backdrop */}
+      {drawerVisible && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="animate-fade-in-soft absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60"
+            style={{
+              opacity: progress,
+              transition: dragging ? "none" : "opacity 280ms cubic-bezier(0.32,0.72,0,1)",
+            }}
             onClick={() => setMobileOpen(false)}
           />
-          <div className="animate-glass-pop absolute top-3 bottom-3 left-3 w-[min(84vw,320px)]">
-            <div className="relative h-full">
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="hover:bg-foreground/10 absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full"
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              <Sidebar {...sidebarProps} />
-            </div>
+          <div
+            className="absolute top-0 bottom-0 left-0 will-change-transform"
+            style={{
+              width,
+              transform: `translate3d(${(progress - 1) * width}px,0,0)`,
+              transition: dragging
+                ? "none"
+                : "transform 280ms cubic-bezier(0.32,0.72,0,1)",
+            }}
+          >
+            <Sidebar {...sidebarProps} mobile />
           </div>
         </div>
       )}
 
       {/* Main */}
-      <main className="flex min-w-0 flex-1 flex-col">
-        {children}
-      </main>
+      <main className="flex min-w-0 flex-1 flex-col">{children}</main>
     </div>
   );
 }
 
+/* ================================================================== */
+
+type Profile = { name: string; email: string; avatar: string } | null;
 
 function Sidebar({
   threads,
   activeThreadId,
+  profile,
   onDelete,
   onBulkDelete,
   onPin,
   onRename,
+  onArchive,
+  onNewChat,
   onSignOut,
   closeMobile,
+  mobile,
   t,
 }: {
   threads: Thread[];
   activeThreadId?: string;
+  profile: Profile;
   onDelete: (id: string) => void;
   onBulkDelete: (ids: string[]) => void;
   onPin: (id: string, pinned: boolean) => void;
   onRename: (id: string, title: string) => void;
+  onArchive: (id: string) => void;
+  onNewChat: () => void;
   onSignOut: () => void;
   closeMobile: () => void;
+  mobile?: boolean;
   t: (k: string) => string;
 }) {
   const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [selection, setSelection] = useState<Set<string>>(new Set());
   const [confirmDelete, setConfirmDelete] = useState<{
     ids: string[];
     label: string;
   } | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return threads;
-    return threads.filter((t) => t.title.toLowerCase().includes(q));
+    return threads.filter((x) => x.title.toLowerCase().includes(q));
   }, [threads, query]);
 
-  const pinned = filtered.filter((t) => t.pinned_at);
-  const others = filtered.filter((t) => !t.pinned_at);
+  const pinnedList = filtered.filter((x) => x.pinned_at);
+  const others = filtered.filter((x) => !x.pinned_at);
+
+  type Row =
+    | { kind: "label"; key: string; text: string }
+    | { kind: "thread"; key: string; thread: Thread };
+
+  const rows: Row[] = useMemo(() => {
+    const out: Row[] = [];
+    if (pinnedList.length) {
+      out.push({ kind: "label", key: "l-pin", text: "Pinned" });
+      pinnedList.forEach((th) =>
+        out.push({ kind: "thread", key: th.id, thread: th }),
+      );
+    }
+    if (others.length) {
+      out.push({ kind: "label", key: "l-recent", text: t("nav.recent") });
+      others.forEach((th) =>
+        out.push({ kind: "thread", key: th.id, thread: th }),
+      );
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered]);
+
+  const virtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: (i) => (rows[i]?.kind === "label" ? 28 : 44),
+    overscan: 12,
+  });
 
   const inSelection = selection.size > 0;
+  const canPinMore = pinnedList.length < 5;
 
-  const toggleSelect = (id: string) => {
+  const toggleSelect = (id: string) =>
     setSelection((s) => {
       const next = new Set(s);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  };
-
   const clearSelection = () => setSelection(new Set());
 
   return (
     <>
-      <div className="glass-strong flex h-full flex-col rounded-3xl p-4">
-        <Link
-          to="/dashboard"
-          onClick={closeMobile}
-          className="mb-3 flex items-center gap-2.5 px-1.5"
-        >
-          <Logo size={26} />
-          <div className="text-sm font-semibold tracking-tight">
-            {t("brand.name")}
-          </div>
-        </Link>
-
-        {/* Search — directly below brand */}
-        <div className="relative mb-3">
-          <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 opacity-70">
-            <Logo size={14} />
-          </span>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search chats"
-            className="glass w-full rounded-full py-2 pr-3 pl-9 text-[13px] outline-none placeholder:text-muted-foreground/60"
-          />
+      <div
+        className={cn(
+          "glass-panel flex h-full flex-col overflow-hidden",
+          mobile ? "rounded-r-3xl" : "rounded-3xl",
+        )}
+        style={{
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 10px)",
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-2 px-4 pb-3">
+          <Link
+            to="/dashboard"
+            onClick={closeMobile}
+            className="flex min-w-0 flex-1 items-center gap-2.5"
+          >
+            <Logo size={26} />
+            <span className="truncate text-[17px] font-semibold tracking-tight text-foreground">
+              {t("brand.name")}
+            </span>
+          </Link>
+          <button
+            onClick={() => setSearchOpen((v) => !v)}
+            className="glass-bright flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+            aria-label="Search chats"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="glass-bright flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+                aria-label="More options"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="glass-menu">
+              <DropdownMenuItem
+                onClick={() => {
+                  onNewChat();
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" /> {t("nav.newChat")}
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/settings" onClick={closeMobile}>
+                  <SettingsIcon className="mr-2 h-4 w-4" /> {t("nav.settings")}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/privacy" onClick={closeMobile}>
+                  <Shield className="mr-2 h-4 w-4" /> {t("nav.privacy")}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onSignOut}>
+                <LogOut className="mr-2 h-4 w-4" /> {t("nav.signOut")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        <Link
-          to="/dashboard"
-          onClick={closeMobile}
-          className={cn(
-            "mb-0.5 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition",
-            !activeThreadId
-              ? "bg-foreground/8 text-foreground font-medium"
-              : "text-foreground/85 hover:bg-foreground/5",
-          )}
-        >
-          <Logo size={14} />
-          {t("nav.home")}
-        </Link>
-        <Link
-          to="/memory"
-          onClick={closeMobile}
-          className="text-foreground/85 hover:bg-foreground/5 mb-0.5 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
-        >
-          <Logo size={14} />
-          {t("nav.memory")}
-        </Link>
-        <Link
-          to="/settings"
-          onClick={closeMobile}
-          className="text-foreground/85 hover:bg-foreground/5 mb-0.5 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
-        >
-          <Logo size={14} />
-          {t("nav.settings")}
-        </Link>
-        <Link
-          to="/account"
-          onClick={closeMobile}
-          className="text-foreground/85 hover:bg-foreground/5 mb-2 flex items-center gap-2.5 rounded-2xl px-3 py-2 text-[12px] transition"
-        >
-          <Logo size={14} />
-          Account
-        </Link>
+        {/* Search */}
+        {(searchOpen || query) && (
+          <div className="animate-fade-in-soft px-3 pb-2">
+            <div className="relative">
+              <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 opacity-70" />
+              <input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search chats"
+                className="glass-bright w-full rounded-full py-2.5 pr-3 pl-9 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+        )}
 
-
-
-
-
-
+        {/* Navigation */}
+        <nav className="px-2.5 pb-1">
+          <NavItem to="/dashboard" icon={Home} label={t("nav.home")} onClick={closeMobile} exact />
+          <NavItem to="/memory" icon={Brain} label={t("nav.memory")} onClick={closeMobile} />
+          <NavItem to="/settings" icon={SettingsIcon} label={t("nav.settings")} onClick={closeMobile} />
+          <NavItem to="/account" icon={UserIcon} label="Account" onClick={closeMobile} />
+        </nav>
 
         {/* Selection toolbar */}
         {inSelection && (
-          <div className="glass animate-fade-in-soft mb-2 flex items-center justify-between rounded-2xl px-3 py-2">
-            <span className="text-xs font-medium">
-              {selection.size} selected
-            </span>
+          <div className="glass-bright animate-fade-in-soft mx-3 mb-2 flex items-center justify-between rounded-2xl px-3 py-2">
+            <span className="text-xs font-medium">{selection.size} selected</span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() =>
@@ -350,13 +565,13 @@ function Sidebar({
                     label: `Delete ${selection.size} conversation${selection.size === 1 ? "" : "s"}?`,
                   })
                 }
-                className="flex h-7 items-center gap-1 rounded-full bg-destructive px-2.5 text-[11px] font-medium text-destructive-foreground transition active:scale-95"
+                className="bg-destructive text-destructive-foreground flex h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-medium transition active:scale-95"
               >
                 <Trash2 className="h-3 w-3" /> Delete
               </button>
               <button
                 onClick={clearSelection}
-                className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-foreground/10"
+                className="hover:bg-foreground/10 flex h-7 w-7 items-center justify-center rounded-full"
                 aria-label="Cancel selection"
               >
                 <X className="h-3.5 w-3.5" />
@@ -365,77 +580,94 @@ function Sidebar({
           </div>
         )}
 
-        <nav className="-mr-2 flex-1 overflow-y-auto pr-1">
-          {threads.length === 0 && (
+        {/* Chat history — virtualized */}
+        <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-2.5">
+          {rows.length === 0 && (
             <div className="text-muted-foreground px-3 py-6 text-center text-xs">
-              —
+              {query ? `No chats match "${query}"` : "No conversations yet"}
             </div>
           )}
+          <div
+            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+          >
+            {virtualizer.getVirtualItems().map((v) => {
+              const row = rows[v.index];
+              if (!row) return null;
+              return (
+                <div
+                  key={row.key}
+                  ref={virtualizer.measureElement}
+                  data-index={v.index}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    transform: `translateY(${v.start}px)`,
+                  }}
+                >
+                  {row.kind === "label" ? (
+                    <div className="text-muted-foreground mt-2 mb-1 px-3 text-[10px] font-semibold tracking-wider uppercase">
+                      {row.text}
+                    </div>
+                  ) : (
+                    <ThreadRow
+                      thread={row.thread}
+                      active={activeThreadId === row.thread.id}
+                      selected={selection.has(row.thread.id)}
+                      selectionMode={inSelection}
+                      onSelect={() => toggleSelect(row.thread.id)}
+                      onOpen={closeMobile}
+                      onPin={onPin}
+                      onRename={onRename}
+                      onArchive={onArchive}
+                      onDeleteRequest={(id, title) =>
+                        setConfirmDelete({ ids: [id], label: `Delete "${title}"?` })
+                      }
+                      canPinMore={canPinMore}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-          {pinned.length > 0 && (
-            <>
-              <SectionLabel>Pinned</SectionLabel>
-              <ul className="mb-1 space-y-0.5">
-                {pinned.map((thr) => (
-                  <ThreadRow
-                    key={thr.id}
-                    thread={thr}
-                    active={activeThreadId === thr.id}
-                    selected={selection.has(thr.id)}
-                    selectionMode={inSelection}
-                    onSelect={() => toggleSelect(thr.id)}
-                    onOpen={closeMobile}
-                    onPin={onPin}
-                    onRename={onRename}
-                    onDeleteRequest={(id, title) =>
-                      setConfirmDelete({ ids: [id], label: `Delete "${title}"?` })
-                    }
-                    canPinMore={pinned.length < 5}
-                  />
-                ))}
-              </ul>
-            </>
-          )}
-
-          {others.length > 0 && (
-            <>
-              {pinned.length > 0 && <SectionLabel>{t("nav.recent")}</SectionLabel>}
-              <ul className="space-y-0.5">
-                {others.map((thr) => (
-                  <ThreadRow
-                    key={thr.id}
-                    thread={thr}
-                    active={activeThreadId === thr.id}
-                    selected={selection.has(thr.id)}
-                    selectionMode={inSelection}
-                    onSelect={() => toggleSelect(thr.id)}
-                    onOpen={closeMobile}
-                    onPin={onPin}
-                    onRename={onRename}
-                    onDeleteRequest={(id, title) =>
-                      setConfirmDelete({ ids: [id], label: `Delete "${title}"?` })
-                    }
-                    canPinMore={pinned.length < 5}
-                  />
-                ))}
-              </ul>
-            </>
-          )}
-
-          {filtered.length === 0 && query && (
-            <div className="text-muted-foreground px-3 py-6 text-center text-xs">
-              No chats match "{query}"
-            </div>
-          )}
-        </nav>
-
+        {/* Pinned bottom section */}
+        <div className="mx-2.5 mt-2 shrink-0">
+          <Link
+            to="/account"
+            onClick={closeMobile}
+            className="glass-bright flex items-center gap-3 rounded-2xl px-3 py-2.5 transition active:scale-[0.98]"
+          >
+            {profile?.avatar ? (
+              <img
+                src={profile.avatar}
+                alt=""
+                className="h-9 w-9 shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <span className="bg-foreground text-background flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
+                {(profile?.name ?? "A").charAt(0).toUpperCase()}
+              </span>
+            )}
+            <span className="min-w-0 flex-1">
+              <span className="text-foreground block truncate text-[13px] font-semibold">
+                {profile?.name ?? "Account"}
+              </span>
+              <span className="text-muted-foreground block truncate text-[11px]">
+                {AI_MODEL_LABEL} · {threads.length}/200 chats
+              </span>
+            </span>
+          </Link>
+        </div>
       </div>
 
       <AlertDialog
         open={!!confirmDelete}
         onOpenChange={(o) => !o && setConfirmDelete(null)}
       >
-        <AlertDialogContent className="rounded-3xl border-white/10 bg-background/85 backdrop-blur-2xl">
+        <AlertDialogContent className="glass-menu rounded-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle>{confirmDelete?.label}</AlertDialogTitle>
             <AlertDialogDescription>
@@ -447,15 +679,12 @@ function Sidebar({
             <AlertDialogAction
               onClick={() => {
                 if (!confirmDelete) return;
-                if (confirmDelete.ids.length === 1) {
-                  onDelete(confirmDelete.ids[0]);
-                } else {
-                  onBulkDelete(confirmDelete.ids);
-                }
+                if (confirmDelete.ids.length === 1) onDelete(confirmDelete.ids[0]);
+                else onBulkDelete(confirmDelete.ids);
                 clearSelection();
                 setConfirmDelete(null);
               }}
-              className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full"
             >
               Delete
             </AlertDialogAction>
@@ -466,11 +695,29 @@ function Sidebar({
   );
 }
 
-function SectionLabel({ children }: { children: ReactNode }) {
+function NavItem({
+  to,
+  icon: Icon,
+  label,
+  onClick,
+  exact,
+}: {
+  to: string;
+  icon: typeof Home;
+  label: string;
+  onClick: () => void;
+  exact?: boolean;
+}) {
   return (
-    <div className="text-muted-foreground mt-2 mb-1 px-3 text-[10px] font-semibold tracking-wider uppercase">
-      {children}
-    </div>
+    <Link
+      to={to}
+      onClick={onClick}
+      activeOptions={{ exact: !!exact }}
+      className="text-foreground/80 hover:bg-foreground/8 data-[status=active]:bg-foreground/12 data-[status=active]:text-foreground flex h-[54px] items-center gap-3 rounded-2xl px-3 text-[15px] transition-all duration-200 active:scale-[0.97] data-[status=active]:font-semibold data-[status=active]:shadow-[0_0_0_1px_var(--border),0_0_24px_-8px_rgba(255,255,255,0.45)]"
+    >
+      <Icon className="h-[18px] w-[18px] shrink-0" />
+      <span className="truncate">{label}</span>
+    </Link>
   );
 }
 
@@ -483,6 +730,7 @@ function ThreadRow({
   onOpen,
   onPin,
   onRename,
+  onArchive,
   onDeleteRequest,
   canPinMore,
 }: {
@@ -494,15 +742,16 @@ function ThreadRow({
   onOpen: () => void;
   onPin: (id: string, pinned: boolean) => void;
   onRename: (id: string, title: string) => void;
+  onArchive: (id: string) => void;
   onDeleteRequest: (id: string, title: string) => void;
   canPinMore: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(thread.title);
+  const [offset, setOffset] = useState(0);
+  const [swiping, setSwiping] = useState(false);
+  const swipe = useRef<{ x: number; y: number; decided: boolean } | null>(null);
   const isPinned = !!thread.pinned_at;
-
-  // Mistouch prevention: deletion is ONLY available through the ⋯ menu → Delete
-  // (which opens a confirmation dialog). No long-press, no swipe, no accidental delete.
 
   const commitRename = () => {
     const title = draft.trim();
@@ -519,14 +768,62 @@ function ThreadRow({
         toast.success("Link copied");
       }
     } catch {
-      /* user cancelled */
+      /* cancelled */
+    }
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const tch = e.touches[0];
+    if (!tch || selectionMode || editing) return;
+    swipe.current = { x: tch.clientX, y: tch.clientY, decided: false };
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    const g = swipe.current;
+    const tch = e.touches[0];
+    if (!g || !tch) return;
+    const dx = tch.clientX - g.x;
+    const dy = tch.clientY - g.y;
+    if (!g.decided) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if (Math.abs(dy) >= Math.abs(dx)) {
+        swipe.current = null;
+        return;
+      }
+      g.decided = true;
+      setSwiping(true);
+      e.stopPropagation();
+    }
+    e.stopPropagation();
+    setOffset(Math.max(-120, Math.min(120, dx)));
+  };
+  const onTouchEnd = () => {
+    const g = swipe.current;
+    swipe.current = null;
+    setSwiping(false);
+    const dx = offset;
+    setOffset(0);
+    if (!g?.decided) return;
+    if (dx <= -80) onDeleteRequest(thread.id, thread.title);
+    else if (dx >= 80) {
+      if (isPinned || canPinMore) onPin(thread.id, !isPinned);
+      else toast.error("You can pin up to 5 chats.");
     }
   };
 
   return (
-    <li className="group relative animate-fade-in-soft">
+    <div className="group relative">
+      {/* swipe action hints */}
+      {offset !== 0 && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-between rounded-2xl px-4">
+          <span className="text-foreground/70 text-[11px] font-semibold">
+            {isPinned ? "Unpin" : "Pin"}
+          </span>
+          <span className="text-destructive text-[11px] font-semibold">Delete</span>
+        </div>
+      )}
+
       {editing ? (
-        <div className="flex items-center gap-1 rounded-2xl bg-foreground/5 px-2 py-1.5">
+        <div className="bg-foreground/8 flex items-center gap-1 rounded-2xl px-2 py-1.5">
           <input
             autoFocus
             value={draft}
@@ -536,11 +833,11 @@ function ThreadRow({
               if (e.key === "Enter") commitRename();
               if (e.key === "Escape") setEditing(false);
             }}
-            className="flex-1 bg-transparent text-sm outline-none"
+            className="text-foreground flex-1 bg-transparent text-sm outline-none"
           />
           <button
             onClick={commitRename}
-            className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-foreground/10"
+            className="hover:bg-foreground/10 flex h-6 w-6 items-center justify-center rounded-full"
             aria-label="Save"
           >
             <Check className="h-3.5 w-3.5" />
@@ -549,13 +846,9 @@ function ThreadRow({
       ) : selectionMode ? (
         <button
           onClick={onSelect}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            onSelect();
-          }}
           className={cn(
-            "flex w-full items-center gap-2.5 rounded-2xl px-3 py-2 text-left text-sm transition",
-            selected ? "bg-foreground/12 font-medium" : "hover:bg-foreground/5",
+            "flex w-full items-center gap-2.5 rounded-2xl px-3 py-2.5 text-left text-sm transition",
+            selected ? "bg-foreground/15 font-medium" : "hover:bg-foreground/8",
           )}
         >
           <span
@@ -563,7 +856,7 @@ function ThreadRow({
               "flex h-4 w-4 shrink-0 items-center justify-center rounded border",
               selected
                 ? "border-foreground bg-foreground text-background"
-                : "border-foreground/30",
+                : "border-foreground/40",
             )}
           >
             {selected && <Check className="h-3 w-3" />}
@@ -572,9 +865,19 @@ function ThreadRow({
         </button>
       ) : (
         <div
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onTouchCancel={onTouchEnd}
+          style={{
+            transform: `translate3d(${offset}px,0,0)`,
+            transition: swiping ? "none" : "transform 220ms cubic-bezier(0.32,0.72,0,1)",
+          }}
           className={cn(
-            "flex items-center gap-1 rounded-2xl pr-1 transition",
-            active ? "bg-foreground/8" : "hover:bg-foreground/5",
+            "relative flex items-center gap-1 rounded-2xl pr-1 transition-colors",
+            active
+              ? "bg-foreground/12 shadow-[0_0_0_1px_var(--border)]"
+              : "hover:bg-foreground/8",
           )}
         >
           <Link
@@ -582,14 +885,14 @@ function ThreadRow({
             params={{ threadId: thread.id }}
             onClick={onOpen}
             className={cn(
-              "flex min-w-0 flex-1 items-center gap-2.5 rounded-2xl px-3 py-2 text-sm",
-              active && "font-medium",
+              "text-foreground flex min-w-0 flex-1 items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm",
+              active ? "font-semibold" : "font-normal",
             )}
           >
             {isPinned ? (
-              <Pin className="h-3 w-3 shrink-0 opacity-70" />
+              <Pin className="h-3.5 w-3.5 shrink-0 opacity-80" />
             ) : (
-              <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-60" />
+              <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-70" />
             )}
             <span className="truncate">{thread.title}</span>
           </Link>
@@ -597,16 +900,13 @@ function ThreadRow({
             <DropdownMenuTrigger asChild>
               <button
                 onClick={(e) => e.stopPropagation()}
-                className="hover:bg-foreground/10 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg opacity-60 transition hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                className="hover:bg-foreground/12 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg opacity-70 transition hover:opacity-100"
                 aria-label="Chat options"
               >
                 <MoreHorizontal className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="rounded-2xl border-white/10 bg-background/90 backdrop-blur-2xl"
-            >
+            <DropdownMenuContent align="end" className="glass-menu">
               <DropdownMenuItem
                 onClick={() => {
                   setDraft(thread.title);
@@ -629,6 +929,9 @@ function ThreadRow({
                   </>
                 )}
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onArchive(thread.id)}>
+                <Archive className="mr-2 h-3.5 w-3.5" /> Archive
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={share}>
                 <Share2 className="mr-2 h-3.5 w-3.5" /> Share
               </DropdownMenuItem>
@@ -646,6 +949,6 @@ function ThreadRow({
           </DropdownMenu>
         </div>
       )}
-    </li>
+    </div>
   );
 }

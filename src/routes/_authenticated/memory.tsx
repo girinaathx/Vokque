@@ -22,7 +22,7 @@ import {
   type MemoryCategory,
 } from "@/lib/memories.functions";
 import {
-  Brain,
+  Copy,
   Download,
   Upload,
   Plus,
@@ -695,9 +695,23 @@ function MemoryRow({
                   <Archive className="h-3.5 w-3.5" />
                 )}
               </IconAction>
+              <IconAction
+                onClick={() =>
+                  void copyText(
+                    memory.title
+                      ? `${memory.title}\n${memory.content}`
+                      : memory.content,
+                    "Memory copied",
+                  )
+                }
+                label="Copy"
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </IconAction>
               <IconAction onClick={onStartEdit} label="Edit">
                 <Pencil className="h-3.5 w-3.5" />
               </IconAction>
+
               <IconAction onClick={onDelete} label="Delete" destructive>
                 <Trash2 className="h-3.5 w-3.5" />
               </IconAction>

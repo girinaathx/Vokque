@@ -24,7 +24,6 @@ import {
 } from "@/lib/threads.functions";
 import {
   Plus,
-  MessageSquare,
   Trash2,
   Menu,
   X,
@@ -112,22 +111,6 @@ export function AppShell({
   const { data: threads = [] } = useQuery({
     queryKey: ["threads"],
     queryFn: () => listFn({ data: undefined as never }),
-  });
-
-  const { data: profile } = useQuery({
-    queryKey: ["shell-user"],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getUser();
-      const u = data.user;
-      if (!u) return null;
-      const meta = (u.user_metadata ?? {}) as Record<string, string>;
-      return {
-        name: meta.full_name || meta.name || u.email?.split("@")[0] || "You",
-        email: u.email ?? "",
-        avatar: meta.avatar_url || meta.picture || "",
-      };
-    },
-    staleTime: 5 * 60_000,
   });
 
   const createMut = useMutation({
@@ -292,7 +275,6 @@ export function AppShell({
   const sidebarProps = {
     threads,
     activeThreadId,
-    profile: profile ?? null,
     onDelete: (id: string) => deleteMut.mutate(id),
     onBulkDelete: (ids: string[]) => bulkDeleteMut.mutate(ids),
     onPin: (id: string, pinned: boolean) => pinMut.mutate({ id, pinned }),
@@ -373,12 +355,9 @@ export function AppShell({
 
 /* ================================================================== */
 
-type Profile = { name: string; email: string; avatar: string } | null;
-
 function Sidebar({
   threads,
   activeThreadId,
-  profile,
   onDelete,
   onBulkDelete,
   onPin,
@@ -392,7 +371,6 @@ function Sidebar({
 }: {
   threads: Thread[];
   activeThreadId?: string;
-  profile: Profile;
   onDelete: (id: string) => void;
   onBulkDelete: (ids: string[]) => void;
   onPin: (id: string, pinned: boolean) => void;
@@ -490,7 +468,7 @@ function Sidebar({
           </Link>
           <button
             onClick={() => setSearchOpen((v) => !v)}
-            className="glass-bright flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+            className="hover:bg-foreground/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
             aria-label="Search chats"
           >
             <Search className="h-4 w-4" />
@@ -498,7 +476,7 @@ function Sidebar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="glass-bright flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+                className="hover:bg-foreground/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
                 aria-label="More options"
               >
                 <MoreVertical className="h-4 w-4" />
@@ -540,7 +518,7 @@ function Sidebar({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search chats"
-                className="glass-bright w-full rounded-full py-2.5 pr-3 pl-9 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+                className="bg-foreground/8 text-foreground w-full rounded-full py-2.5 pr-3 pl-9 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
           </div>
@@ -556,7 +534,7 @@ function Sidebar({
 
         {/* Selection toolbar */}
         {inSelection && (
-          <div className="glass-bright animate-fade-in-soft mx-3 mb-2 flex items-center justify-between rounded-2xl px-3 py-2">
+          <div className="bg-foreground/8 animate-fade-in-soft mx-3 mb-2 flex items-center justify-between rounded-2xl px-3 py-2">
             <span className="text-xs font-medium">{selection.size} selected</span>
             <div className="flex items-center gap-1">
               <button

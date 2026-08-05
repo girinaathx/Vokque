@@ -377,7 +377,7 @@ export function ChatWindow({
                       isUser ? "justify-end" : "justify-start",
                     )}
                   >
-                    <CopyBtn text={text} />
+                    <CopyBtn text={text} label={isUser ? undefined : "Copy all"} />
                     {!guest && <RememberBtn text={text} threadId={threadId} />}
                     {isUser && (
                       <button

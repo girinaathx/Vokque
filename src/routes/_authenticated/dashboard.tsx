@@ -155,9 +155,12 @@ function Dashboard() {
   return (
     <AppShell>
       <div
-        className="mx-auto w-full max-w-3xl px-5 pb-32 lg:pt-14"
-        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)" }}
+        className="mx-auto w-full max-w-3xl px-5 pb-32"
+        style={{ paddingTop: PAGE_TOP_PADDING }}
       >
+        <div className="animate-fade-up mb-7 flex justify-center">
+          <Logo size={30} />
+        </div>
 
         <div className="animate-fade-up">
           <p className="text-muted-foreground text-sm">
@@ -174,6 +177,7 @@ function Dashboard() {
             How are you feeling today? What would you like help with?
           </p>
         </div>
+
 
         {/* Composer */}
         <div className="animate-fade-up mt-7 [animation-delay:120ms]">

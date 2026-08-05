@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app/AppShell";
+import { PageContainer, PageHeader } from "@/components/app/PageHeader";
+
 import { supabase } from "@/integrations/supabase/client";
 import {
   LogOut,
@@ -155,7 +157,8 @@ function AccountPage() {
             destructive
           />
         </div>
-      </div>
+      </PageContainer>
+
     </AppShell>
   );
 }

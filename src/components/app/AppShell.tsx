@@ -467,14 +467,15 @@ function Sidebar({
     <>
       <div
         className={cn(
-          "glass-panel flex h-full flex-col overflow-hidden",
-          mobile ? "rounded-r-3xl" : "rounded-3xl",
+          "bg-background border-border flex h-full flex-col overflow-hidden",
+          mobile ? "rounded-r-3xl border-r" : "rounded-3xl border",
         )}
         style={{
           paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 10px)",
         }}
       >
+
         {/* Header */}
         <div className="flex items-center gap-2 px-4 pb-3">
           <Link
@@ -633,34 +634,8 @@ function Sidebar({
           </div>
         </div>
 
-        {/* Pinned bottom section */}
-        <div className="mx-2.5 mt-2 shrink-0">
-          <Link
-            to="/account"
-            onClick={closeMobile}
-            className="glass-bright flex items-center gap-3 rounded-2xl px-3 py-2.5 transition active:scale-[0.98]"
-          >
-            {profile?.avatar ? (
-              <img
-                src={profile.avatar}
-                alt=""
-                className="h-9 w-9 shrink-0 rounded-full object-cover"
-              />
-            ) : (
-              <span className="bg-foreground text-background flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
-                {(profile?.name ?? "A").charAt(0).toUpperCase()}
-              </span>
-            )}
-            <span className="min-w-0 flex-1">
-              <span className="text-foreground block truncate text-[13px] font-semibold">
-                {profile?.name ?? "Account"}
-              </span>
-              <span className="text-muted-foreground block truncate text-[11px]">
-                {AI_MODEL_LABEL} · {threads.length}/200 chats
-              </span>
-            </span>
-          </Link>
-        </div>
+
+
       </div>
 
       <AlertDialog

@@ -850,9 +850,7 @@ function ThreadRow({
           }}
           className={cn(
             "relative flex items-center gap-1 rounded-2xl pr-1 transition-colors",
-            active
-              ? "bg-foreground/12 shadow-[0_0_0_1px_var(--border)]"
-              : "hover:bg-foreground/8",
+            active ? "bg-foreground/10" : "hover:bg-foreground/8",
           )}
         >
           <Link
@@ -860,17 +858,14 @@ function ThreadRow({
             params={{ threadId: thread.id }}
             onClick={onOpen}
             className={cn(
-              "text-foreground flex min-w-0 flex-1 items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm",
+              "text-foreground flex min-w-0 flex-1 items-center gap-2 rounded-2xl px-3 py-2.5 text-sm",
               active ? "font-semibold" : "font-normal",
             )}
           >
-            {isPinned ? (
-              <Pin className="h-3.5 w-3.5 shrink-0 opacity-80" />
-            ) : (
-              <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-70" />
-            )}
+            {isPinned && <Pin className="h-3.5 w-3.5 shrink-0 opacity-80" />}
             <span className="truncate">{thread.title}</span>
           </Link>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button

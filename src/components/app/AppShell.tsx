@@ -24,7 +24,6 @@ import {
 } from "@/lib/threads.functions";
 import {
   Plus,
-  MessageSquare,
   Trash2,
   Menu,
   X,
@@ -72,7 +71,7 @@ type Thread = {
 };
 
 const DRAWER_MAX = 360;
-const AI_MODEL_LABEL = "Gemini 2.5 Flash";
+
 
 function useDrawerWidth() {
   const [w, setW] = useState(320);
@@ -112,22 +111,6 @@ export function AppShell({
   const { data: threads = [] } = useQuery({
     queryKey: ["threads"],
     queryFn: () => listFn({ data: undefined as never }),
-  });
-
-  const { data: profile } = useQuery({
-    queryKey: ["shell-user"],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getUser();
-      const u = data.user;
-      if (!u) return null;
-      const meta = (u.user_metadata ?? {}) as Record<string, string>;
-      return {
-        name: meta.full_name || meta.name || u.email?.split("@")[0] || "You",
-        email: u.email ?? "",
-        avatar: meta.avatar_url || meta.picture || "",
-      };
-    },
-    staleTime: 5 * 60_000,
   });
 
   const createMut = useMutation({
@@ -292,7 +275,6 @@ export function AppShell({
   const sidebarProps = {
     threads,
     activeThreadId,
-    profile: profile ?? null,
     onDelete: (id: string) => deleteMut.mutate(id),
     onBulkDelete: (ids: string[]) => bulkDeleteMut.mutate(ids),
     onPin: (id: string, pinned: boolean) => pinMut.mutate({ id, pinned }),
@@ -373,12 +355,9 @@ export function AppShell({
 
 /* ================================================================== */
 
-type Profile = { name: string; email: string; avatar: string } | null;
-
 function Sidebar({
   threads,
   activeThreadId,
-  profile,
   onDelete,
   onBulkDelete,
   onPin,
@@ -392,7 +371,6 @@ function Sidebar({
 }: {
   threads: Thread[];
   activeThreadId?: string;
-  profile: Profile;
   onDelete: (id: string) => void;
   onBulkDelete: (ids: string[]) => void;
   onPin: (id: string, pinned: boolean) => void;
@@ -467,14 +445,15 @@ function Sidebar({
     <>
       <div
         className={cn(
-          "glass-panel flex h-full flex-col overflow-hidden",
-          mobile ? "rounded-r-3xl" : "rounded-3xl",
+          "bg-background border-border flex h-full flex-col overflow-hidden",
+          mobile ? "rounded-r-3xl border-r" : "rounded-3xl border",
         )}
         style={{
           paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 10px)",
         }}
       >
+
         {/* Header */}
         <div className="flex items-center gap-2 px-4 pb-3">
           <Link
@@ -489,7 +468,7 @@ function Sidebar({
           </Link>
           <button
             onClick={() => setSearchOpen((v) => !v)}
-            className="glass-bright flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+            className="hover:bg-foreground/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
             aria-label="Search chats"
           >
             <Search className="h-4 w-4" />
@@ -497,7 +476,7 @@ function Sidebar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="glass-bright flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+                className="hover:bg-foreground/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition active:scale-90"
                 aria-label="More options"
               >
                 <MoreVertical className="h-4 w-4" />
@@ -539,7 +518,7 @@ function Sidebar({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search chats"
-                className="glass-bright w-full rounded-full py-2.5 pr-3 pl-9 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+                className="bg-foreground/8 text-foreground w-full rounded-full py-2.5 pr-3 pl-9 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
           </div>
@@ -555,7 +534,7 @@ function Sidebar({
 
         {/* Selection toolbar */}
         {inSelection && (
-          <div className="glass-bright animate-fade-in-soft mx-3 mb-2 flex items-center justify-between rounded-2xl px-3 py-2">
+          <div className="bg-foreground/8 animate-fade-in-soft mx-3 mb-2 flex items-center justify-between rounded-2xl px-3 py-2">
             <span className="text-xs font-medium">{selection.size} selected</span>
             <div className="flex items-center gap-1">
               <button
@@ -633,34 +612,8 @@ function Sidebar({
           </div>
         </div>
 
-        {/* Pinned bottom section */}
-        <div className="mx-2.5 mt-2 shrink-0">
-          <Link
-            to="/account"
-            onClick={closeMobile}
-            className="glass-bright flex items-center gap-3 rounded-2xl px-3 py-2.5 transition active:scale-[0.98]"
-          >
-            {profile?.avatar ? (
-              <img
-                src={profile.avatar}
-                alt=""
-                className="h-9 w-9 shrink-0 rounded-full object-cover"
-              />
-            ) : (
-              <span className="bg-foreground text-background flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
-                {(profile?.name ?? "A").charAt(0).toUpperCase()}
-              </span>
-            )}
-            <span className="min-w-0 flex-1">
-              <span className="text-foreground block truncate text-[13px] font-semibold">
-                {profile?.name ?? "Account"}
-              </span>
-              <span className="text-muted-foreground block truncate text-[11px]">
-                {AI_MODEL_LABEL} · {threads.length}/200 chats
-              </span>
-            </span>
-          </Link>
-        </div>
+
+
       </div>
 
       <AlertDialog
@@ -713,7 +666,7 @@ function NavItem({
       to={to}
       onClick={onClick}
       activeOptions={{ exact: !!exact }}
-      className="text-foreground/80 hover:bg-foreground/8 data-[status=active]:bg-foreground/12 data-[status=active]:text-foreground flex h-[54px] items-center gap-3 rounded-2xl px-3 text-[15px] transition-all duration-200 active:scale-[0.97] data-[status=active]:font-semibold data-[status=active]:shadow-[0_0_0_1px_var(--border),0_0_24px_-8px_rgba(255,255,255,0.45)]"
+      className="text-foreground hover:bg-foreground/8 data-[status=active]:bg-foreground/10 flex h-[54px] items-center gap-3 rounded-2xl px-3 text-[15px] font-normal transition-colors duration-200 data-[status=active]:font-semibold"
     >
       <Icon className="h-[18px] w-[18px] shrink-0" />
       <span className="truncate">{label}</span>
@@ -875,9 +828,7 @@ function ThreadRow({
           }}
           className={cn(
             "relative flex items-center gap-1 rounded-2xl pr-1 transition-colors",
-            active
-              ? "bg-foreground/12 shadow-[0_0_0_1px_var(--border)]"
-              : "hover:bg-foreground/8",
+            active ? "bg-foreground/10" : "hover:bg-foreground/8",
           )}
         >
           <Link
@@ -885,17 +836,14 @@ function ThreadRow({
             params={{ threadId: thread.id }}
             onClick={onOpen}
             className={cn(
-              "text-foreground flex min-w-0 flex-1 items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm",
+              "text-foreground flex min-w-0 flex-1 items-center gap-2 rounded-2xl px-3 py-2.5 text-sm",
               active ? "font-semibold" : "font-normal",
             )}
           >
-            {isPinned ? (
-              <Pin className="h-3.5 w-3.5 shrink-0 opacity-80" />
-            ) : (
-              <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-70" />
-            )}
+            {isPinned && <Pin className="h-3.5 w-3.5 shrink-0 opacity-80" />}
             <span className="truncate">{thread.title}</span>
           </Link>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button

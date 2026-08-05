@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { AppShell } from "@/components/app/AppShell";
+import { PageContainer, PageHeader } from "@/components/app/PageHeader";
+
 import { useTheme, type ThemePref } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -61,20 +63,13 @@ function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl px-5 pt-6 pb-32 lg:pt-12">
-        <div className="animate-fade-up mb-6 flex items-center gap-3">
-          <div className="glass flex h-11 w-11 items-center justify-center rounded-2xl">
-            <Palette className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-              Settings
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              Everything Avenxa can do — in one place.
-            </p>
-          </div>
-        </div>
+      <PageContainer className="max-w-5xl">
+        <PageHeader
+          title="Settings"
+          subtitle="Everything Avenxa can do — in one place."
+        />
+        <div className="h-6" />
+
 
         <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
           {/* Side nav */}
@@ -114,7 +109,8 @@ function SettingsPage() {
 
           </div>
         </div>
-      </div>
+      </PageContainer>
+
     </AppShell>
   );
 }

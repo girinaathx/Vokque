@@ -3,6 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/app/AppShell";
+import { PageContainer, PageHeader } from "@/components/app/PageHeader";
+import { copyText } from "@/lib/copy";
+
 import {
   createMemory,
   deleteAllMemories,
@@ -19,7 +22,7 @@ import {
   type MemoryCategory,
 } from "@/lib/memories.functions";
 import {
-  Brain,
+  Copy,
   Download,
   Upload,
   Plus,
@@ -300,23 +303,12 @@ function MemoryPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-3xl px-5 pt-6 pb-32 lg:pt-12">
-        <div className="animate-fade-up">
-          <div className="flex items-center gap-3">
-            <div className="glass flex h-11 w-11 items-center justify-center rounded-2xl">
-              <Brain className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-                Memory
-              </h1>
-              <p className="text-muted-foreground text-sm">
-                Everything Avenxa remembers about you. Yours to edit, pin,
-                archive, export, or delete — anytime.
-              </p>
-            </div>
-          </div>
-        </div>
+      <PageContainer>
+        <PageHeader
+          title="Memory"
+          subtitle="Everything Avenxa remembers about you. Yours to edit, pin, archive, export, or delete — anytime."
+        />
+
 
         {/* Stats */}
         <div className="animate-fade-up mt-5 grid grid-cols-3 gap-2 [animation-delay:60ms]">
@@ -535,7 +527,8 @@ function MemoryPage() {
             />
           ))}
         </div>
-      </div>
+      </PageContainer>
+
     </AppShell>
   );
 }
@@ -702,9 +695,23 @@ function MemoryRow({
                   <Archive className="h-3.5 w-3.5" />
                 )}
               </IconAction>
+              <IconAction
+                onClick={() =>
+                  void copyText(
+                    memory.title
+                      ? `${memory.title}\n${memory.content}`
+                      : memory.content,
+                    "Memory copied",
+                  )
+                }
+                label="Copy"
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </IconAction>
               <IconAction onClick={onStartEdit} label="Edit">
                 <Pencil className="h-3.5 w-3.5" />
               </IconAction>
+
               <IconAction onClick={onDelete} label="Delete" destructive>
                 <Trash2 className="h-3.5 w-3.5" />
               </IconAction>

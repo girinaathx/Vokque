@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app/AppShell";
+import { PageContainer, PageHeader } from "@/components/app/PageHeader";
+
 import { supabase } from "@/integrations/supabase/client";
 import {
   LogOut,
@@ -94,20 +96,20 @@ function AccountPage() {
 
   return (
     <AppShell>
-      <div
-        className="mx-auto w-full max-w-2xl px-5 pb-32"
-        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)" }}
-      >
+      <PageContainer className="max-w-2xl">
+        <PageHeader title="Account" />
+
         {/* Identity */}
-        <div className="animate-fade-up glass-strong rounded-3xl p-6 text-center">
-          <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-white/25 to-white/5 text-4xl font-semibold text-foreground shadow-lg ring-1 ring-white/15 backdrop-blur-xl">
+        <div className="animate-fade-up glass-strong mt-6 rounded-3xl p-6 text-center">
+          <div className="text-foreground mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-foreground/8 text-3xl font-semibold">
             {initial}
           </div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">
+          <h2 className="font-display text-2xl font-semibold tracking-tight">
             {profile?.name ?? "…"}
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-1 text-sm">{profile?.email}</p>
         </div>
+
 
         {/* Info rows */}
         <div className="animate-fade-up mt-4 space-y-2 [animation-delay:80ms]">
@@ -155,7 +157,8 @@ function AccountPage() {
             destructive
           />
         </div>
-      </div>
+      </PageContainer>
+
     </AppShell>
   );
 }

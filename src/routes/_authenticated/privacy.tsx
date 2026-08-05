@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app/AppShell";
-import { ShieldCheck } from "lucide-react";
+import { PageContainer, PageHeader } from "@/components/app/PageHeader";
+
 
 export const Route = createFileRoute("/_authenticated/privacy")({
   head: () => ({
@@ -138,18 +139,10 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
 function PrivacyPage() {
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-3xl px-5 pt-6 pb-32 lg:pt-12">
-        <div className="animate-fade-up mb-8 flex items-center gap-3">
-          <div className="glass flex h-11 w-11 items-center justify-center rounded-2xl">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-              Privacy Policy
-            </h1>
-            <p className="text-muted-foreground text-sm">Last updated: June 2026</p>
-          </div>
-        </div>
+      <PageContainer>
+        <PageHeader title="Privacy Policy" subtitle="Last updated: June 2026" />
+        <div className="h-6" />
+
 
         <div className="glass-strong animate-fade-up rounded-3xl p-6 sm:p-8 [animation-delay:80ms]">
           <p className="text-sm leading-relaxed">
@@ -178,7 +171,8 @@ function PrivacyPage() {
             understood this Privacy Policy.
           </p>
         </div>
-      </div>
+      </PageContainer>
+
     </AppShell>
   );
 }

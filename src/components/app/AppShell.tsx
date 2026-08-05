@@ -688,7 +688,7 @@ function NavItem({
       to={to}
       onClick={onClick}
       activeOptions={{ exact: !!exact }}
-      className="text-foreground/80 hover:bg-foreground/8 data-[status=active]:bg-foreground/12 data-[status=active]:text-foreground flex h-[54px] items-center gap-3 rounded-2xl px-3 text-[15px] transition-all duration-200 active:scale-[0.97] data-[status=active]:font-semibold data-[status=active]:shadow-[0_0_0_1px_var(--border),0_0_24px_-8px_rgba(255,255,255,0.45)]"
+      className="text-foreground hover:bg-foreground/8 data-[status=active]:bg-foreground/10 flex h-[54px] items-center gap-3 rounded-2xl px-3 text-[15px] font-normal transition-colors duration-200 data-[status=active]:font-semibold"
     >
       <Icon className="h-[18px] w-[18px] shrink-0" />
       <span className="truncate">{label}</span>

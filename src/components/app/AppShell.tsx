@@ -71,7 +71,7 @@ type Thread = {
 };
 
 const DRAWER_MAX = 360;
-const AI_MODEL_LABEL = "Gemini 2.5 Flash";
+
 
 function useDrawerWidth() {
   const [w, setW] = useState(320);

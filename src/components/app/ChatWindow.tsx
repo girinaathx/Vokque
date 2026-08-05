@@ -644,13 +644,14 @@ function IconBtn({
   );
 }
 
-function CopyBtn({ text }: { text: string }) {
+function CopyBtn({ text, label }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
   return (
     <button
-      onClick={() => {
-        navigator.clipboard.writeText(text);
+      onClick={async () => {
+        const ok = await copyText(text, "");
+        if (!ok) return;
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
@@ -662,12 +663,13 @@ function CopyBtn({ text }: { text: string }) {
         </>
       ) : (
         <>
-          <Copy className="h-3 w-3" /> {t("chat.copy")}
+          <Copy className="h-3 w-3" /> {label ?? t("chat.copy")}
         </>
       )}
     </button>
   );
 }
+
 
 function normalizeMath(input: string) {
   // Accept \( ... \) and \[ ... \] and convert to $ / $$ so remark-math sees them.

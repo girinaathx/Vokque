@@ -3,6 +3,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app/AppShell";
+import { PAGE_TOP_PADDING } from "@/components/app/PageHeader";
+import { Logo } from "@/components/brand/Logo";
+
 import { createThread } from "@/lib/threads.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {

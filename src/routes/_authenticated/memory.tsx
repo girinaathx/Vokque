@@ -300,23 +300,12 @@ function MemoryPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-3xl px-5 pt-6 pb-32 lg:pt-12">
-        <div className="animate-fade-up">
-          <div className="flex items-center gap-3">
-            <div className="glass flex h-11 w-11 items-center justify-center rounded-2xl">
-              <Brain className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-                Memory
-              </h1>
-              <p className="text-muted-foreground text-sm">
-                Everything Avenxa remembers about you. Yours to edit, pin,
-                archive, export, or delete — anytime.
-              </p>
-            </div>
-          </div>
-        </div>
+      <PageContainer>
+        <PageHeader
+          title="Memory"
+          subtitle="Everything Avenxa remembers about you. Yours to edit, pin, archive, export, or delete — anytime."
+        />
+
 
         {/* Stats */}
         <div className="animate-fade-up mt-5 grid grid-cols-3 gap-2 [animation-delay:60ms]">

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app/AppShell";
-import { ShieldCheck } from "lucide-react";
+import { PageContainer, PageHeader } from "@/components/app/PageHeader";
+
 
 export const Route = createFileRoute("/_authenticated/privacy")({
   head: () => ({
@@ -170,7 +171,8 @@ function PrivacyPage() {
             understood this Privacy Policy.
           </p>
         </div>
-      </div>
+      </PageContainer>
+
     </AppShell>
   );
 }

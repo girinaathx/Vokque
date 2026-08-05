@@ -3,6 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/app/AppShell";
+import { PageContainer, PageHeader } from "@/components/app/PageHeader";
+import { copyText } from "@/lib/copy";
+
 import {
   createMemory,
   deleteAllMemories,
@@ -524,7 +527,8 @@ function MemoryPage() {
             />
           ))}
         </div>
-      </div>
+      </PageContainer>
+
     </AppShell>
   );
 }

@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
-import { Logo } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 
 /**
  * Consistent top spacing for every page so titles never sit behind the
- * floating menu / new-chat buttons.
+ * fixed app header (logo + menu / new-chat buttons).
  */
-export const PAGE_TOP_PADDING = "calc(env(safe-area-inset-top, 0px) + 96px)";
+export const APP_HEADER_HEIGHT = 56;
+export const PAGE_TOP_PADDING = `calc(env(safe-area-inset-top, 0px) + ${APP_HEADER_HEIGHT + 32}px)`;
 
 /**
  * Shared page container: equal top padding on every screen.
@@ -29,7 +29,8 @@ export function PageContainer({
 }
 
 /**
- * Centered Avenxa logo above the page title.
+ * Page title block. The Avenxa logo lives in the fixed app header, so it is
+ * never pushed down by page content.
  */
 export function PageHeader({
   title,
@@ -40,8 +41,7 @@ export function PageHeader({
 }) {
   return (
     <header className="animate-fade-up flex flex-col items-center text-center">
-      <Logo size={30} />
-      <h1 className="font-display mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+      <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
         {title}
       </h1>
       {subtitle && (
@@ -50,3 +50,4 @@ export function PageHeader({
     </header>
   );
 }
+

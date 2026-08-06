@@ -318,27 +318,36 @@ export function AppShell({
         <Sidebar {...sidebarProps} />
       </aside>
 
-      {/* Mobile floating glass buttons */}
-      <div
-        className="pointer-events-none fixed inset-x-0 z-40 flex items-center justify-between px-4 lg:hidden"
-        style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+      {/* Fixed app header — logo always perfectly centered */}
+      <header
+        className="pointer-events-none fixed inset-x-0 z-40 flex items-center px-4"
+        style={{
+          top: "env(safe-area-inset-top, 0px)",
+          height: APP_HEADER_HEIGHT,
+        }}
       >
         <button
           onClick={() => setMobileOpen(true)}
-          className="glass-bright pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90"
+          className="glass-bright pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 lg:hidden"
           aria-label="Menu"
         >
           <Menu className="h-5 w-5" />
         </button>
+
+        <div className="pointer-events-none absolute left-1/2 -translate-x-1/2">
+          <Logo size={26} />
+        </div>
+
         <button
           onClick={() => createMut.mutate()}
           disabled={createMut.isPending}
-          className="glass-bright pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
+          className="glass-bright pointer-events-auto ml-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
           aria-label={t("nav.newChat")}
         >
           <Plus className="h-5 w-5" />
         </button>
-      </div>
+      </header>
+
 
       {/* Mobile drawer + backdrop */}
       {drawerVisible && (

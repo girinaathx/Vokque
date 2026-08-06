@@ -104,6 +104,7 @@ function SettingsPage() {
 
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
+            {active === "profile" && <ProfileSection />}
             {active === "appearance" && <AppearanceSection />}
             {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Avenxa responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}

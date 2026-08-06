@@ -20,7 +20,11 @@ import {
   Monitor,
   LogOut,
   ChevronRight,
+  User as UserIcon,
+  Loader2,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 
 
@@ -38,6 +42,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 type SectionId =
+  | "profile"
   | "appearance"
   | "model"
   | "memory"
@@ -47,6 +52,7 @@ type SectionId =
   | "account";
 
 const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
+  { id: "profile", label: "Profile", icon: UserIcon },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "model", label: "AI Model", icon: Brain },
   { id: "memory", label: "Memory", icon: Brain },
@@ -59,7 +65,7 @@ const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
 
 
 function SettingsPage() {
-  const [active, setActive] = useState<SectionId>("appearance");
+  const [active, setActive] = useState<SectionId>("profile");
 
   return (
     <AppShell>
@@ -98,6 +104,7 @@ function SettingsPage() {
 
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
+            {active === "profile" && <ProfileSection />}
             {active === "appearance" && <AppearanceSection />}
             {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Avenxa responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
@@ -124,6 +131,147 @@ function SectionTitle({ title, sub }: { title: string; sub?: string }) {
     <div className="mb-4">
       <h2 className="font-display text-lg font-semibold tracking-tight">{title}</h2>
       {sub && <p className="text-muted-foreground mt-1 text-sm">{sub}</p>}
+    </div>
+  );
+}
+
+function ProfileSection() {
+  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["profile-settings"],
+    queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const user = auth.user;
+      if (!user) return null;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id, username, display_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      return {
+        id: user.id,
+        email: user.email ?? "",
+        username: profile?.username ?? "",
+        display_name: profile?.display_name ?? "",
+      };
+    },
+  });
+
+  useEffect(() => {
+    if (!data) return;
+    setUsername(data.username);
+    setDisplayName(data.display_name);
+  }, [data]);
+
+  const normalized = username.trim().toLowerCase();
+  const validUsername = /^[a-z0-9_]{3,20}$/.test(normalized);
+  const dirty =
+    !!data && (normalized !== data.username || displayName.trim() !== data.display_name);
+
+  const save = async () => {
+    if (!data) return;
+    if (username && !validUsername) {
+      toast.error("Username must be 3–20 characters: letters, numbers, underscore");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: data.id,
+        username: normalized || null,
+        display_name: displayName.trim() || null,
+      },
+      { onConflict: "id" },
+    );
+    setSaving(false);
+    if (error) {
+      toast.error(
+        error.code === "23505" ? "That username is already taken" : "Couldn't save profile",
+      );
+      return;
+    }
+    toast.success("Profile updated");
+    void refetch();
+  };
+
+  const previewName = displayName.trim() || data?.display_name || "Your name";
+  const initial = (previewName[0] ?? "A").toUpperCase();
+
+  return (
+    <Card>
+      <SectionTitle title="Profile" sub="Your name and username on Avenxa." />
+
+      {/* Preview */}
+      <div className="glass mb-5 flex items-center gap-3 rounded-2xl p-4">
+        <div className="bg-foreground/10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-semibold">
+          {initial}
+        </div>
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold">{previewName}</div>
+          <div className="text-muted-foreground truncate text-xs">
+            {normalized ? `@${normalized}` : data?.email}
+          </div>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="text-muted-foreground flex items-center gap-2 text-sm">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <Field label="Display name">
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Your name"
+              maxLength={40}
+              className="glass w-full rounded-2xl px-4 py-2.5 text-sm outline-none"
+            />
+          </Field>
+
+          <Field label="Username">
+            <div className="glass flex items-center rounded-2xl px-4">
+              <span className="text-muted-foreground text-sm">@</span>
+              <input
+                value={username}
+                onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
+                placeholder="username"
+                maxLength={20}
+                autoCapitalize="none"
+                spellCheck={false}
+                className="w-full bg-transparent px-1 py-2.5 text-sm outline-none"
+              />
+            </div>
+            <p className="text-muted-foreground mt-1.5 text-xs">
+              3–20 characters. Letters, numbers and underscores. Must be unique.
+            </p>
+          </Field>
+
+          <button
+            onClick={() => void save()}
+            disabled={!dirty || saving}
+            className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition hover:opacity-90 disabled:opacity-40"
+          >
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            Save changes
+          </button>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
+        {label}
+      </label>
+      {children}
     </div>
   );
 }

@@ -65,7 +65,7 @@ const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
 
 
 function SettingsPage() {
-  const [active, setActive] = useState<SectionId>("appearance");
+  const [active, setActive] = useState<SectionId>("profile");
 
   return (
     <AppShell>

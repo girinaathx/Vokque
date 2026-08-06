@@ -38,6 +38,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 type SectionId =
+  | "profile"
   | "appearance"
   | "model"
   | "memory"
@@ -47,6 +48,7 @@ type SectionId =
   | "account";
 
 const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
+  { id: "profile", label: "Profile", icon: UserIcon },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "model", label: "AI Model", icon: Brain },
   { id: "memory", label: "Memory", icon: Brain },

@@ -699,7 +699,7 @@ function EmptyState({ onPick: _onPick }: { onPick: (t: string) => void }) {
   const { t } = useTranslation();
   return (
     <div className="animate-fade-up flex flex-col items-center pt-24 text-center">
-      <Logo size={44} glow className="mb-4" />
+
       <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
         {t("chat.emptyTitle")}
       </h2>

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
  * fixed app header (logo + menu / new-chat buttons).
  */
 export const APP_HEADER_HEIGHT = 56;
-export const PAGE_TOP_PADDING = `calc(env(safe-area-inset-top, 0px) + ${APP_HEADER_HEIGHT + 32}px)`;
+export const PAGE_TOP_PADDING = `calc(env(safe-area-inset-top, 0px) + ${APP_HEADER_HEIGHT + 12}px)`;
 
 /**
  * Shared page container: equal top padding on every screen.

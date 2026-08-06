@@ -244,7 +244,18 @@ export function AppShell({
           return;
         }
         g.decided = true;
+        g.lastX = tch.clientX;
+        g.lastT = performance.now();
+        g.velocity = 0;
       }
+      // px per ms, smoothed — used for flick / velocity-based completion
+      const now = performance.now();
+      const dt = Math.max(1, now - (g.lastT ?? now));
+      const instant = (tch.clientX - (g.lastX ?? tch.clientX)) / dt;
+      g.velocity = (g.velocity ?? 0) * 0.7 + instant * 0.3;
+      g.lastX = tch.clientX;
+      g.lastT = now;
+
       if (g.from === "edge") {
         setDrag(Math.max(0, Math.min(width, dx)));
       } else {
@@ -261,12 +272,17 @@ export function AppShell({
       setDrag(null);
       return;
     }
+    const v = g.velocity ?? 0; // px/ms; >0 = moving right
     setDrag((d) => {
       const offset = d ?? 0;
-      setMobileOpen(offset > width * 0.4);
+      // Fast flick wins over distance; otherwise snap at 40%.
+      if (v > 0.4) setMobileOpen(true);
+      else if (v < -0.4) setMobileOpen(false);
+      else setMobileOpen(offset > width * 0.4);
       return null;
     });
   }, [width]);
+
 
   const dragging = drag !== null;
   const progress = dragging ? (drag as number) / width : mobileOpen ? 1 : 0;

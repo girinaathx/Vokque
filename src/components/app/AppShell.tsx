@@ -202,6 +202,9 @@ export function AppShell({
     active: boolean;
     decided: boolean;
     from: "edge" | "drawer";
+    lastX?: number;
+    lastT?: number;
+    velocity?: number;
   } | null>(null);
 
   const onTouchStart = useCallback(

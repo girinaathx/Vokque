@@ -20,7 +20,11 @@ import {
   Monitor,
   LogOut,
   ChevronRight,
+  User as UserIcon,
+  Loader2,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 
 

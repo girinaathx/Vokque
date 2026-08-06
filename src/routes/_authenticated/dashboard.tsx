@@ -161,9 +161,8 @@ function Dashboard() {
         className="mx-auto w-full max-w-3xl px-5 pb-32"
         style={{ paddingTop: PAGE_TOP_PADDING }}
       >
-        <div className="animate-fade-up mb-7 flex justify-center">
-          <Logo size={30} />
-        </div>
+
+
 
         <div className="animate-fade-up">
           <p className="text-muted-foreground text-sm">

@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/brand/Logo";
+import { APP_HEADER_HEIGHT } from "@/components/app/PageHeader";
 import { supabase } from "@/integrations/supabase/client";
 import {
   listThreads,

@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      artifacts: {
+        Row: {
+          created_at: string
+          extension: string
+          filename: string
+          id: string
+          kind: string
+          mime_type: string
+          size_bytes: number
+          storage_path: string
+          thread_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          extension: string
+          filename: string
+          id?: string
+          kind: string
+          mime_type: string
+          size_bytes: number
+          storage_path: string
+          thread_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          extension?: string
+          filename?: string
+          id?: string
+          kind?: string
+          mime_type?: string
+          size_bytes?: number
+          storage_path?: string
+          thread_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       memories: {
         Row: {
           archived_at: string | null

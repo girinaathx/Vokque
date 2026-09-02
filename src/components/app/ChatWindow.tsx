@@ -323,6 +323,9 @@ export function ChatWindow({
 
                 )}
 
+                {!isUser && <ArtifactParts parts={m.parts} />}
+
+
                 {editingId === m.id && isUser ? (
                   <div className="glass w-full max-w-[88%] rounded-2xl p-3">
                     <textarea

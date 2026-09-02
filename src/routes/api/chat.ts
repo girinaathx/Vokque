@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   convertToModelMessages,
-  
+  stepCountIs,
   streamText,
   type UIMessage,
 } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { resolveChatProvider } from "@/lib/ai/providers.server";
+import { createArtifactTools } from "@/lib/artifacts/tools.server";
 import { createClient } from "@supabase/supabase-js";
 import Firecrawl from "@mendable/firecrawl-js";
+
 
 // Heuristic: does this user turn need fresh web info?
 const FACTUAL_HINTS =

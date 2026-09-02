@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/Logo";
 import { copyText } from "@/lib/copy";
+import { ArtifactParts } from "@/components/app/ArtifactCard";
 import { truncateThreadMessages } from "@/lib/threads.functions";
 import {
   ArrowUp,

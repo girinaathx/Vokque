@@ -331,8 +331,14 @@ export const Route = createFileRoute("/api/chat")({
             model,
             system: systemPrompt,
             messages: await convertToModelMessages(messages),
+            tools: createArtifactTools({
+              userId: isGuest ? null : userId,
+              threadId: threadId || null,
+            }),
+            stopWhen: stepCountIs(50),
             abortSignal: request.signal,
           });
+
 
           return result.toUIMessageStreamResponse({
             originalMessages: messages,

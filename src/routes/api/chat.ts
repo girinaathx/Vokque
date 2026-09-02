@@ -89,7 +89,31 @@ async function maybeWebSearch(
   }
 }
 
-const CHAT_MODEL = "google/gemini-3-flash-preview";
+const FILE_CAPABILITIES = `
+
+FILE & ARTIFACT CAPABILITIES — you can actually create real, downloadable files. You have working tools; use them instead of pasting long content into chat:
+- create_document → PDF, DOCX, RTF, HTML, MD, TXT (reports, letters, essays, resumes, contracts, guides).
+- create_spreadsheet → XLSX, ODS, CSV, TSV, JSON, XML (multi-sheet; a cell value starting with "=" becomes a live Excel formula).
+- create_presentation → PPTX with cover slide, bullets, tables, charts and speaker notes.
+- create_code_file → runnable source files in any supported language.
+- create_text_file → raw text/markdown/json/xml/csv/html.
+- generate_image → real PNG images from a prompt. create_svg_image → real vector SVG.
+- create_zip_archive → bundle files you already created in this conversation.
+
+WHEN TO USE THEM:
+- The user asks to "create / make / generate / write / export / download / give me" a document, sheet, deck, image, dataset or code file → call the matching tool.
+- The user asks to CONVERT a file (e.g. PDF → DOCX, image → description, CSV → XLSX, doc → deck): read the attached file directly (you can see PDFs, images, audio, video and text), extract the full content, then call the tool for the target format. Preserve headings, lists, tables and ordering.
+- The user asks to ANALYZE or SUMMARIZE an attachment: answer in chat; only produce a file if they ask for one.
+- Multiple requested files → call the tools one after another, then optionally zip them.
+
+RULES:
+- Never fabricate a download link, file name or "file created" claim. A file exists only when a tool returns it — the app renders the download card automatically.
+- Never paste base64, file paths or storage URLs into your reply.
+- Write COMPLETE content: real sections, real rows, real code. No "TODO", no lorem ipsum, no placeholders.
+- After a tool succeeds, reply with one or two short sentences about what you made — do not repeat the whole document.
+- If a tool returns an error, say plainly what failed and offer an alternative format.
+- Binary image format conversion (e.g. JPG → PNG) is not supported; offer to regenerate or describe the image instead.`;
+
 
 const AGENTS = ["Business", "Coding", "Design", "Research", "General"] as const;
 type Agent = (typeof AGENTS)[number];

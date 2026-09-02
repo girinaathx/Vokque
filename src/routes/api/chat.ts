@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   convertToModelMessages,
-  
+  stepCountIs,
   streamText,
   type UIMessage,
 } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { resolveChatProvider } from "@/lib/ai/providers.server";
+import { createArtifactTools } from "@/lib/artifacts/tools.server";
 import { createClient } from "@supabase/supabase-js";
 import Firecrawl from "@mendable/firecrawl-js";
+
 
 // Heuristic: does this user turn need fresh web info?
 const FACTUAL_HINTS =
@@ -87,7 +89,31 @@ async function maybeWebSearch(
   }
 }
 
-const CHAT_MODEL = "google/gemini-3-flash-preview";
+const FILE_CAPABILITIES = `
+
+FILE & ARTIFACT CAPABILITIES — you can actually create real, downloadable files. You have working tools; use them instead of pasting long content into chat:
+- create_document → PDF, DOCX, RTF, HTML, MD, TXT (reports, letters, essays, resumes, contracts, guides).
+- create_spreadsheet → XLSX, ODS, CSV, TSV, JSON, XML (multi-sheet; a cell value starting with "=" becomes a live Excel formula).
+- create_presentation → PPTX with cover slide, bullets, tables, charts and speaker notes.
+- create_code_file → runnable source files in any supported language.
+- create_text_file → raw text/markdown/json/xml/csv/html.
+- generate_image → real PNG images from a prompt. create_svg_image → real vector SVG.
+- create_zip_archive → bundle files you already created in this conversation.
+
+WHEN TO USE THEM:
+- The user asks to "create / make / generate / write / export / download / give me" a document, sheet, deck, image, dataset or code file → call the matching tool.
+- The user asks to CONVERT a file (e.g. PDF → DOCX, image → description, CSV → XLSX, doc → deck): read the attached file directly (you can see PDFs, images, audio, video and text), extract the full content, then call the tool for the target format. Preserve headings, lists, tables and ordering.
+- The user asks to ANALYZE or SUMMARIZE an attachment: answer in chat; only produce a file if they ask for one.
+- Multiple requested files → call the tools one after another, then optionally zip them.
+
+RULES:
+- Never fabricate a download link, file name or "file created" claim. A file exists only when a tool returns it — the app renders the download card automatically.
+- Never paste base64, file paths or storage URLs into your reply.
+- Write COMPLETE content: real sections, real rows, real code. No "TODO", no lorem ipsum, no placeholders.
+- After a tool succeeds, reply with one or two short sentences about what you made — do not repeat the whole document.
+- If a tool returns an error, say plainly what failed and offer an alternative format.
+- Binary image format conversion (e.g. JPG → PNG) is not supported; offer to regenerate or describe the image instead.`;
+
 
 const AGENTS = ["Business", "Coding", "Design", "Research", "General"] as const;
 type Agent = (typeof AGENTS)[number];
@@ -132,7 +158,7 @@ Pick 1–3 of the most relevant agents. Do not mention this comment to the user.
 
 MATHEMATICS: Avenxa has full LaTeX rendering (KaTeX). Always write mathematics in LaTeX — never plain-text approximations. Use $...$ for inline math and $$...$$ on their own lines for display math. Use proper commands: \\frac, \\sqrt, \\int, \\sum, \\lim, \\begin{pmatrix}...\\end{pmatrix}, \\begin{cases}...\\end{cases}, \\vec, \\partial. For any calculation, show the steps in order, each on its own display line, then state the final answer clearly. Cover arithmetic, algebra, geometry, trigonometry, calculus, linear algebra, statistics, probability, and physics-style derivations.
 
-PROACTIVE: when the user has a goal, break it into steps, name obstacles, recommend actions, and offer to execute (draft the email, build the plan, write the code, outline the design).`;
+PROACTIVE: when the user has a goal, break it into steps, name obstacles, recommend actions, and offer to execute (draft the email, build the plan, write the code, outline the design).${FILE_CAPABILITIES}`;
 
 const CITE_INSTRUCTIONS = `\n\nCITATIONS MODE — ON.
 - For any factual recommendation in travel, fitness, productivity, study, health, news, or research, cite a credible public source.
@@ -162,13 +188,15 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY;
-        if (!apiKey) {
-          return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+        let provider;
+        try {
+          provider = resolveChatProvider();
+        } catch {
+          return new Response("AI is not configured.", { status: 500 });
         }
-        const gateway = createLovableAiGatewayProvider(apiKey);
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
+
 
         const body = (await request.json()) as ChatBody;
         const messages = body.messages ?? [];
@@ -254,7 +282,7 @@ export const Route = createFileRoute("/api/chat")({
         }
 
 
-        const model = gateway(CHAT_MODEL);
+        const model = provider.model;
         const personaBlock =
           "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
           AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");
@@ -303,8 +331,14 @@ export const Route = createFileRoute("/api/chat")({
             model,
             system: systemPrompt,
             messages: await convertToModelMessages(messages),
+            tools: createArtifactTools({
+              userId: isGuest ? null : userId,
+              threadId: threadId || null,
+            }),
+            stopWhen: stepCountIs(50),
             abortSignal: request.signal,
           });
+
 
           return result.toUIMessageStreamResponse({
             originalMessages: messages,

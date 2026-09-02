@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/Logo";
 import { copyText } from "@/lib/copy";
+import { ArtifactParts } from "@/components/app/ArtifactCard";
 import { truncateThreadMessages } from "@/lib/threads.functions";
 import {
   ArrowUp,
@@ -322,6 +323,9 @@ export function ChatWindow({
                   </div>
 
                 )}
+
+                {!isUser && <ArtifactParts parts={m.parts} />}
+
 
                 {editingId === m.id && isUser ? (
                   <div className="glass w-full max-w-[88%] rounded-2xl p-3">

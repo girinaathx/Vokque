@@ -188,13 +188,15 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY;
-        if (!apiKey) {
-          return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+        let provider;
+        try {
+          provider = resolveChatProvider();
+        } catch {
+          return new Response("AI is not configured.", { status: 500 });
         }
-        const gateway = createLovableAiGatewayProvider(apiKey);
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
+
 
         const body = (await request.json()) as ChatBody;
         const messages = body.messages ?? [];

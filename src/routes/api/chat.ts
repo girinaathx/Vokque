@@ -282,7 +282,7 @@ export const Route = createFileRoute("/api/chat")({
         }
 
 
-        const model = gateway(CHAT_MODEL);
+        const model = provider.model;
         const personaBlock =
           "\n\nSPECIALIST PERSONAS YOU CAN CHANNEL:\n" +
           AGENTS.map((a) => `- ${a}: ${AGENT_PERSONAS[a]}`).join("\n");

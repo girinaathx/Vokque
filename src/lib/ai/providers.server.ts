@@ -31,7 +31,14 @@ export function resolveChatProvider(): ChatProvider {
       baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
       headers: { Authorization: `Bearer ${geminiKey}` },
     });
-    return { name: "gemini", modelId: GEMINI_MODEL, model: google(GEMINI_MODEL) };
+    return {
+      name: "gemini",
+      modelId: GEMINI_MODEL,
+      // Thinking off: the OpenAI-compatible surface cannot round-trip Gemini 3
+      // thought signatures, which breaks multi-step tool calling.
+      options: { gemini: { reasoningEffort: "none" } },
+      model: google(GEMINI_MODEL),
+    };
   }
 
   const lovableKey = process.env.LOVABLE_API_KEY;
@@ -41,5 +48,11 @@ export function resolveChatProvider(): ChatProvider {
     baseURL: "https://ai.gateway.lovable.dev/v1",
     headers: { "Lovable-API-Key": lovableKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
   });
-  return { name: "lovable", modelId: LOVABLE_MODEL, model: lovable(LOVABLE_MODEL) };
+  return {
+    name: "lovable",
+    modelId: LOVABLE_MODEL,
+    options: {},
+    model: lovable(LOVABLE_MODEL),
+  };
+}
 }

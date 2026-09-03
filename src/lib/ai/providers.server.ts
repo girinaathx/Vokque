@@ -11,9 +11,12 @@ export type ChatProvider = {
   name: ProviderName;
   /** Model id used for conversational turns + tool calling. */
   modelId: string;
+  /** Provider-specific request fields, keyed for `providerOptions`. */
+  options: Record<string, Record<string, unknown>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   model: any;
 };
+
 
 const GEMINI_MODEL = "gemini-3.6-flash";
 const LOVABLE_MODEL = "google/gemini-3.7-flash";

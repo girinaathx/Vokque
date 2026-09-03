@@ -742,10 +742,64 @@ export async function generateZip(
 }
 
 /** Real image generation through the Lovable AI Gateway. */
+function b64ToBytes(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+const ASPECT_BY_SIZE: Record<string, string> = {
+  "1024x1024": "1:1",
+  "1536x1024": "16:9",
+  "1024x1536": "9:16",
+};
+
+/** Google Gemini image model (direct provider, used when GEMINI_API_KEY is set). */
+async function generateImageWithGemini(
+  key: string,
+  prompt: string,
+  size: string,
+): Promise<Generated | null> {
+  const model = "gemini-3.1-flash-image";
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    {
+      method: "POST",
+      headers: { "x-goog-api-key": key, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"],
+          imageConfig: { aspectRatio: ASPECT_BY_SIZE[size] ?? "1:1" },
+        },
+      }),
+    },
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    console.error(`Gemini image generation failed (${res.status}): ${text.slice(0, 400)}`);
+    return null; // fall back to the gateway provider
+  }
+  const json = (await res.json()) as {
+    candidates?: { content?: { parts?: { inlineData?: { data?: string } }[] } }[];
+  };
+  const parts = json.candidates?.[0]?.content?.parts ?? [];
+  const data = parts.find((p) => p.inlineData?.data)?.inlineData?.data;
+  if (!data) return null;
+  return { bytes: b64ToBytes(data), ext: "png" };
+}
+
 export async function generateImageBytes(
   prompt: string,
   size: "1024x1024" | "1536x1024" | "1024x1536",
 ): Promise<Generated> {
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (geminiKey) {
+    const out = await generateImageWithGemini(geminiKey, prompt, size);
+    if (out) return out;
+  }
+
   const key = process.env.LOVABLE_API_KEY;
   if (!key) throw new Error("Image generation is not configured.");
   const res = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
@@ -762,10 +816,7 @@ export async function generateImageBytes(
   const json = (await res.json()) as { data?: { b64_json?: string }[] };
   const b64 = json.data?.[0]?.b64_json;
   if (!b64) throw new Error("Image generation returned no image data.");
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return { bytes, ext: "png" };
+  return { bytes: b64ToBytes(b64), ext: "png" };
 }
 
 export function generateSvg(svg: string): Generated {

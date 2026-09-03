@@ -13,7 +13,7 @@ export type ChatProvider = {
   /** Model id used for conversational turns + tool calling. */
   modelId: string;
   /** Provider-specific request fields, keyed for `providerOptions`. */
-  options: Record<string, Record<string, unknown>>;
+  options: Record<string, Record<string, never>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   model: any;
 };

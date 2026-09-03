@@ -336,6 +336,7 @@ export const Route = createFileRoute("/api/chat")({
               threadId: threadId || null,
             }),
             stopWhen: stepCountIs(50),
+            providerOptions: provider.options,
             abortSignal: request.signal,
           });
 

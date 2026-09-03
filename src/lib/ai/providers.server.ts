@@ -1,4 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 /**
  * Provider abstraction. Google Gemini is the primary provider; the Lovable AI
@@ -11,25 +12,30 @@ export type ChatProvider = {
   name: ProviderName;
   /** Model id used for conversational turns + tool calling. */
   modelId: string;
+  /** Provider-specific request fields, keyed for `providerOptions`. */
+  options: Record<string, Record<string, never>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   model: any;
 };
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+
+const GEMINI_MODEL = "gemini-3.6-flash";
 const LOVABLE_MODEL = "google/gemini-3.7-flash";
 
 export function resolveChatProvider(): ChatProvider {
   const geminiKey = process.env.GEMINI_API_KEY;
   if (geminiKey) {
-    // Google's official OpenAI-compatible surface — supports streaming,
-    // function calling and multimodal (image / audio / PDF) inputs.
-    const google = createOpenAICompatible({
+    // Official Google GenAI provider — streaming, function calling, thought
+    // signatures and multimodal (image / audio / video / PDF) input.
+    const google = createGoogleGenerativeAI({ apiKey: geminiKey });
+    return {
       name: "gemini",
-      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
-      headers: { Authorization: `Bearer ${geminiKey}` },
-    });
-    return { name: "gemini", modelId: GEMINI_MODEL, model: google(GEMINI_MODEL) };
+      modelId: GEMINI_MODEL,
+      options: {},
+      model: google(GEMINI_MODEL),
+    };
   }
+
 
   const lovableKey = process.env.LOVABLE_API_KEY;
   if (!lovableKey) throw new Error("No AI provider configured.");
@@ -38,5 +44,10 @@ export function resolveChatProvider(): ChatProvider {
     baseURL: "https://ai.gateway.lovable.dev/v1",
     headers: { "Lovable-API-Key": lovableKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
   });
-  return { name: "lovable", modelId: LOVABLE_MODEL, model: lovable(LOVABLE_MODEL) };
+  return {
+    name: "lovable",
+    modelId: LOVABLE_MODEL,
+    options: {},
+    model: lovable(LOVABLE_MODEL),
+  };
 }

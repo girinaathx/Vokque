@@ -55,4 +55,3 @@ export function resolveChatProvider(): ChatProvider {
     model: lovable(LOVABLE_MODEL),
   };
 }
-}

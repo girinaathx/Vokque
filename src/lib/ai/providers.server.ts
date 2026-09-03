@@ -25,22 +25,17 @@ const LOVABLE_MODEL = "google/gemini-3.7-flash";
 export function resolveChatProvider(): ChatProvider {
   const geminiKey = process.env.GEMINI_API_KEY;
   if (geminiKey) {
-    // Google's official OpenAI-compatible surface — supports streaming,
-    // function calling and multimodal (image / audio / PDF) inputs.
-    const google = createOpenAICompatible({
-      name: "gemini",
-      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
-      headers: { Authorization: `Bearer ${geminiKey}` },
-    });
+    // Official Google GenAI provider — streaming, function calling, thought
+    // signatures and multimodal (image / audio / video / PDF) input.
+    const google = createGoogleGenerativeAI({ apiKey: geminiKey });
     return {
       name: "gemini",
       modelId: GEMINI_MODEL,
-      // Thinking off: the OpenAI-compatible surface cannot round-trip Gemini 3
-      // thought signatures, which breaks multi-step tool calling.
-      options: { gemini: { reasoningEffort: "none" } },
+      options: {},
       model: google(GEMINI_MODEL),
     };
   }
+
 
   const lovableKey = process.env.LOVABLE_API_KEY;
   if (!lovableKey) throw new Error("No AI provider configured.");

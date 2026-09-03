@@ -221,7 +221,7 @@ export async function generatePdf(title: string, blocks: Block[]): Promise<Gener
 
 export async function generateDocx(title: string, blocks: Block[]): Promise<Generated> {
   const d = await import("docx");
-  const children: InstanceType<typeof d.Paragraph>[] | unknown[] = [];
+  const children: unknown[] = [];
 
   if (title) {
     children.push(

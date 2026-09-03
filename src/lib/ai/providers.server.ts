@@ -15,7 +15,7 @@ export type ChatProvider = {
   model: any;
 };
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.6-flash";
 const LOVABLE_MODEL = "google/gemini-3.7-flash";
 
 export function resolveChatProvider(): ChatProvider {

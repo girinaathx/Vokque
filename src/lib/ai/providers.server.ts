@@ -1,4 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 /**
  * Provider abstraction. Google Gemini is the primary provider; the Lovable AI

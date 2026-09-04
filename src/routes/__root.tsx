@@ -96,7 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "Avenxa is a premium AI assistant for study, work, and everyday life — built by Avenxa Technology.",
         },
-        { name: "theme-color", content: "#000000" },
+        { name: "theme-color", content: "#7fb2dd" },
         {
           property: "og:title",
           content: "Avenxa — Your Everyday AI",
@@ -124,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap",
         },
         {
           rel: "stylesheet",

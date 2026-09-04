@@ -39,7 +39,6 @@ export const Route = createFileRoute("/_authenticated/settings")({
 
 type SectionId =
   | "profile"
-  | "appearance"
   | "model"
   | "memory"
   | "privacy"
@@ -49,7 +48,6 @@ type SectionId =
 
 const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
   { id: "profile", label: "Profile", icon: UserIcon },
-  { id: "appearance", label: "Appearance", icon: Palette },
   { id: "model", label: "AI Model", icon: Brain },
   { id: "memory", label: "Memory", icon: Brain },
   { id: "privacy", label: "Privacy Policy", icon: ShieldCheck },
@@ -101,7 +99,6 @@ function SettingsPage() {
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
             {active === "profile" && <ProfileSection />}
-            {active === "appearance" && <AppearanceSection />}
             {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Avenxa responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
             {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how Avenxa handles your data, chats, and account." />}
@@ -269,49 +266,6 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
       </label>
       {children}
     </div>
-  );
-}
-
-function AppearanceSection() {
-  const { theme, setTheme } = useTheme();
-  const options: Array<{ id: ThemePref; label: string; desc: string; icon: typeof Sun }> = [
-    { id: "system", label: "System", desc: "Follow your device", icon: Monitor },
-    { id: "dark", label: "AMOLED Dark", desc: "Pure black, matte, no reflections", icon: Moon },
-    { id: "light", label: "Pure White", desc: "Pure white, black ink, no tint", icon: Sun },
-  ];
-  return (
-    <Card>
-      <SectionTitle title="Appearance" sub="Choose how Avenxa looks." />
-      <div className="grid gap-2 sm:grid-cols-3">
-        {options.map((o) => {
-          const Icon = o.icon;
-          const isActive = theme === o.id;
-          return (
-            <button
-              key={o.id}
-              onClick={() => setTheme(o.id)}
-              className={cn(
-                "glass flex flex-col items-start gap-2 rounded-2xl p-4 text-left transition hover:-translate-y-px",
-                isActive && "ring-2 ring-foreground/40",
-              )}
-            >
-              <div className="flex w-full items-center justify-between">
-                <Icon className="h-5 w-5" />
-                {isActive && (
-                  <span className="rounded-full bg-foreground px-2 py-0.5 text-[10px] font-semibold text-background">
-                    Active
-                  </span>
-                )}
-              </div>
-              <div>
-                <div className="text-sm font-semibold">{o.label}</div>
-                <div className="text-muted-foreground text-xs">{o.desc}</div>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </Card>
   );
 }
 

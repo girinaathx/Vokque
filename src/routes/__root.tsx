@@ -21,7 +21,8 @@ import i18n from "@/lib/i18n";
 
 const SITE_URL = "https://feyncloud.lovable.app";
 
-const themeBootScript = `(function(){try{var t=localStorage.getItem('oi:theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
+// Avenxa has one permanent theme — never switch on device preference.
+const themeBootScript = `(function(){try{document.documentElement.classList.remove('dark');document.documentElement.style.colorScheme='light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
 
 function NotFoundComponent() {
   return (
@@ -95,7 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "Avenxa is a premium AI assistant for study, work, and everyday life — built by Avenxa Technology.",
         },
-        { name: "theme-color", content: "#000000" },
+        { name: "theme-color", content: "#7fb2dd" },
         {
           property: "og:title",
           content: "Avenxa — Your Everyday AI",
@@ -123,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap",
         },
         {
           rel: "stylesheet",

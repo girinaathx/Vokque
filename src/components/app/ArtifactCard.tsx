@@ -1,68 +1,50 @@
-import { Download, FileText, Image as ImageIcon, Loader2, AlertCircle } from "lucide-react";
-import { formatBytes, type ArtifactMeta } from "@/lib/artifacts/spec";
-import { cn } from "@/lib/utils";
+import { Download, FileText, Loader2, AlertCircle } from "lucide-react";
+import type { ArtifactMeta } from "@/lib/artifacts/spec";
 
-const ICON_TINT: Record<string, string> = {
-  pdf: "text-rose-400",
-  docx: "text-sky-400",
-  rtf: "text-sky-400",
-  xlsx: "text-emerald-400",
-  ods: "text-emerald-400",
-  csv: "text-emerald-400",
-  tsv: "text-emerald-400",
-  pptx: "text-orange-400",
-  zip: "text-amber-400",
-  png: "text-violet-400",
-  svg: "text-violet-400",
-};
-
-/** Liquid-glass card shown in chat for every real generated file. */
+/**
+ * Generated artifacts. Images render directly in the conversation with a tiny
+ * download control; other files render as a slim glass chip.
+ */
 export function ArtifactCard({ artifact }: { artifact: ArtifactMeta }) {
   const isImage = artifact.mimeType.startsWith("image/");
-  const tint = ICON_TINT[artifact.extension] ?? "text-foreground/70";
 
-  return (
-    <div className="animate-fade-up my-3 w-full max-w-md overflow-hidden rounded-3xl border border-white/12 bg-white/[0.06] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.75)] backdrop-blur-2xl">
-      {isImage && (
-        <a href={artifact.url} target="_blank" rel="noreferrer" className="block">
-          <img
-            src={artifact.url}
-            alt={artifact.filename}
-            loading="lazy"
-            className="max-h-80 w-full object-cover"
-          />
-        </a>
-      )}
-      <div className="flex items-center gap-3 p-3">
-        <span
-          className={cn(
-            "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/[0.07]",
-            tint,
-          )}
-        >
-          {isImage ? <ImageIcon className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-[14px] font-medium">{artifact.filename}</span>
-          <span className="text-muted-foreground block text-[12px]">
-            {artifact.kind} · {formatBytes(artifact.sizeBytes)}
-          </span>
-        </span>
+  if (isImage) {
+    return (
+      <figure className="animate-fade-up group relative my-3 w-full max-w-sm">
+        <img
+          src={artifact.url}
+          alt={artifact.filename}
+          loading="lazy"
+          className="w-full rounded-2xl object-contain shadow-[0_10px_36px_-22px_rgba(0,0,0,0.5)]"
+        />
         <a
           href={artifact.url}
           download={artifact.filename}
-          className="flex h-10 items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.08] px-4 text-[13px] font-medium transition-transform active:scale-95"
+          aria-label="Download image"
+          className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#050505] shadow-[0_2px_8px_-3px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100"
         >
-          <Download className="h-4 w-4" /> Save
+          <Download className="h-3.5 w-3.5" />
         </a>
-      </div>
-    </div>
+      </figure>
+    );
+  }
+
+  return (
+    <a
+      href={artifact.url}
+      download={artifact.filename}
+      className="glass animate-fade-up my-2 inline-flex max-w-full items-center gap-2 rounded-full py-1.5 pr-3 pl-3 text-[13px] text-[#050505] transition active:scale-[0.98]"
+    >
+      <FileText className="h-3.5 w-3.5 shrink-0 opacity-70" />
+      <span className="min-w-0 truncate">{artifact.filename}</span>
+      <Download className="h-3.5 w-3.5 shrink-0 opacity-70" />
+    </a>
   );
 }
 
 export function ArtifactPending({ label }: { label: string }) {
   return (
-    <div className="text-muted-foreground my-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-[13px] backdrop-blur-xl">
+    <div className="glass-thin my-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12.5px] text-[#111111]">
       <Loader2 className="h-3.5 w-3.5 animate-spin" /> {label}
     </div>
   );
@@ -70,8 +52,8 @@ export function ArtifactPending({ label }: { label: string }) {
 
 export function ArtifactError({ message }: { message: string }) {
   return (
-    <div className="text-destructive my-3 inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-2 text-[13px] backdrop-blur-xl">
-      <AlertCircle className="h-4 w-4" /> {message}
+    <div className="glass-thin text-destructive my-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12.5px]">
+      <AlertCircle className="h-3.5 w-3.5" /> {message}
     </div>
   );
 }

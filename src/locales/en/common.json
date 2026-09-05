@@ -29,8 +29,8 @@
     "welcomeBackToast": "Welcome back"
   },
   "chat": {
-    "placeholder": "Message Vokque…",
-    "thinking": "Thinking…",
+    "placeholder": "Ask Vokque",
+    "thinking": "Analysing...",
     "disclaimer": "Vokque can make mistakes. Verify important info.",
     "emptyTitle": "What's on your mind?",
     "emptySubtitle": "I'm here to help — ask me anything.",
@@ -92,7 +92,7 @@
     "account": {
       "signOut": "Sign out of this device",
       "signOutAll": "Sign out everywhere",
-      "deleteNote": "To delete your account, contact support@avenxa.tech.",
+      "deleteNote": "To delete your account, contact our support team.",
       "changePassword": "Change password",
       "sent": "Password reset email sent"
     },

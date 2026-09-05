@@ -237,7 +237,7 @@ function MemoryPage() {
   const handleExportJson = async () => {
     const data = await exportFn({ data: undefined as never });
     download(
-      `avenxa-memories-${stamp}.json`,
+      `vokque-memories-${stamp}.json`,
       JSON.stringify(data, null, 2),
       "application/json",
     );
@@ -253,7 +253,7 @@ function MemoryPage() {
       )
       .join("\n");
     download(
-      `avenxa-memories-${stamp}.txt`,
+      `vokque-memories-${stamp}.txt`,
       `Vokque Memories — exported ${stamp}\n\n${body}\n`,
       "text/plain",
     );

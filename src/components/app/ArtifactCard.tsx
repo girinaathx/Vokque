@@ -21,7 +21,7 @@ export function ArtifactCard({ artifact }: { artifact: ArtifactMeta }) {
           href={artifact.url}
           download={artifact.filename}
           aria-label="Download image"
-          className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#050505] shadow-[0_2px_8px_-3px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100"
+          className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-black shadow-[0_2px_8px_-3px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100"
         >
           <Download className="h-3.5 w-3.5" />
         </a>
@@ -33,7 +33,7 @@ export function ArtifactCard({ artifact }: { artifact: ArtifactMeta }) {
     <a
       href={artifact.url}
       download={artifact.filename}
-      className="glass animate-fade-up my-2 inline-flex max-w-full items-center gap-2 rounded-full py-1.5 pr-3 pl-3 text-[13px] text-[#050505] transition active:scale-[0.98]"
+      className="glass animate-fade-up my-2 inline-flex max-w-full items-center gap-2 rounded-full py-1.5 pr-3 pl-3 text-[13px] text-black transition active:scale-[0.98]"
     >
       <FileText className="h-3.5 w-3.5 shrink-0 opacity-70" />
       <span className="min-w-0 truncate">{artifact.filename}</span>
@@ -44,7 +44,7 @@ export function ArtifactCard({ artifact }: { artifact: ArtifactMeta }) {
 
 export function ArtifactPending({ label }: { label: string }) {
   return (
-    <div className="glass-thin my-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12.5px] text-[#111111]">
+    <div className="glass-thin my-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12.5px] text-white">
       <Loader2 className="h-3.5 w-3.5 animate-spin" /> {label}
     </div>
   );

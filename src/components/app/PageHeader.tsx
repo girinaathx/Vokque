@@ -29,7 +29,7 @@ export function PageContainer({
 }
 
 /**
- * Page title block. The Avenxa logo lives in the fixed app header, so it is
+ * Page title block. The Vokque logo lives in the fixed app header, so it is
  * never pushed down by page content.
  */
 export function PageHeader({

@@ -79,7 +79,7 @@ export function ChatWindow({
       id: threadId,
       messages: initialMessages,
       transport,
-      onError: () => toast.error("Unable to reach Avenxa. Please try again."),
+      onError: () => toast.error("Unable to reach Vokque. Please try again."),
     });
 
   useEffect(() => {
@@ -261,22 +261,13 @@ export function ChatWindow({
 
   return (
     <div className="relative flex h-[100dvh] min-h-0 flex-1 flex-col">
-      {/* Top liquid-glass fade — messages dissolve under floating buttons */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-30 h-24 bg-gradient-to-b from-background via-background/70 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_bottom,black,transparent)]"
-      />
-      {/* Transcript */}
+      {/* Transcript — plain text over the wallpaper, no containers */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 pt-20 lg:px-8 lg:pt-24 [mask-image:linear-gradient(to_bottom,transparent_0,black_72px,black_calc(100%-96px),transparent_100%)]"
+        className="flex-1 overflow-y-auto px-5 pt-20 lg:px-8 lg:pt-24"
         style={{ paddingBottom: "180px" }}
       >
-        <div className="mx-auto w-full max-w-3xl space-y-6">
-          {messages.length === 0 && (
-            <EmptyState onPick={(tx) => sendMessage({ text: tx })} />
-          )}
-
+        <div className="mx-auto w-full max-w-3xl space-y-8">
           {messages.map((m, idx) => {
             const isUser = m.role === "user";
             const text = m.parts
@@ -288,64 +279,51 @@ export function ChatWindow({
                 (typeof p.type === "string" && p.type.startsWith("file")),
             ) as Array<{ url?: string; mediaType?: string; filename?: string }>;
             return (
-              <div
-                key={m.id}
-                className={cn(
-                  "animate-fade-up group flex flex-col",
-                  isUser ? "items-end" : "items-start",
-                )}
-              >
+              <div key={m.id} className="animate-fade-up group flex flex-col">
                 {fileParts.length > 0 && (
-                  <div
-                    className={cn(
-                      "mb-2 flex flex-wrap gap-2",
-                      isUser ? "justify-end" : "justify-start",
-                    )}
-                  >
+                  <div className="mb-2 flex flex-wrap gap-2">
                     {fileParts.map((f, i) =>
                       f.mediaType?.startsWith("image/") && f.url ? (
                         <img
                           key={i}
                           src={f.url}
-                          alt={f.filename ?? "attachment"}
-                          className="max-h-56 max-w-[260px] rounded-2xl object-cover"
+                          alt=""
+                          className="h-12 w-12 rounded-lg object-cover"
                         />
                       ) : (
                         <span
                           key={i}
-                          className="glass inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px]"
+                          className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/25 text-white"
+                          aria-label="Attachment"
                         >
-                          <Plus className="h-3 w-3" />
-                          {f.filename ?? f.mediaType ?? "file"}
+                          <Paperclip className="h-4 w-4" />
                         </span>
                       ),
                     )}
                   </div>
-
                 )}
 
                 {!isUser && <ArtifactParts parts={m.parts} />}
 
-
                 {editingId === m.id && isUser ? (
-                  <div className="glass w-full max-w-[88%] rounded-2xl p-3">
+                  <div className="w-full max-w-full">
                     <textarea
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
                       autoFocus
                       rows={3}
-                      className="w-full resize-none bg-transparent text-[15px] outline-none"
+                      className="w-full resize-none border-b border-white/25 bg-transparent text-[15.5px] text-white outline-none"
                     />
-                    <div className="mt-2 flex justify-end gap-2">
+                    <div className="mt-2 flex gap-3">
                       <button
                         onClick={() => setEditingId(null)}
-                        className="hover:bg-foreground/5 rounded-full px-3 py-1 text-xs"
+                        className="text-[12px] text-white/70"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={() => handleEditSave(m.id)}
-                        className="bg-primary text-primary-foreground rounded-full px-3 py-1 text-xs font-medium"
+                        className="text-[12px] font-medium text-white"
                       >
                         Update
                       </button>
@@ -354,17 +332,11 @@ export function ChatWindow({
                 ) : (
                   <div
                     className={cn(
-                      "min-w-0 text-[15.5px] leading-relaxed",
-                      isUser
-                        ? "max-w-[88%] whitespace-pre-wrap text-right"
-                        : "w-full max-w-full text-left",
+                      "min-w-0 max-w-full text-[15.5px] leading-[1.65] text-white",
+                      isUser ? "font-medium whitespace-pre-wrap" : "font-normal",
                     )}
                   >
-                    {isUser ? (
-                      <p className="whitespace-pre-wrap">{text}</p>
-                    ) : (
-                      <Markdown text={text} />
-                    )}
+                    {isUser ? <p>{text}</p> : <Markdown text={text} />}
                     {!isUser &&
                       idx === messages.length - 1 &&
                       status === "streaming" &&
@@ -373,15 +345,7 @@ export function ChatWindow({
                 )}
 
                 {!editingId && text && (
-                  <div
-                    className={cn(
-                      "mt-1.5 flex items-center gap-1 transition",
-                      isUser
-                        ? "opacity-0 group-hover:opacity-100"
-                        : "opacity-70 group-hover:opacity-100",
-                      isUser ? "justify-end" : "justify-start",
-                    )}
-                  >
+                  <div className="mt-2 flex items-center gap-1 opacity-60 transition group-hover:opacity-100">
                     <CopyBtn text={text} label={isUser ? undefined : "Copy all"} />
                     {!guest && <RememberBtn text={text} threadId={threadId} />}
                     {isUser && (
@@ -390,7 +354,7 @@ export function ChatWindow({
                           setEditingId(m.id);
                           setEditValue(text);
                         }}
-                        className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+                        className="flex items-center gap-1 rounded-full px-2 py-1 text-[11px] text-white"
                       >
                         <Pencil className="h-3 w-3" /> {t("chat.edit")}
                       </button>
@@ -398,7 +362,7 @@ export function ChatWindow({
                     {!isUser && idx === messages.length - 1 && !isLoading && (
                       <button
                         onClick={handleRegenerate}
-                        className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+                        className="flex items-center gap-1 rounded-full px-2 py-1 text-[11px] text-white"
                       >
                         <RotateCcw className="h-3 w-3" /> {t("chat.regenerate")}
                       </button>
@@ -416,12 +380,11 @@ export function ChatWindow({
           )}
 
           {error && (
-            <div className="text-destructive text-center text-xs">
-              {error.message}
-            </div>
+            <div className="text-[13px] text-white">{error.message}</div>
           )}
         </div>
       </div>
+
 
       {/* Fixed composer — matte, no reflections */}
       <div

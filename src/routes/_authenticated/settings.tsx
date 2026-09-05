@@ -27,7 +27,7 @@ import { useEffect } from "react";
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Settings · Avenxa" },
+      { title: "Settings · Vokque" },
       {
         name: "description",
         content: "Manage appearance, memory, chats, account, and more.",
@@ -66,7 +66,7 @@ function SettingsPage() {
       <PageContainer className="max-w-5xl">
         <PageHeader
           title="Settings"
-          subtitle="Everything Avenxa can do — in one place."
+          subtitle="Everything Vokque can do — in one place."
         />
         <div className="h-6" />
 
@@ -99,9 +99,9 @@ function SettingsPage() {
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
             {active === "profile" && <ProfileSection />}
-            {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Avenxa responses — coming soon." />}
+            {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Vokque responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
-            {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how Avenxa handles your data, chats, and account." />}
+            {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how Vokque handles your data, chats, and account." />}
             {active === "terms" && <TermsSection />}
             {active === "about" && <AboutSection />}
             {active === "account" && <AccountSection />}
@@ -195,7 +195,7 @@ function ProfileSection() {
 
   return (
     <Card>
-      <SectionTitle title="Profile" sub="Your name and username on Avenxa." />
+      <SectionTitle title="Profile" sub="Your name and username on Vokque." />
 
       {/* Preview */}
       <div className="glass mb-5 flex items-center gap-3 rounded-2xl p-4">
@@ -360,9 +360,9 @@ function PlaceholderSection({
 function AboutSection() {
   return (
     <Card>
-      <SectionTitle title="About Avenxa" />
+      <SectionTitle title="About Vokque" />
       <div className="space-y-3 text-sm">
-        <p>Avenxa is created by Avenxa Technology.</p>
+        <p>Vokque is created by Vokque Technology.</p>
         <p className="text-muted-foreground text-xs">Version 1.0</p>
       </div>
     </Card>
@@ -374,15 +374,15 @@ function TermsSection() {
     <Card>
       <SectionTitle
         title="Terms of Service"
-        sub="By using Avenxa you agree to the following terms."
+        sub="By using Vokque you agree to the following terms."
       />
       <div className="text-muted-foreground space-y-3 text-sm leading-relaxed">
         <p>
-          Avenxa is provided by O1 Platforms. You are responsible for the
+          Vokque is provided by O1 Platforms. You are responsible for the
           content you submit and for complying with applicable laws.
         </p>
         <p>
-          Avenxa may use third-party AI models to generate responses. Outputs
+          Vokque may use third-party AI models to generate responses. Outputs
           can be inaccurate — verify important information independently.
         </p>
         <p>

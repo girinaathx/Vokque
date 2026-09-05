@@ -6,11 +6,11 @@ import { PageContainer, PageHeader } from "@/components/app/PageHeader";
 export const Route = createFileRoute("/_authenticated/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy · Avenxa" },
+      { title: "Privacy Policy · Vokque" },
       {
         name: "description",
         content:
-          "How Avenxa collects, uses, stores, and protects your information.",
+          "How Vokque collects, uses, stores, and protects your information.",
       },
     ],
   }),
@@ -19,10 +19,10 @@ export const Route = createFileRoute("/_authenticated/privacy")({
 
 const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
-    title: "1. About Avenxa",
+    title: "1. About Vokque",
     body: [
-      "Avenxa is an AI-powered educational assistant designed to help students and users learn, create, research, and solve problems safely and responsibly.",
-      "Avenxa is intended for users aged 13 years and older.",
+      "Vokque is an AI-powered educational assistant designed to help students and users learn, create, research, and solve problems safely and responsibly.",
+      "Vokque is intended for users aged 13 years and older.",
     ],
   },
   {
@@ -50,7 +50,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "4. Chat Privacy",
     body: [
-      "Avenxa is designed with privacy in mind.",
+      "Vokque is designed with privacy in mind.",
       "• User chats are not publicly visible.",
       "• We do not sell chat data to advertisers.",
       "• Conversations are protected using industry-standard security measures.",
@@ -60,7 +60,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "5. Student Safety",
     body: [
-      "Avenxa is committed to maintaining a safe environment for students. The platform does not promote, encourage, or exploit:",
+      "Vokque is committed to maintaining a safe environment for students. The platform does not promote, encourage, or exploit:",
       "• Violence",
       "• Self-harm",
       "• Illegal activities",
@@ -74,7 +74,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "6. Age Requirement",
     body: [
-      "Users must be at least 13 years old to use Avenxa.",
+      "Users must be at least 13 years old to use Vokque.",
       "Users under the applicable minimum age in their region may not create an account without appropriate permissions where required by law.",
     ],
   },
@@ -88,7 +88,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "8. Data Sharing",
     body: [
-      "Avenxa does not sell personal information. Information may be shared only when:",
+      "Vokque does not sell personal information. Information may be shared only when:",
       "• Required by law or legal process",
       "• Necessary to protect users or platform security",
       "• Required to operate trusted service providers supporting the platform",
@@ -116,7 +116,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
   {
     title: "11. Compliance",
     body: [
-      "Avenxa follows applicable laws, regulations, and government requirements in jurisdictions where the service is provided.",
+      "Vokque follows applicable laws, regulations, and government requirements in jurisdictions where the service is provided.",
       "We cooperate with lawful requests from authorized government authorities when legally required.",
     ],
   },
@@ -130,7 +130,7 @@ const SECTIONS: Array<{ title: string; body: string[] }> = [
     title: "13. Contact",
     body: [
       "For privacy-related questions, concerns, or requests, please contact:",
-      "Avenxa Support",
+      "Vokque Support",
       "support: openiplatforms@gmail",
     ],
   },
@@ -146,8 +146,8 @@ function PrivacyPage() {
 
         <div className="glass-strong animate-fade-up rounded-3xl p-6 sm:p-8 [animation-delay:80ms]">
           <p className="text-sm leading-relaxed">
-            Welcome to Avenxa. Your privacy and trust are important to us.
-            This Privacy Policy explains how Avenxa collects, uses, stores,
+            Welcome to Vokque. Your privacy and trust are important to us.
+            This Privacy Policy explains how Vokque collects, uses, stores,
             and protects your information.
           </p>
 
@@ -167,7 +167,7 @@ function PrivacyPage() {
           </div>
 
           <p className="text-muted-foreground mt-8 border-t border-foreground/10 pt-6 text-xs">
-            By using Avenxa, you acknowledge that you have read and
+            By using Vokque, you acknowledge that you have read and
             understood this Privacy Policy.
           </p>
         </div>

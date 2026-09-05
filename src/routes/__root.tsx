@@ -21,7 +21,7 @@ import i18n from "@/lib/i18n";
 
 const SITE_URL = "https://feyncloud.lovable.app";
 
-// Avenxa has one permanent theme — never switch on device preference.
+// Vokque has one permanent theme — never switch on device preference.
 const themeBootScript = `(function(){try{document.documentElement.classList.remove('dark');document.documentElement.style.colorScheme='light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
 
 function NotFoundComponent() {
@@ -90,16 +90,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
         },
-        { title: "Avenxa — Your Everyday AI" },
+        { title: "Vokque — Your Everyday AI" },
         {
           name: "description",
           content:
-            "Avenxa is a premium AI assistant for study, work, and everyday life — built by Avenxa Technology.",
+            "Vokque is a premium AI assistant for study, work, and everyday life — built by Vokque Technology.",
         },
         { name: "theme-color", content: "#7fb2dd" },
         {
           property: "og:title",
-          content: "Avenxa — Your Everyday AI",
+          content: "Vokque — Your Everyday AI",
         },
         {
           property: "og:description",
@@ -107,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "A premium AI assistant for study, work, and everyday life.",
         },
         { property: "og:type", content: "website" },
-        { property: "og:site_name", content: "Avenxa" },
+        { property: "og:site_name", content: "Vokque" },
         { property: "og:image", content: `${SITE_URL}${logoUrl}` },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: `${SITE_URL}${logoUrl}` },
@@ -140,16 +140,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "@graph": [
               {
                 "@type": "WebSite",
-                name: "Avenxa",
+                name: "Vokque",
                 url: `${SITE_URL}/`,
                 description:
-                  "Avenxa is a premium AI assistant for study, work, and everyday life.",
+                  "Vokque is a premium AI assistant for study, work, and everyday life.",
                 publisher: { "@id": `${SITE_URL}/#organization` },
               },
               {
                 "@type": "Organization",
                 "@id": `${SITE_URL}/#organization`,
-                name: "Avenxa Technology",
+                name: "Vokque Technology",
                 url: `${SITE_URL}/`,
                 logo: `${SITE_URL}${logoUrl}`,
               },

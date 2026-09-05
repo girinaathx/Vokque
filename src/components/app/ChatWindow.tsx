@@ -79,7 +79,7 @@ export function ChatWindow({
       id: threadId,
       messages: initialMessages,
       transport,
-      onError: () => toast.error("Unable to reach Avenxa. Please try again."),
+      onError: () => toast.error("Unable to reach Vokque. Please try again."),
     });
 
   useEffect(() => {

@@ -10,17 +10,17 @@ import { Logo } from "@/components/brand/Logo";
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   head: () => ({
     meta: [
-      { title: "Chat · Avenxa" },
+      { title: "Chat · Vokque" },
       {
         name: "description",
         content:
-          "Chat with Avenxa about study, work, code, and everyday questions — with math, image, file, and voice support.",
+          "Chat with Vokque about study, work, code, and everyday questions — with math, image, file, and voice support.",
       },
-      { property: "og:title", content: "Chat · Avenxa" },
+      { property: "og:title", content: "Chat · Vokque" },
       {
         property: "og:description",
         content:
-          "Continue your Avenxa conversation with multimodal text, image, file, and voice support.",
+          "Continue your Vokque conversation with multimodal text, image, file, and voice support.",
       },
       { name: "robots", content: "noindex" },
     ],

@@ -38,8 +38,8 @@ export async function generatePdf(title: string, blocks: Block[]): Promise<Gener
   const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.create();
   doc.setTitle(title || "Document");
-  doc.setProducer("Avenxa");
-  doc.setCreator("Avenxa");
+  doc.setProducer("Vokque");
+  doc.setCreator("Vokque");
 
   const fonts = await loadFonts();
   let regular, bold, mono;
@@ -329,7 +329,7 @@ export async function generateDocx(title: string, blocks: Block[]): Promise<Gene
   }
 
   const doc = new d.Document({
-    creator: "Avenxa",
+    creator: "Vokque",
     title: title || "Document",
     styles: { default: { document: { run: { font: "Arial", size: 24 } } } },
     numbering: {
@@ -643,7 +643,7 @@ export async function generatePresentation(
   const PptxGenJS = (await import("pptxgenjs")).default;
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_16x9";
-  pptx.author = "Avenxa";
+  pptx.author = "Vokque";
   pptx.title = title || "Presentation";
 
   const cover = pptx.addSlide();

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, type ReactNode } from "react";
 
 /**
- * Avenxa has ONE permanent visual theme (editorial ink over the wallpaper).
+ * Vokque has ONE permanent visual theme (editorial ink over the wallpaper).
  * The provider is kept for API compatibility, but there is no dark mode,
  * no theme switcher and no system-preference detection.
  */

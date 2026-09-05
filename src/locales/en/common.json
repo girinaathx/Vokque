@@ -1,6 +1,6 @@
 {
   "brand": {
-    "name": "Avenxa",
+    "name": "Vokque",
     "tagline": "Your everyday AI"
   },
   "nav": {
@@ -16,7 +16,7 @@
     "welcomeBack": "Welcome back",
     "createAccount": "Create your account",
     "signInSubtitle": "Sign in to your AI companion",
-    "signUpSubtitle": "Start your journey with Avenxa",
+    "signUpSubtitle": "Start your journey with Vokque",
     "email": "you@example.com",
     "password": "••••••••",
     "signIn": "Sign in",
@@ -25,13 +25,13 @@
     "haveAccount": "Already have an account?",
     "forgot": "Forgot password?",
     "back": "← Back",
-    "welcomeToast": "Welcome to Avenxa",
+    "welcomeToast": "Welcome to Vokque",
     "welcomeBackToast": "Welcome back"
   },
   "chat": {
-    "placeholder": "Message Avenxa…",
+    "placeholder": "Message Vokque…",
     "thinking": "Thinking…",
-    "disclaimer": "Avenxa can make mistakes. Verify important info.",
+    "disclaimer": "Vokque can make mistakes. Verify important info.",
     "emptyTitle": "What's on your mind?",
     "emptySubtitle": "I'm here to help — ask me anything.",
     "starters": {
@@ -55,7 +55,7 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Everything Avenxa can do — in one place.",
+    "subtitle": "Everything Vokque can do — in one place.",
     "sections": {
       "account": "Account",
       "general": "General",
@@ -76,7 +76,7 @@
     },
     "appearance": {
       "title": "Appearance",
-      "subtitle": "Choose how Avenxa looks.",
+      "subtitle": "Choose how Vokque looks.",
       "system": "System",
       "systemDesc": "Follow your device",
       "dark": "AMOLED Dark",
@@ -97,8 +97,8 @@
       "sent": "Password reset email sent"
     },
     "about": {
-      "title": "About Avenxa",
-      "body": "Avenxa is created by Avenxa Technology.",
+      "title": "About Vokque",
+      "body": "Vokque is created by Vokque Technology.",
       "version": "Version 1.0"
     }
   },

@@ -23,10 +23,10 @@ export function Logo({ className, size = 40, glow = false }: LogoProps) {
           aria-hidden
         />
       )}
-      {/* White geometric Avenxa mark on transparent bg. Invert to black in light theme. */}
+      {/* White geometric Vokque mark on transparent bg. Invert to black in light theme. */}
       <img
         src={logoUrl}
-        alt="Avenxa logo"
+        alt="Vokque logo"
         width={size}
         height={size}
         className="relative h-full w-full object-contain invert dark:invert-0"

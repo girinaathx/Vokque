@@ -24,13 +24,13 @@ import type { LucideIcon } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Home · Avenxa" },
+      { title: "Home · Vokque" },
       {
         name: "description",
         content:
-          "Your personalized Avenxa home — math, code, writing, study, and intelligent conversation.",
+          "Your personalized Vokque home — math, code, writing, study, and intelligent conversation.",
       },
-      { property: "og:title", content: "Home · Avenxa" },
+      { property: "og:title", content: "Home · Vokque" },
       {
         property: "og:description",
         content: "Quick chat shortcuts for math, code, writing, and study.",

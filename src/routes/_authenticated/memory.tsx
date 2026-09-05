@@ -42,17 +42,17 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/memory")({
   head: () => ({
     meta: [
-      { title: "Memory · Avenxa" },
+      { title: "Memory · Vokque" },
       {
         name: "description",
         content:
-          "Review, edit, pin, archive, import, export, and delete everything Avenxa remembers about you.",
+          "Review, edit, pin, archive, import, export, and delete everything Vokque remembers about you.",
       },
-      { property: "og:title", content: "Memory · Avenxa" },
+      { property: "og:title", content: "Memory · Vokque" },
       {
         property: "og:description",
         content:
-          "Full control over your Avenxa memory — edit, pin, archive, import, export, or delete.",
+          "Full control over your Vokque memory — edit, pin, archive, import, export, or delete.",
       },
     ],
   }),
@@ -254,7 +254,7 @@ function MemoryPage() {
       .join("\n");
     download(
       `avenxa-memories-${stamp}.txt`,
-      `Avenxa Memories — exported ${stamp}\n\n${body}\n`,
+      `Vokque Memories — exported ${stamp}\n\n${body}\n`,
       "text/plain",
     );
     toast.success("Exported TXT");
@@ -306,7 +306,7 @@ function MemoryPage() {
       <PageContainer>
         <PageHeader
           title="Memory"
-          subtitle="Everything Avenxa remembers about you. Yours to edit, pin, archive, export, or delete — anytime."
+          subtitle="Everything Vokque remembers about you. Yours to edit, pin, archive, export, or delete — anytime."
         />
 
 

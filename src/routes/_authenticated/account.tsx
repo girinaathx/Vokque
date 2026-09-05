@@ -18,8 +18,8 @@ import {
 export const Route = createFileRoute("/_authenticated/account")({
   head: () => ({
     meta: [
-      { title: "Account · Avenxa" },
-      { name: "description", content: "Manage your Avenxa account, plan, and security." },
+      { title: "Account · Vokque" },
+      { name: "description", content: "Manage your Vokque account, plan, and security." },
     ],
   }),
   component: AccountPage,

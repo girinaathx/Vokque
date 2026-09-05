@@ -11,16 +11,16 @@ import { useTranslation } from "react-i18next";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in · Avenxa" },
+      { title: "Sign in · Vokque" },
       {
         name: "description",
         content:
-          "Sign in to Avenxa, your premium AI assistant for study, work, and everyday life — with Google, email, or guest mode.",
+          "Sign in to Vokque, your premium AI assistant for study, work, and everyday life — with Google, email, or guest mode.",
       },
-      { property: "og:title", content: "Sign in · Avenxa" },
+      { property: "og:title", content: "Sign in · Vokque" },
       {
         property: "og:description",
-        content: "Sign in to Avenxa with Google, email, or continue as guest.",
+        content: "Sign in to Vokque with Google, email, or continue as guest.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://feyncloud.lovable.app/auth" },

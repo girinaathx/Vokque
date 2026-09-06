@@ -420,34 +420,30 @@ export function ChatWindow({
       >
         <div className="pointer-events-auto mx-auto w-full max-w-3xl">
           {attachments.length > 0 && (
-            <div className="glass mb-2 flex flex-wrap gap-2 rounded-2xl p-2">
+            <div className="mb-2 flex flex-wrap gap-2">
               {attachments.map((f, i) => {
                 const isImg = f.type.startsWith("image/");
                 const url = isImg ? URL.createObjectURL(f) : null;
                 return (
-                  <div
-                    key={`${f.name}-${i}`}
-                    className="bg-foreground/5 relative flex items-center gap-2 rounded-xl py-1 pr-2 pl-1 text-[12px]"
-                  >
+                  <div key={`${f.name}-${i}`} className="relative">
                     {url ? (
                       <img
                         src={url}
-                        alt={f.name}
-                        className="h-9 w-9 rounded-lg object-cover"
+                        alt="Attachment"
+                        className="h-12 w-12 rounded-xl object-cover"
                       />
                     ) : (
-                      <span className="bg-foreground/5 flex h-9 w-9 items-center justify-center rounded-lg">
-                        <Plus className="h-4 w-4" />
+                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-black">
+                        <Paperclip className="h-4 w-4" />
                       </span>
                     )}
-                    <span className="max-w-[140px] truncate">{f.name}</span>
                     <button
                       type="button"
                       onClick={() =>
                         setAttachments((p) => p.filter((_, j) => j !== i))
                       }
-                      className="hover:bg-foreground/10 flex h-5 w-5 items-center justify-center rounded-full"
-                      aria-label="Remove"
+                      className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-black"
+                      aria-label="Remove attachment"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -460,7 +456,7 @@ export function ChatWindow({
 
           <form
             onSubmit={handleSubmit}
-            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-background/70 px-1.5 py-1.5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
+            className="flex items-center gap-1 rounded-full bg-white px-1.5 py-1.5"
           >
             <input
               ref={fileInputRef}

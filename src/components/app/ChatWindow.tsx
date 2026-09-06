@@ -27,7 +27,7 @@ import {
   Pencil,
   Mic,
   MicOff,
-  Plus,
+  Paperclip,
   Brain,
   X,
 } from "lucide-react";
@@ -261,13 +261,31 @@ export function ChatWindow({
 
   return (
     <div className="relative flex h-[100dvh] min-h-0 flex-1 flex-col">
+      {/* Readability fade — subtle black gradient behind the conversation only */}
+      {messages.length > 0 && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-0 animate-fade-in-soft"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.8) 100%)",
+          }}
+        />
+      )}
       {/* Transcript — plain text over the wallpaper, no containers */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-5 pt-20 lg:px-8 lg:pt-24"
+        className="relative z-10 flex-1 overflow-y-auto px-5 pt-20 lg:px-8 lg:pt-24"
         style={{ paddingBottom: "180px" }}
       >
         <div className="mx-auto w-full max-w-3xl space-y-8">
+          {messages.length === 0 && !input.trim() && (
+            <div className="flex justify-center pt-24">
+              <h2 className="text-center text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                What’s on your mind?
+              </h2>
+            </div>
+          )}
           {messages.map((m, idx) => {
             const isUser = m.role === "user";
             const text = m.parts
@@ -279,7 +297,13 @@ export function ChatWindow({
                 (typeof p.type === "string" && p.type.startsWith("file")),
             ) as Array<{ url?: string; mediaType?: string; filename?: string }>;
             return (
-              <div key={m.id} className="animate-fade-up group flex flex-col">
+              <div
+                key={m.id}
+                className={cn(
+                  "animate-fade-up group flex flex-col",
+                  isUser ? "items-end text-right" : "items-start text-left",
+                )}
+              >
                 {fileParts.length > 0 && (
                   <div className="mb-2 flex flex-wrap gap-2">
                     {fileParts.map((f, i) =>
@@ -332,15 +356,17 @@ export function ChatWindow({
                 ) : (
                   <div
                     className={cn(
-                      "min-w-0 max-w-full text-[15.5px] leading-[1.65] text-white",
-                      isUser ? "font-medium whitespace-pre-wrap" : "font-normal",
+                      "min-w-0 text-[15.5px] leading-[1.65] text-white",
+                      isUser
+                        ? "max-w-[85%] font-medium whitespace-pre-wrap"
+                        : "max-w-full font-normal",
                     )}
                   >
                     {isUser ? <p>{text}</p> : <Markdown text={text} />}
                     {!isUser &&
                       idx === messages.length - 1 &&
                       status === "streaming" &&
-                      !text && <TypingIndicator label={t("chat.thinking")} />}
+                      !text && <TypingIndicator label="Analysing…" />}
                   </div>
                 )}
 
@@ -375,7 +401,7 @@ export function ChatWindow({
 
           {status === "submitted" && (
             <div className="animate-fade-up">
-              <TypingIndicator label={t("chat.thinking")} />
+              <TypingIndicator label="Analysing…" />
             </div>
           )}
 
@@ -394,34 +420,30 @@ export function ChatWindow({
       >
         <div className="pointer-events-auto mx-auto w-full max-w-3xl">
           {attachments.length > 0 && (
-            <div className="glass mb-2 flex flex-wrap gap-2 rounded-2xl p-2">
+            <div className="mb-2 flex flex-wrap gap-2">
               {attachments.map((f, i) => {
                 const isImg = f.type.startsWith("image/");
                 const url = isImg ? URL.createObjectURL(f) : null;
                 return (
-                  <div
-                    key={`${f.name}-${i}`}
-                    className="bg-foreground/5 relative flex items-center gap-2 rounded-xl py-1 pr-2 pl-1 text-[12px]"
-                  >
+                  <div key={`${f.name}-${i}`} className="relative">
                     {url ? (
                       <img
                         src={url}
-                        alt={f.name}
-                        className="h-9 w-9 rounded-lg object-cover"
+                        alt="Attachment"
+                        className="h-12 w-12 rounded-xl object-cover"
                       />
                     ) : (
-                      <span className="bg-foreground/5 flex h-9 w-9 items-center justify-center rounded-lg">
-                        <Plus className="h-4 w-4" />
+                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-black">
+                        <Paperclip className="h-4 w-4" />
                       </span>
                     )}
-                    <span className="max-w-[140px] truncate">{f.name}</span>
                     <button
                       type="button"
                       onClick={() =>
                         setAttachments((p) => p.filter((_, j) => j !== i))
                       }
-                      className="hover:bg-foreground/10 flex h-5 w-5 items-center justify-center rounded-full"
-                      aria-label="Remove"
+                      className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-black"
+                      aria-label="Remove attachment"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -434,7 +456,7 @@ export function ChatWindow({
 
           <form
             onSubmit={handleSubmit}
-            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-background/70 px-1.5 py-1.5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
+            className="flex items-center gap-1 rounded-full bg-white px-1.5 py-1.5"
           >
             <input
               ref={fileInputRef}
@@ -451,7 +473,7 @@ export function ChatWindow({
               ariaLabel={t("chat.attach")}
               onClick={() => fileInputRef.current?.click()}
             >
-              <Plus className="h-[20px] w-[20px]" />
+              <Paperclip className="h-[19px] w-[19px]" />
             </IconBtn>
 
             <textarea
@@ -476,7 +498,7 @@ export function ChatWindow({
               }}
               rows={1}
               placeholder={t("chat.placeholder")}
-              className="placeholder:text-muted-foreground/60 flex-1 resize-none self-center bg-transparent px-2 py-2 text-[15.5px] leading-[22px] outline-none"
+              className="flex-1 resize-none self-center bg-transparent px-2 py-2 text-[15.5px] leading-[22px] text-black outline-none placeholder:text-black/70"
               style={{
                 minHeight: "22px",
                 maxHeight: "132px",
@@ -504,7 +526,7 @@ export function ChatWindow({
               <button
                 type="button"
                 onClick={() => stop()}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90"
                 aria-label={t("chat.stop")}
               >
                 <Square className="h-3.5 w-3.5" fill="currentColor" />
@@ -513,7 +535,7 @@ export function ChatWindow({
               <button
                 type="submit"
                 disabled={!input.trim() && attachments.length === 0}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90 disabled:pointer-events-none disabled:opacity-0"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90 disabled:pointer-events-none disabled:opacity-0"
                 aria-label={t("chat.send")}
                 style={{ transition: "opacity 150ms ease" }}
               >
@@ -522,7 +544,7 @@ export function ChatWindow({
             )}
           </form>
 
-          <p className="text-muted-foreground/60 mt-2 text-center text-[10px]">
+          <p className="mt-2 text-center text-[10px] text-white/60">
             {t("chat.disclaimer")}
           </p>
         </div>
@@ -601,10 +623,8 @@ function IconBtn({
       onClick={onClick}
       aria-label={ariaLabel}
       className={cn(
-        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90",
-        active
-          ? "bg-destructive text-destructive-foreground"
-          : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
+        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90",
+        active && "opacity-60",
       )}
     >
       {children}
@@ -660,20 +680,3 @@ const Markdown = memo(function Markdown({ text }: { text: string }) {
     </div>
   );
 });
-
-
-function EmptyState({ onPick: _onPick }: { onPick: (t: string) => void }) {
-  const { t } = useTranslation();
-  return (
-    <div className="animate-fade-up flex flex-col items-center pt-24 text-center">
-
-      <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-        {t("chat.emptyTitle")}
-      </h2>
-      <p className="text-muted-foreground mt-2 text-sm">
-        {t("chat.emptySubtitle")}
-      </p>
-    </div>
-  );
-}
-

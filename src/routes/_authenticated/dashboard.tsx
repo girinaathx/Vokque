@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useRef, useState } from "react";
 import { AppShell } from "@/components/app/AppShell";
 import { createThread } from "@/lib/threads.functions";
-import { Paperclip, Mic, MicOff } from "lucide-react";
+import { Paperclip, Mic, MicOff, ArrowUp } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -58,6 +58,7 @@ function Dashboard() {
     const text = draft.trim();
     if (!text || startMut.isPending) return;
     startMut.mutate({ text });
+    setDraft("");
   };
 
   const toggleVoice = () => {
@@ -127,18 +128,29 @@ function Dashboard() {
             className="min-w-0 flex-1 bg-transparent text-center text-[15px] text-black outline-none placeholder:text-black/70"
           />
 
-          <button
-            type="button"
-            onClick={toggleVoice}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90"
-            aria-label={listening ? "Stop voice input" : "Voice input"}
-          >
-            {listening ? (
-              <MicOff className="h-[19px] w-[19px]" />
-            ) : (
-              <Mic className="h-[19px] w-[19px]" />
-            )}
-          </button>
+          {draft.trim() ? (
+            <button
+              type="submit"
+              disabled={startMut.isPending}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90 disabled:opacity-40"
+              aria-label="Send message"
+            >
+              <ArrowUp className="h-[20px] w-[20px]" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={toggleVoice}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90"
+              aria-label={listening ? "Stop voice input" : "Voice input"}
+            >
+              {listening ? (
+                <MicOff className="h-[19px] w-[19px]" />
+              ) : (
+                <Mic className="h-[19px] w-[19px]" />
+              )}
+            </button>
+          )}
         </form>
       </div>
     </AppShell>

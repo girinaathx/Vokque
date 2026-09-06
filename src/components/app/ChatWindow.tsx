@@ -297,7 +297,13 @@ export function ChatWindow({
                 (typeof p.type === "string" && p.type.startsWith("file")),
             ) as Array<{ url?: string; mediaType?: string; filename?: string }>;
             return (
-              <div key={m.id} className="animate-fade-up group flex flex-col">
+              <div
+                key={m.id}
+                className={cn(
+                  "animate-fade-up group flex flex-col",
+                  isUser ? "items-end text-right" : "items-start text-left",
+                )}
+              >
                 {fileParts.length > 0 && (
                   <div className="mb-2 flex flex-wrap gap-2">
                     {fileParts.map((f, i) =>

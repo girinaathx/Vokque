@@ -261,6 +261,17 @@ export function ChatWindow({
 
   return (
     <div className="relative flex h-[100dvh] min-h-0 flex-1 flex-col">
+      {/* Readability fade — subtle black gradient behind the conversation only */}
+      {messages.length > 0 && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-0 animate-fade-in-soft"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.8) 100%)",
+          }}
+        />
+      )}
       {/* Transcript — plain text over the wallpaper, no containers */}
       <div
         ref={scrollRef}

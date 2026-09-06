@@ -28,7 +28,6 @@ import {
   Mic,
   MicOff,
   Paperclip,
-  Plus,
   Brain,
   X,
 } from "lucide-react";
@@ -681,20 +680,3 @@ const Markdown = memo(function Markdown({ text }: { text: string }) {
     </div>
   );
 });
-
-
-function EmptyState({ onPick: _onPick }: { onPick: (t: string) => void }) {
-  const { t } = useTranslation();
-  return (
-    <div className="animate-fade-up flex flex-col items-center pt-24 text-center">
-
-      <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-        {t("chat.emptyTitle")}
-      </h2>
-      <p className="text-muted-foreground mt-2 text-sm">
-        {t("chat.emptySubtitle")}
-      </p>
-    </div>
-  );
-}
-

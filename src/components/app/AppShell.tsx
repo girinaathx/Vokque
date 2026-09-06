@@ -327,13 +327,13 @@ export function AppShell({
           height: APP_HEADER_HEIGHT,
         }}
       >
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="glass-bright pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 lg:hidden"
+        <Link
+          to="/menu"
+          className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition active:scale-90 lg:hidden"
           aria-label="Menu"
         >
           <Menu className="h-5 w-5" />
-        </button>
+        </Link>
 
         <div className="pointer-events-none absolute left-1/2 -translate-x-1/2">
           <Logo size={26} />
@@ -342,39 +342,13 @@ export function AppShell({
         <button
           onClick={() => createMut.mutate()}
           disabled={createMut.isPending}
-          className="glass-bright pointer-events-auto ml-auto flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
+          className="pointer-events-auto ml-auto bg-white text-black flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
           aria-label={t("nav.newChat")}
         >
           <Plus className="h-5 w-5" />
         </button>
       </header>
 
-
-      {/* Mobile drawer + backdrop */}
-      {drawerVisible && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/60"
-            style={{
-              opacity: progress,
-              transition: dragging ? "none" : "opacity 280ms cubic-bezier(0.32,0.72,0,1)",
-            }}
-            onClick={() => setMobileOpen(false)}
-          />
-          <div
-            className="absolute top-0 bottom-0 left-0 will-change-transform"
-            style={{
-              width,
-              transform: `translate3d(${(progress - 1) * width}px,0,0)`,
-              transition: dragging
-                ? "none"
-                : "transform 280ms cubic-bezier(0.32,0.72,0,1)",
-            }}
-          >
-            <Sidebar {...sidebarProps} mobile />
-          </div>
-        </div>
-      )}
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col">{children}</main>

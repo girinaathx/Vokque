@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedPrivacyRouteImport } from './routes/_authenticated/privacy'
+import { Route as AuthenticatedMenuRouteImport } from './routes/_authenticated/menu'
 import { Route as AuthenticatedMemoryRouteImport } from './routes/_authenticated/memory'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
@@ -61,6 +62,11 @@ const AuthenticatedPrivacyRoute = AuthenticatedPrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMenuRoute = AuthenticatedMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMemoryRoute = AuthenticatedMemoryRouteImport.update({
   id: '/memory',
   path: '/memory',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/memory': typeof AuthenticatedMemoryRoute
+  '/menu': typeof AuthenticatedMenuRoute
   '/privacy': typeof AuthenticatedPrivacyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/api/chat': typeof ApiChatRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/account': typeof AuthenticatedAccountRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/memory': typeof AuthenticatedMemoryRoute
+  '/menu': typeof AuthenticatedMenuRoute
   '/privacy': typeof AuthenticatedPrivacyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/api/chat': typeof ApiChatRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/memory': typeof AuthenticatedMemoryRoute
+  '/_authenticated/menu': typeof AuthenticatedMenuRoute
   '/_authenticated/privacy': typeof AuthenticatedPrivacyRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/api/chat': typeof ApiChatRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/dashboard'
     | '/memory'
+    | '/menu'
     | '/privacy'
     | '/settings'
     | '/api/chat'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/dashboard'
     | '/memory'
+    | '/menu'
     | '/privacy'
     | '/settings'
     | '/api/chat'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/dashboard'
     | '/_authenticated/memory'
+    | '/_authenticated/menu'
     | '/_authenticated/privacy'
     | '/_authenticated/settings'
     | '/api/chat'
@@ -234,6 +246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPrivacyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/menu': {
+      id: '/_authenticated/menu'
+      path: '/menu'
+      fullPath: '/menu'
+      preLoaderRoute: typeof AuthenticatedMenuRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/memory': {
       id: '/_authenticated/memory'
       path: '/memory'
@@ -269,6 +288,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMemoryRoute: typeof AuthenticatedMemoryRoute
+  AuthenticatedMenuRoute: typeof AuthenticatedMenuRoute
   AuthenticatedPrivacyRoute: typeof AuthenticatedPrivacyRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
@@ -278,6 +298,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMemoryRoute: AuthenticatedMemoryRoute,
+  AuthenticatedMenuRoute: AuthenticatedMenuRoute,
   AuthenticatedPrivacyRoute: AuthenticatedPrivacyRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,

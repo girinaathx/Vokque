@@ -27,6 +27,7 @@ import {
   Pencil,
   Mic,
   MicOff,
+  Paperclip,
   Plus,
   Brain,
   X,
@@ -473,7 +474,7 @@ export function ChatWindow({
               ariaLabel={t("chat.attach")}
               onClick={() => fileInputRef.current?.click()}
             >
-              <Plus className="h-[20px] w-[20px]" />
+              <Paperclip className="h-[19px] w-[19px]" />
             </IconBtn>
 
             <textarea
@@ -498,7 +499,7 @@ export function ChatWindow({
               }}
               rows={1}
               placeholder={t("chat.placeholder")}
-              className="placeholder:text-muted-foreground/60 flex-1 resize-none self-center bg-transparent px-2 py-2 text-[15.5px] leading-[22px] outline-none"
+              className="flex-1 resize-none self-center bg-transparent px-2 py-2 text-[15.5px] leading-[22px] text-black outline-none placeholder:text-black/70"
               style={{
                 minHeight: "22px",
                 maxHeight: "132px",
@@ -526,7 +527,7 @@ export function ChatWindow({
               <button
                 type="button"
                 onClick={() => stop()}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90"
                 aria-label={t("chat.stop")}
               >
                 <Square className="h-3.5 w-3.5" fill="currentColor" />
@@ -535,7 +536,7 @@ export function ChatWindow({
               <button
                 type="submit"
                 disabled={!input.trim() && attachments.length === 0}
-                className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90 disabled:pointer-events-none disabled:opacity-0"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90 disabled:pointer-events-none disabled:opacity-0"
                 aria-label={t("chat.send")}
                 style={{ transition: "opacity 150ms ease" }}
               >
@@ -544,7 +545,7 @@ export function ChatWindow({
             )}
           </form>
 
-          <p className="text-muted-foreground/60 mt-2 text-center text-[10px]">
+          <p className="mt-2 text-center text-[10px] text-white/60">
             {t("chat.disclaimer")}
           </p>
         </div>
@@ -623,10 +624,8 @@ function IconBtn({
       onClick={onClick}
       aria-label={ariaLabel}
       className={cn(
-        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-90",
-        active
-          ? "bg-destructive text-destructive-foreground"
-          : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
+        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90",
+        active && "opacity-60",
       )}
     >
       {children}

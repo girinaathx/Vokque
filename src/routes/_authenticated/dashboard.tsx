@@ -58,6 +58,7 @@ function Dashboard() {
     const text = draft.trim();
     if (!text || startMut.isPending) return;
     startMut.mutate({ text });
+    setDraft("");
   };
 
   const toggleVoice = () => {

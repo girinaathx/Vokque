@@ -356,15 +356,17 @@ export function ChatWindow({
                 ) : (
                   <div
                     className={cn(
-                      "min-w-0 max-w-full text-[15.5px] leading-[1.65] text-white",
-                      isUser ? "font-medium whitespace-pre-wrap" : "font-normal",
+                      "min-w-0 text-[15.5px] leading-[1.65] text-white",
+                      isUser
+                        ? "max-w-[85%] font-medium whitespace-pre-wrap"
+                        : "max-w-full font-normal",
                     )}
                   >
                     {isUser ? <p>{text}</p> : <Markdown text={text} />}
                     {!isUser &&
                       idx === messages.length - 1 &&
                       status === "streaming" &&
-                      !text && <TypingIndicator label={t("chat.thinking")} />}
+                      !text && <TypingIndicator label="Analysing…" />}
                   </div>
                 )}
 

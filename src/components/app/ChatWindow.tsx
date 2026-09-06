@@ -401,7 +401,7 @@ export function ChatWindow({
 
           {status === "submitted" && (
             <div className="animate-fade-up">
-              <TypingIndicator label={t("chat.thinking")} />
+              <TypingIndicator label="Analysing…" />
             </div>
           )}
 

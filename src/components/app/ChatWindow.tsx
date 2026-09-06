@@ -275,10 +275,17 @@ export function ChatWindow({
       {/* Transcript — plain text over the wallpaper, no containers */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-5 pt-20 lg:px-8 lg:pt-24"
+        className="relative z-10 flex-1 overflow-y-auto px-5 pt-20 lg:px-8 lg:pt-24"
         style={{ paddingBottom: "180px" }}
       >
         <div className="mx-auto w-full max-w-3xl space-y-8">
+          {messages.length === 0 && !input.trim() && (
+            <div className="flex justify-center pt-24">
+              <h2 className="text-center text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                What’s on your mind?
+              </h2>
+            </div>
+          )}
           {messages.map((m, idx) => {
             const isUser = m.role === "user";
             const text = m.parts

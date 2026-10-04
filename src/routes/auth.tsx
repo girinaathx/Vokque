@@ -70,6 +70,7 @@ function AuthPage() {
   }, [navigate]);
 
   const handleGoogle = async () => {
+    if (googleLoading) return;
     setGoogleLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
@@ -80,7 +81,9 @@ function AuthPage() {
         return;
       }
       if (result.redirected) return;
-      navigate({ to: "/dashboard" });
+      const { data } = await supabase.auth.getSession();
+      if (data.session) navigate({ to: "/dashboard" });
+      else toast.error("Sign-in could not complete. Please try again.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("errors.generic"));
     } finally {
@@ -100,14 +103,15 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
         toast.success(t("auth.welcomeToast"));
-        navigate({ to: "/dashboard" });
+        if (data.session) navigate({ to: "/dashboard" });
+        else toast.message("Check your email to confirm your account.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,

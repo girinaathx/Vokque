@@ -638,7 +638,7 @@ function Sidebar({
         open={!!confirmDelete}
         onOpenChange={(o) => !o && setConfirmDelete(null)}
       >
-        <AlertDialogContent className="glass-menu rounded-3xl">
+        <AlertDialogContent className="glass-menu rounded-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>{confirmDelete?.label}</AlertDialogTitle>
             <AlertDialogDescription>

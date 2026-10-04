@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
+import { useTheme } from "@/lib/theme";
 import { AppShell } from "@/components/app/AppShell";
 import { PageContainer, PageHeader } from "@/components/app/PageHeader";
 
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 type SectionId =
+  | "appearance"
   | "profile"
   | "model"
   | "memory"
@@ -47,6 +49,7 @@ type SectionId =
   | "account";
 
 const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
+  { id: "appearance", label: "Appearance", icon: Palette },
   { id: "profile", label: "Profile", icon: UserIcon },
   { id: "model", label: "AI Model", icon: Brain },
   { id: "memory", label: "Memory", icon: Brain },
@@ -98,6 +101,7 @@ function SettingsPage() {
 
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
+            {active === "appearance" && <AppearanceSection />}
             {active === "profile" && <ProfileSection />}
             {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Vokque responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
@@ -115,8 +119,18 @@ function SettingsPage() {
   );
 }
 
+function AppearanceSection() {
+  const { theme, setTheme } = useTheme();
+  return <div className="space-y-4">
+    <SectionTitle title="Appearance" sub="Choose your Vokque theme." />
+    <div role="group" aria-label="Theme" className="flex gap-2">
+      {(["light", "dark"] as const).map(option => <button key={option} type="button" onClick={() => setTheme(option)} aria-pressed={theme === option} className={cn("glass min-h-11 rounded-lg px-5 text-sm capitalize transition", theme === option && "ring-2 ring-ring")}>{option}</button>)}
+    </div>
+  </div>;
+}
+
 function Card({ children }: { children: ReactNode }) {
-  return <div className="glass-strong rounded-3xl p-5 sm:p-6">{children}</div>;
+  return <div className="p-1 sm:p-2">{children}</div>;
 }
 
 function SectionTitle({ title, sub }: { title: string; sub?: string }) {

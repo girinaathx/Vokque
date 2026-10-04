@@ -19,6 +19,8 @@ export const Route = createFileRoute("/")({
           "A premium AI assistant for study, work, math, code, and everyday questions.",
       },
       { property: "og:url", content: "https://feyncloud.lovable.app/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://feyncloud.lovable.app/" }],
   }),
@@ -47,7 +49,7 @@ function SplashIndex() {
   }, [navigate]);
 
   return (
-    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-black">
+    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-background">
       <h1 className="sr-only">Vokque — Your Everyday AI Assistant</h1>
       <div
         className={`transition-all duration-500 ease-out ${

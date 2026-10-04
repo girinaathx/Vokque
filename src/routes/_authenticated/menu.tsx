@@ -14,6 +14,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTheme } from "@/lib/theme";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { listThreads, createThread } from "@/lib/threads.functions";
@@ -48,6 +49,7 @@ const ITEMS = [
 ] as const;
 
 function MenuPage() {
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { t } = useTranslation();
@@ -75,7 +77,7 @@ function MenuPage() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-black px-5"
+      className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background px-5"
       style={{
         paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 24px)",
@@ -85,7 +87,7 @@ function MenuPage() {
         <div className="flex items-center justify-between">
           <Link
             to="/dashboard"
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition active:scale-90"
+            className="flex h-11 w-11 items-center justify-center rounded-full glass text-foreground transition active:scale-90"
             aria-label="Back to home"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -93,14 +95,14 @@ function MenuPage() {
           <Logo size={26} />
           <button
             onClick={newChat}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition active:scale-90"
+            className="flex h-11 w-11 items-center justify-center rounded-full glass text-foreground transition active:scale-90"
             aria-label="New conversation"
           >
             <Plus className="h-5 w-5" />
           </button>
         </div>
 
-        <h1 className="mt-8 text-3xl font-bold tracking-tight text-white">
+        <h1 className="mt-8 text-3xl font-bold tracking-tight text-foreground">
           Menu
         </h1>
 
@@ -109,7 +111,7 @@ function MenuPage() {
             <Link
               key={to}
               to={to}
-              className="flex h-14 items-center gap-3 rounded-2xl bg-white px-4 text-[15px] font-medium text-black transition active:scale-[0.98]"
+              className="flex h-14 items-center gap-3 rounded-2xl glass px-4 text-[15px] font-medium text-foreground transition active:scale-[0.98]"
             >
               <Icon className="h-[18px] w-[18px] shrink-0" />
               <span className="truncate">{label}</span>
@@ -117,19 +119,20 @@ function MenuPage() {
           ))}
         </nav>
 
-        <h2 className="mt-9 text-[11px] font-semibold tracking-widest text-white/60 uppercase">
+        <div className="mt-6 flex items-center justify-between gap-3 text-sm"><span>Theme</span><div role="group" aria-label="Theme" className="flex gap-2">{(["light", "dark"] as const).map(v => <button key={v} aria-pressed={theme === v} onClick={() => setTheme(v)} className={`glass min-h-11 rounded-lg px-4 capitalize ${theme === v ? "ring-2 ring-ring" : ""}`}>{v}</button>)}</div></div>
+        <h2 className="mt-9 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">
           Recent conversations
         </h2>
         <div className="mt-3 space-y-1">
           {threads.length === 0 && (
-            <p className="text-[13px] text-white/60">No conversations yet</p>
+            <p className="text-[13px] text-muted-foreground">No conversations yet</p>
           )}
           {threads.map((th) => (
             <Link
               key={th.id}
               to="/chat/$threadId"
               params={{ threadId: th.id }}
-              className="block truncate py-2.5 text-[15px] text-white"
+              className="block truncate py-2.5 text-[15px] text-foreground"
             >
               {th.title}
             </Link>
@@ -138,7 +141,7 @@ function MenuPage() {
 
         <button
           onClick={signOut}
-          className="mt-10 flex h-14 w-full items-center gap-3 rounded-2xl bg-white px-4 text-[15px] font-medium text-black transition active:scale-[0.98]"
+          className="mt-10 flex h-14 w-full items-center gap-3 rounded-2xl glass px-4 text-[15px] font-medium text-foreground transition active:scale-[0.98]"
         >
           <LogOut className="h-[18px] w-[18px]" />
           {t("nav.signOut")}

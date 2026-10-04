@@ -7,7 +7,7 @@ interface LogoProps {
   glow?: boolean;
 }
 
-/** Existing Vokque mark, rendered in pure white. Shape unchanged. */
+/** Existing Vokque mark; preserve its shape on both surfaces. */
 export function Logo({ className, size = 40 }: LogoProps) {
   return (
     <div
@@ -19,7 +19,7 @@ export function Logo({ className, size = 40 }: LogoProps) {
         alt="Vokque logo"
         width={size}
         height={size}
-        className="relative h-full w-full object-contain"
+        className="relative h-full w-full object-contain brightness-0 dark:brightness-0 dark:invert"
         draggable={false}
       />
     </div>

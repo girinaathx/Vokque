@@ -75,7 +75,7 @@ function MenuPage() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-black px-5"
+      className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background px-5"
       style={{
         paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 24px)",
@@ -85,7 +85,7 @@ function MenuPage() {
         <div className="flex items-center justify-between">
           <Link
             to="/dashboard"
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition active:scale-90"
+            className="flex h-11 w-11 items-center justify-center rounded-full glass text-foreground transition active:scale-90"
             aria-label="Back to home"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -93,14 +93,14 @@ function MenuPage() {
           <Logo size={26} />
           <button
             onClick={newChat}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition active:scale-90"
+            className="flex h-11 w-11 items-center justify-center rounded-full glass text-foreground transition active:scale-90"
             aria-label="New conversation"
           >
             <Plus className="h-5 w-5" />
           </button>
         </div>
 
-        <h1 className="mt-8 text-3xl font-bold tracking-tight text-white">
+        <h1 className="mt-8 text-3xl font-bold tracking-tight text-foreground">
           Menu
         </h1>
 
@@ -117,19 +117,19 @@ function MenuPage() {
           ))}
         </nav>
 
-        <h2 className="mt-9 text-[11px] font-semibold tracking-widest text-white/60 uppercase">
+        <h2 className="mt-9 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">
           Recent conversations
         </h2>
         <div className="mt-3 space-y-1">
           {threads.length === 0 && (
-            <p className="text-[13px] text-white/60">No conversations yet</p>
+            <p className="text-[13px] text-muted-foreground">No conversations yet</p>
           )}
           {threads.map((th) => (
             <Link
               key={th.id}
               to="/chat/$threadId"
               params={{ threadId: th.id }}
-              className="block truncate py-2.5 text-[15px] text-white"
+              className="block truncate py-2.5 text-[15px] text-foreground"
             >
               {th.title}
             </Link>

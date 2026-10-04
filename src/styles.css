@@ -4,9 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ============================================================
-   VOKQUE — monochrome, cinematic. Black & white only.
-   ============================================================ */
+/* Vokque semantic light and midnight themes */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -48,31 +46,32 @@
 
 :root {
   --radius: 0.9rem;
-
-  --wallpaper: url("/__l5e/assets-v1/1a384136-0415-4746-b2b3-de7b268cd0d0/vokque-city.png");
-
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #000000;
-  --card-foreground: #ffffff;
-  --popover: #000000;
-  --popover-foreground: #ffffff;
-  --primary: #ffffff;
-  --primary-foreground: #000000;
-  --secondary: #000000;
-  --secondary-foreground: #ffffff;
-  --muted: #000000;
-  --muted-foreground: #ffffff;
-  --accent: #000000;
-  --accent-foreground: #ffffff;
-  --destructive: #ffffff;
-  --destructive-foreground: #000000;
-  --border: rgba(255, 255, 255, 0.18);
-  --input: rgba(255, 255, 255, 0.18);
-  --ring: rgba(255, 255, 255, 0.4);
-
-  --glass: #000000;
-  --glass-strong: #000000;
+  --background: #ffffff; --foreground: #101720;
+  --card: #ffffff; --card-foreground: #101720;
+  --popover: #ffffff; --popover-foreground: #101720;
+  --primary: #142b49; --primary-foreground: #ffffff;
+  --secondary: #f1f5f9; --secondary-foreground: #101720;
+  --muted: #f2f5f8; --muted-foreground: #526272;
+  --accent: #e8f2fc; --accent-foreground: #142b49;
+  --destructive: #ba2d3b; --destructive-foreground: #ffffff;
+  --border: #dce4ed; --input: #dce4ed; --ring: #376fa8;
+  --glass: rgb(248 251 255 / 84%); --glass-strong: rgb(255 255 255 / 94%);
+  --glass-border: rgb(78 117 160 / 24%);
+  --energy: rgb(61 133 212 / 32%); --energy-soft: rgb(142 197 242 / 35%);
+}
+.dark {
+  --background: #080f1c; --foreground: #f6f9ff;
+  --card: #101b2b; --card-foreground: #f6f9ff;
+  --popover: #142137; --popover-foreground: #f6f9ff;
+  --primary: #b7d9ff; --primary-foreground: #071222;
+  --secondary: #18263a; --secondary-foreground: #eaf3ff;
+  --muted: #172436; --muted-foreground: #a7b9cc;
+  --accent: #203753; --accent-foreground: #f6f9ff;
+  --destructive: #e86c77; --destructive-foreground: #080f1c;
+  --border: #324259; --input: #324259; --ring: #87bafb;
+  --glass: rgb(24 42 66 / 76%); --glass-strong: rgb(20 33 54 / 94%);
+  --glass-border: rgb(167 202 244 / 27%);
+  --energy: rgb(38 94 188 / 48%); --energy-soft: rgb(56 145 229 / 31%);
 }
 
 @layer base {
@@ -88,20 +87,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
-    background: #000000;
-  }
-
-  /* Permanent wallpaper — the monochrome city photograph */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-color: #000000;
-    background-image: var(--wallpaper);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: var(--background);
   }
 
   * {
@@ -118,8 +104,8 @@
   }
 
   ::selection {
-    background: #ffffff;
-    color: #000000;
+    background: var(--accent);
+    color: var(--accent-foreground);
   }
 }
 
@@ -129,46 +115,24 @@
   letter-spacing: -0.02em;
 }
 
-/* ------------------------------------------------------------
-   Surfaces — solid black, thin white hairlines. No glass.
-   ------------------------------------------------------------ */
+/* Glass belongs to controls, not large content areas. */
+@utility glass { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(16px); }
+@utility glass-strong { background: var(--glass-strong); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
+@utility glass-thin { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); }
+@utility glass-dock { background: var(--glass-strong); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
+@utility glass-matte { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(16px); }
+@utility glass-bright { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(16px); transition: transform 160ms ease; }
+@utility glass-panel { background: var(--card); border: 1px solid var(--border); }
+@utility glass-menu { background: var(--popover); border: 1px solid var(--glass-border); border-radius: 0.75rem; color: var(--popover-foreground); backdrop-filter: blur(18px); }
 
-@utility glass {
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+@keyframes energy-flow { 0%, 100% { transform: translate3d(-8%, 5%, 0) scale(.85); opacity: .55; } 50% { transform: translate3d(8%, -6%, 0) scale(1.15); opacity: .85; } }
+@utility energy-accent {
+  position: absolute; width: min(70vw, 560px); height: 170px; pointer-events: none;
+  background: radial-gradient(ellipse at 40% 45%, var(--energy), transparent 64%), radial-gradient(ellipse at 70% 60%, var(--energy-soft), transparent 57%);
+  filter: blur(30px); animation: energy-flow 13s ease-in-out infinite alternate;
 }
-@utility glass-strong {
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-@utility glass-thin {
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-}
-@utility glass-dock {
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-@utility glass-matte {
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-@utility glass-bright {
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #ffffff;
-  transition: transform 160ms ease;
-}
-@utility glass-panel {
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-@utility glass-menu {
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 1rem;
-  color: #ffffff;
-}
+@media (prefers-reduced-motion: reduce) { .energy-accent { animation: none; } }
+@media (prefers-reduced-data: reduce) { .energy-accent { animation: none; } }
 
 /* ------------------------------------------------------------
    Animations — subtle only

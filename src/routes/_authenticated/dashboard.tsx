@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRef, useState } from "react";
+import { Logo } from "@/components/brand/Logo";
 import { AppShell } from "@/components/app/AppShell";
 import { createThread } from "@/lib/threads.functions";
 import { Paperclip, Mic, MicOff, ArrowUp } from "lucide-react";
@@ -100,21 +101,19 @@ function Dashboard() {
   return (
     <AppShell>
       <div className="flex min-h-[100dvh] w-full flex-col items-center justify-center px-6">
-        <h1 className="animate-fade-up text-center text-5xl font-semibold tracking-tight text-white sm:text-6xl">
-          Vokque
-        </h1>
+        <div aria-hidden className="energy-accent absolute top-[37%]" />
 
         <form
           onSubmit={(e) => {
             e.preventDefault();
             submit();
           }}
-          className="animate-fade-up mt-10 flex w-full max-w-md items-center gap-1 rounded-full bg-white px-1.5 py-1.5 [animation-delay:100ms]"
+          className="glass-dock relative animate-fade-up flex w-full max-w-md items-center gap-1 rounded-full px-1.5 py-1.5 [animation-delay:100ms]"
         >
           <button
             type="button"
             onClick={() => startMut.mutate({ attach: true })}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-foreground transition active:scale-90"
             aria-label="Attach a file"
           >
             <Paperclip className="h-[19px] w-[19px]" />
@@ -125,14 +124,14 @@ function Dashboard() {
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Ask Vokque"
             aria-label="Ask Vokque"
-            className="min-w-0 flex-1 bg-transparent text-center text-[15px] text-black outline-none placeholder:text-black/70"
+            className="min-w-0 flex-1 bg-transparent text-center text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
           />
 
           {draft.trim() ? (
             <button
               type="submit"
               disabled={startMut.isPending}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90 disabled:opacity-40"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-foreground transition active:scale-90 disabled:opacity-40"
               aria-label="Send message"
             >
               <ArrowUp className="h-[20px] w-[20px]" />
@@ -141,7 +140,7 @@ function Dashboard() {
             <button
               type="button"
               onClick={toggleVoice}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-black transition active:scale-90"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-foreground transition active:scale-90"
               aria-label={listening ? "Stop voice input" : "Voice input"}
             >
               {listening ? (

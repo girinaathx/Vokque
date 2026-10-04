@@ -156,14 +156,26 @@ export function AppShell({
 
   const pinMut = useMutation({
     mutationFn: (v: { id: string; pinned: boolean }) => pinFn({ data: v }),
+    onMutate: async ({ id, pinned }) => {
+      await qc.cancelQueries({ queryKey: ["threads"] });
+      const prev = qc.getQueryData<Thread[]>(["threads"]);
+      qc.setQueryData<Thread[]>(["threads"], old => old?.map(x => x.id === id ? { ...x, pinned_at: pinned ? new Date().toISOString() : null } : x));
+      return { prev };
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["threads"] }),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Could not pin"),
+    onError: (e, _v, ctx) => { qc.setQueryData(["threads"], ctx?.prev); toast.error(e instanceof Error ? e.message : "Could not pin"); },
   });
 
   const renameMut = useMutation({
     mutationFn: (v: { id: string; title: string }) => renameFn({ data: v }),
+    onMutate: async ({ id, title }) => {
+      await qc.cancelQueries({ queryKey: ["threads"] });
+      const prev = qc.getQueryData<Thread[]>(["threads"]);
+      qc.setQueryData<Thread[]>(["threads"], old => old?.map(x => x.id === id ? { ...x, title } : x));
+      return { prev };
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["threads"] }),
-    onError: () => toast.error("Couldn't rename"),
+    onError: (_e, _v, ctx) => { qc.setQueryData(["threads"], ctx?.prev); toast.error("Couldn't rename"); },
   });
 
   const archiveMut = useMutation({
@@ -308,12 +320,14 @@ export function AppShell({
 
   return (
     <div
-      className="relative flex min-h-[100dvh]"
+      className="relative flex min-h-[100dvh] min-w-0 overflow-x-clip"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={endGesture}
       onTouchCancel={endGesture}
     >
+      {drawerVisible && <div className="fixed inset-0 z-40 bg-background/70 lg:hidden" onClick={() => setMobileOpen(false)} aria-hidden />}
+      {drawerVisible && <aside className="fixed inset-y-0 left-0 z-50 w-[min(85vw,360px)] lg:hidden" style={{ transform: `translateX(${(progress - 1) * 100}%)`, transition: dragging ? "none" : "transform 280ms ease" }}><Sidebar {...sidebarProps} mobile /></aside>}
       {/* Sidebar — desktop */}
       <aside className="sticky top-0 hidden h-[100dvh] w-72 shrink-0 flex-col p-3 lg:flex">
         <Sidebar {...sidebarProps} />
@@ -329,7 +343,8 @@ export function AppShell({
       >
         <Link
           to="/menu"
-          className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition active:scale-90 lg:hidden"
+          onClick={(e) => { e.preventDefault(); setMobileOpen(true); }}
+          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full text-foreground transition active:scale-90 lg:hidden"
           aria-label="Menu"
         >
           <Menu className="h-5 w-5" />
@@ -342,7 +357,7 @@ export function AppShell({
         <button
           onClick={() => createMut.mutate()}
           disabled={createMut.isPending}
-          className="pointer-events-auto ml-auto bg-white text-black flex h-11 w-11 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-50"
+          className="glass pointer-events-auto ml-auto flex h-11 w-11 items-center justify-center rounded-full text-foreground transition active:scale-90 disabled:opacity-50"
           aria-label={t("nav.newChat")}
         >
           <Plus className="h-5 w-5" />
@@ -706,6 +721,10 @@ function ThreadRow({
   const [draft, setDraft] = useState(thread.title);
   const [offset, setOffset] = useState(0);
   const [swiping, setSwiping] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const longPress = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressed = useRef(false);
+  const clearLongPress = () => { if (longPress.current) clearTimeout(longPress.current); longPress.current = null; };
   const swipe = useRef<{ x: number; y: number; decided: boolean } | null>(null);
   const isPinned = !!thread.pinned_at;
 
@@ -731,7 +750,10 @@ function ThreadRow({
   const onTouchStart = (e: React.TouchEvent) => {
     const tch = e.touches[0];
     if (!tch || selectionMode || editing) return;
+    longPressed.current = false;
     swipe.current = { x: tch.clientX, y: tch.clientY, decided: false };
+    clearLongPress();
+    longPress.current = setTimeout(() => { longPressed.current = true; swipe.current = null; setMenuOpen(true); }, 550);
   };
   const onTouchMove = (e: React.TouchEvent) => {
     const g = swipe.current;
@@ -741,6 +763,7 @@ function ThreadRow({
     const dy = tch.clientY - g.y;
     if (!g.decided) {
       if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      clearLongPress();
       if (Math.abs(dy) >= Math.abs(dx)) {
         swipe.current = null;
         return;
@@ -753,6 +776,7 @@ function ThreadRow({
     setOffset(Math.max(-120, Math.min(120, dx)));
   };
   const onTouchEnd = () => {
+    clearLongPress();
     const g = swipe.current;
     swipe.current = null;
     setSwiping(false);
@@ -837,7 +861,7 @@ function ThreadRow({
           <Link
             to="/chat/$threadId"
             params={{ threadId: thread.id }}
-            onClick={onOpen}
+            onClick={(e) => { if (longPressed.current) { e.preventDefault(); longPressed.current = false; return; } onOpen(); }}
             className={cn(
               "text-foreground flex min-w-0 flex-1 items-center gap-2 rounded-2xl px-3 py-2.5 text-sm",
               active ? "font-semibold" : "font-normal",
@@ -847,11 +871,13 @@ function ThreadRow({
             <span className="truncate">{thread.title}</span>
           </Link>
 
-          <DropdownMenu>
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
               <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
                 onClick={(e) => e.stopPropagation()}
-                className="hover:bg-foreground/12 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg opacity-70 transition hover:opacity-100"
+                className="glass flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition hover:opacity-80"
                 aria-label="Chat options"
               >
                 <MoreHorizontal className="h-4 w-4" />

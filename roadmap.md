@@ -1,10 +1,9 @@
-# Vokque refinement roadmap
+# Vokque production cleanup roadmap
 
-- [ ] Replace wallpaper-only styling with complete light/dark semantic themes and flicker-free persistence.
-- [ ] Add a restrained animated blue empty-state visual and selective theme-aware liquid glass controls.
-- [ ] Center the existing Vokque logo on home without duplication.
-- [ ] Repair responsive sidebar, three-dot actions, mobile long-press, optimistic rename/pin/archive/delete flows.
-- [ ] Harden and verify chat creation, message persistence ordering, caching, loading, retry, and session expiry handling.
-- [ ] Diagnose and verify Google sign-in and callback behavior; document any external blocker.
-- [ ] Verify response streaming, stop behavior, rendering performance, and large-history behavior.
-- [ ] Validate major pages and flows on phone, tablet, and desktop; clear build/runtime/console errors.
+- [ ] Enforce one permanent black-and-white dark theme and remove all theme controls/code.
+- [ ] Make `/` open directly into the guest-capable chat experience with no splash delay.
+- [ ] Keep one responsive slide-out menu on desktop and mobile; remove the persistent sidebar.
+- [ ] Harden conversation ownership, optimistic management, persistence, and streaming failure handling.
+- [ ] Repair and verify email/Google authentication, redirects, sessions, and logout behavior.
+- [ ] Audit every route, menu destination, image-generation state, and user-facing error.
+- [ ] Validate desktop, tablet, and small-mobile layouts plus console/network health.

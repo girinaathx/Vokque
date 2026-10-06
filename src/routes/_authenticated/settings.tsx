@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { useTheme } from "@/lib/theme";
 import { AppShell } from "@/components/app/AppShell";
 import { PageContainer, PageHeader } from "@/components/app/PageHeader";
 
@@ -11,7 +10,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  Palette,
   Brain,
   ShieldCheck,
   Info,
@@ -31,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
       { title: "Settings · Vokque" },
       {
         name: "description",
-        content: "Manage appearance, memory, chats, account, and more.",
+        content: "Manage your Vokque profile, memory, privacy, and account.",
       },
     ],
   }),
@@ -39,7 +37,6 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 type SectionId =
-  | "appearance"
   | "profile"
   | "model"
   | "memory"
@@ -48,8 +45,7 @@ type SectionId =
   | "about"
   | "account";
 
-const NAV: Array<{ id: SectionId; label: string; icon: typeof Palette }> = [
-  { id: "appearance", label: "Appearance", icon: Palette },
+const NAV: Array<{ id: SectionId; label: string; icon: typeof Brain }> = [
   { id: "profile", label: "Profile", icon: UserIcon },
   { id: "model", label: "AI Model", icon: Brain },
   { id: "memory", label: "Memory", icon: Brain },
@@ -101,7 +97,6 @@ function SettingsPage() {
 
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
-            {active === "appearance" && <AppearanceSection />}
             {active === "profile" && <ProfileSection />}
             {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Vokque responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
@@ -117,16 +112,6 @@ function SettingsPage() {
 
     </AppShell>
   );
-}
-
-function AppearanceSection() {
-  const { theme, setTheme } = useTheme();
-  return <div className="space-y-4">
-    <SectionTitle title="Appearance" sub="Choose your Vokque theme." />
-    <div role="group" aria-label="Theme" className="flex gap-2">
-      {(["light", "dark"] as const).map(option => <button key={option} type="button" onClick={() => setTheme(option)} aria-pressed={theme === option} className={cn("glass min-h-11 rounded-lg px-5 text-sm capitalize transition", theme === option && "ring-2 ring-ring")}>{option}</button>)}
-    </div>
-  </div>;
 }
 
 function Card({ children }: { children: ReactNode }) {

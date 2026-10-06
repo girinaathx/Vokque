@@ -29,7 +29,7 @@
     "welcomeBackToast": "Welcome back"
   },
   "chat": {
-    "placeholder": "Ask Vokque",
+    "placeholder": "What’s on your mind?",
     "thinking": "Analysing...",
     "disclaimer": "Vokque can make mistakes. Verify important info.",
     "emptyTitle": "What's on your mind?",

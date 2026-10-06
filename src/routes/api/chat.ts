@@ -245,12 +245,16 @@ export const Route = createFileRoute("/api/chat")({
         // Persist the latest user message (last item) before streaming.
         const last = messages[messages.length - 1];
         if (supa && last && last.role === "user") {
-          await supa.from("messages").insert({
+          const { error: userSaveError } = await supa.from("messages").insert({
             thread_id: threadId,
             user_id: userId,
             role: "user",
             parts: last.parts,
           });
+          if (userSaveError) {
+            console.error("User message save failed:", userSaveError);
+            return new Response("Your message could not be saved. Please try again.", { status: 503 });
+          }
           const firstText =
             last.parts.find((p) => p.type === "text")?.text?.slice(0, 60) ??
             "New conversation";
@@ -344,19 +348,22 @@ export const Route = createFileRoute("/api/chat")({
           return result.toUIMessageStreamResponse({
             originalMessages: messages,
             onFinish: async ({ messages: finalMessages, isAborted }) => {
-              if (isAborted) return;
               const assistant = finalMessages[finalMessages.length - 1];
               if (supa && assistant && assistant.role === "assistant") {
-                await supa.from("messages").insert({
+                const hasContent = assistant.parts.some((part) => part.type !== "text" || part.text.trim().length > 0);
+                if (!hasContent) return;
+                const { error: assistantSaveError } = await supa.from("messages").insert({
                   thread_id: threadId,
                   user_id: userId,
                   role: "assistant",
                   parts: assistant.parts,
                 });
+                if (assistantSaveError) console.error("Assistant message save failed:", assistantSaveError);
                 await supa
                   .from("threads")
-                  .update({ updated_at: new Date().toISOString() })
-                  .eq("id", threadId);
+                  .update({ updated_at: new Date().toISOString(), ...(isAborted ? {} : {}) })
+                  .eq("id", threadId)
+                  .eq("user_id", userId);
               }
             },
 

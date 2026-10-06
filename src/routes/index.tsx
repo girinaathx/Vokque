@@ -1,7 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Logo } from "@/components/brand/Logo";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute } from "@tanstack/react-router";
+import { GuestChatExperience } from "@/components/app/GuestChatExperience";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,42 +22,5 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://feyncloud.lovable.app/" }],
   }),
-  component: SplashIndex,
+  component: GuestChatExperience,
 });
-
-function SplashIndex() {
-  const navigate = useNavigate();
-  const [phase, setPhase] = useState<"in" | "out">("in");
-
-  useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      const { data } = await supabase.auth.getSession();
-      await new Promise((r) => setTimeout(r, 1100));
-      if (cancelled) return;
-      setPhase("out");
-      await new Promise((r) => setTimeout(r, 420));
-      if (cancelled) return;
-      navigate({ to: data.session ? "/dashboard" : "/auth" });
-    };
-    run();
-    return () => {
-      cancelled = true;
-    };
-  }, [navigate]);
-
-  return (
-    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-background">
-      <h1 className="sr-only">Vokque — Your Everyday AI Assistant</h1>
-      <div
-        className={`transition-all duration-500 ease-out ${
-          phase === "out"
-            ? "scale-110 opacity-0 blur-md"
-            : "scale-100 opacity-100"
-        }`}
-      >
-        <Logo size={112} />
-      </div>
-    </main>
-  );
-}

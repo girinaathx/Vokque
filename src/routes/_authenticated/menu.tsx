@@ -14,7 +14,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useTheme } from "@/lib/theme";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { listThreads, createThread } from "@/lib/threads.functions";
@@ -49,7 +48,6 @@ const ITEMS = [
 ] as const;
 
 function MenuPage() {
-  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { t } = useTranslation();
@@ -119,7 +117,6 @@ function MenuPage() {
           ))}
         </nav>
 
-        <div className="mt-6 flex items-center justify-between gap-3 text-sm"><span>Theme</span><div role="group" aria-label="Theme" className="flex gap-2">{(["light", "dark"] as const).map(v => <button key={v} aria-pressed={theme === v} onClick={() => setTheme(v)} className={`glass min-h-11 rounded-lg px-4 capitalize ${theme === v ? "ring-2 ring-ring" : ""}`}>{v}</button>)}</div></div>
         <h2 className="mt-9 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">
           Recent conversations
         </h2>

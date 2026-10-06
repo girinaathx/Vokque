@@ -74,7 +74,7 @@ function AuthPage() {
     setGoogleLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth`,
       });
       if (result.error) {
         toast.error(result.error.message ?? t("errors.generic"));
@@ -85,7 +85,8 @@ function AuthPage() {
       if (data.session) navigate({ to: "/dashboard" });
       else toast.error("Sign-in could not complete. Please try again.");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("errors.generic"));
+      console.error("Google sign-in failed", err);
+      toast.error("Google sign-in could not be completed. Please try again.");
     } finally {
       setGoogleLoading(false);
     }
@@ -122,7 +123,8 @@ function AuthPage() {
         navigate({ to: "/dashboard" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("errors.generic"));
+      console.error("Email authentication failed", err);
+      toast.error("Sign-in could not be completed. Check your details and try again.");
     } finally {
       setLoading(false);
     }
@@ -136,7 +138,7 @@ function AuthPage() {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin + "/auth",
     });
-    if (error) toast.error(error.message);
+    if (error) toast.error("Password reset could not be started. Please try again.");
     else toast.success("Password reset email sent");
   };
 

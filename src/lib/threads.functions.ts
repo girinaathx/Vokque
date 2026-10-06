@@ -34,6 +34,7 @@ export const pinThread = createServerFn({ method: "POST" })
       const { count } = await context.supabase
         .from("threads")
         .select("id", { count: "exact", head: true })
+        .eq("user_id", context.userId)
         .not("pinned_at", "is", null);
       if ((count ?? 0) >= 5) {
         throw new Error("You can pin up to 5 chats.");
@@ -42,7 +43,8 @@ export const pinThread = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("threads")
       .update({ pinned_at: data.pinned ? new Date().toISOString() : null })
-      .eq("id", data.id);
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
     return { ok: true };
   });
@@ -67,7 +69,8 @@ export const deleteThreadsBulk = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("threads")
       .delete()
-      .in("id", data.ids);
+      .in("id", data.ids)
+      .eq("user_id", context.userId);
     if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
     return { ok: true };
   });
@@ -98,7 +101,8 @@ export const deleteThread = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("threads")
       .delete()
-      .eq("id", data.id);
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
     return { ok: true };
   });
@@ -112,7 +116,8 @@ export const renameThread = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("threads")
       .update({ title: data.title, updated_at: new Date().toISOString() })
-      .eq("id", data.id);
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
     return { ok: true };
   });
@@ -126,7 +131,8 @@ export const archiveThread = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("threads")
       .update({ archived_at: data.archived ? new Date().toISOString() : null })
-      .eq("id", data.id);
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
     return { ok: true };
   });
@@ -141,6 +147,7 @@ export const getThreadMessages = createServerFn({ method: "GET" })
       .from("messages")
       .select("id, role, parts, created_at")
       .eq("thread_id", data.threadId)
+      .eq("user_id", context.userId)
       .order("created_at", { ascending: true });
     if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
     const messages: StoredMessage[] = (rows ?? []).map((r) => ({
@@ -163,6 +170,7 @@ export const truncateThreadMessages = createServerFn({ method: "POST" })
       .from("messages")
       .select("id, created_at")
       .eq("thread_id", data.threadId)
+      .eq("user_id", context.userId)
       .order("created_at", { ascending: true });
     if (error) { console.error(error); throw new Error("Something went wrong, please try again."); }
     const toDelete = (rows ?? []).slice(data.keep).map((r) => r.id);
@@ -170,7 +178,8 @@ export const truncateThreadMessages = createServerFn({ method: "POST" })
       const { error: delErr } = await context.supabase
         .from("messages")
         .delete()
-        .in("id", toDelete);
+        .in("id", toDelete)
+        .eq("user_id", context.userId);
       if (delErr) { console.error(delErr); throw new Error("Something went wrong, please try again."); }
     }
     return { ok: true, deleted: toDelete.length };

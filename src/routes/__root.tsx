@@ -15,7 +15,6 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { logoUrl } from "@/components/brand/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
-import { ChatAppearanceProvider } from "@/lib/chat-appearance";
 import i18n from "@/lib/i18n";
 
 const SITE_URL = "https://feyncloud.lovable.app";
@@ -198,12 +197,10 @@ function RootComponent() {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <ChatAppearanceProvider>
-          <QueryClientProvider client={queryClient}>
-            <Outlet />
-            <Toaster position="top-center" />
-          </QueryClientProvider>
-      </ChatAppearanceProvider>
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+        <Toaster position="top-center" />
+      </QueryClientProvider>
     </I18nextProvider>
   );
 }

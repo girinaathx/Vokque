@@ -15,13 +15,12 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { logoUrl } from "@/components/brand/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/lib/theme";
 import { ChatAppearanceProvider } from "@/lib/chat-appearance";
 import i18n from "@/lib/i18n";
 
 const SITE_URL = "https://feyncloud.lovable.app";
 
-const themeBootScript = `(function(){try{var t=localStorage.getItem('vokque:theme');var d=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
+const documentBootScript = `(function(){try{document.documentElement.style.colorScheme='dark';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
 
 function NotFoundComponent() {
   return (
@@ -95,7 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "Vokque is a premium AI assistant for study, work, and everyday life — built by Vokque Technology.",
         },
-        { name: "theme-color", content: "#7fb2dd" },
+        { name: "theme-color", content: "#000000" },
         {
           property: "og:title",
           content: "Vokque — Your Everyday AI",
@@ -166,10 +165,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: "dark" }}>
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: documentBootScript }} />
       </head>
       <body>
         {children}
@@ -199,14 +198,12 @@ function RootComponent() {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <ThemeProvider>
-        <ChatAppearanceProvider>
+      <ChatAppearanceProvider>
           <QueryClientProvider client={queryClient}>
             <Outlet />
             <Toaster position="top-center" />
           </QueryClientProvider>
-        </ChatAppearanceProvider>
-      </ThemeProvider>
+      </ChatAppearanceProvider>
     </I18nextProvider>
   );
 }

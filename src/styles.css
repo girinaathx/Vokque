@@ -2,9 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
-/* Vokque semantic light and midnight themes */
+/* Vokque is intentionally dark-only. */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -45,33 +43,19 @@
 }
 
 :root {
-  --radius: 0.9rem;
-  --background: #ffffff; --foreground: #101720;
-  --card: #ffffff; --card-foreground: #101720;
-  --popover: #ffffff; --popover-foreground: #101720;
-  --primary: #142b49; --primary-foreground: #ffffff;
-  --secondary: #f1f5f9; --secondary-foreground: #101720;
-  --muted: #f2f5f8; --muted-foreground: #526272;
-  --accent: #e8f2fc; --accent-foreground: #142b49;
-  --destructive: #ba2d3b; --destructive-foreground: #ffffff;
-  --border: #dce4ed; --input: #dce4ed; --ring: #376fa8;
-  --glass: rgb(248 251 255 / 84%); --glass-strong: rgb(255 255 255 / 94%);
-  --glass-border: rgb(78 117 160 / 24%);
-  --energy: rgb(61 133 212 / 32%); --energy-soft: rgb(142 197 242 / 35%);
-}
-.dark {
-  --background: #080f1c; --foreground: #f6f9ff;
-  --card: #101b2b; --card-foreground: #f6f9ff;
-  --popover: #142137; --popover-foreground: #f6f9ff;
-  --primary: #b7d9ff; --primary-foreground: #071222;
-  --secondary: #18263a; --secondary-foreground: #eaf3ff;
-  --muted: #172436; --muted-foreground: #a7b9cc;
-  --accent: #203753; --accent-foreground: #f6f9ff;
-  --destructive: #e86c77; --destructive-foreground: #080f1c;
-  --border: #324259; --input: #324259; --ring: #87bafb;
-  --glass: rgb(24 42 66 / 76%); --glass-strong: rgb(20 33 54 / 94%);
-  --glass-border: rgb(167 202 244 / 27%);
-  --energy: rgb(38 94 188 / 48%); --energy-soft: rgb(56 145 229 / 31%);
+  color-scheme: dark;
+  --radius: 0.625rem;
+  --background: #000000; --foreground: #ffffff;
+  --card: #050505; --card-foreground: #ffffff;
+  --popover: #080808; --popover-foreground: #ffffff;
+  --primary: #ffffff; --primary-foreground: #000000;
+  --secondary: #111111; --secondary-foreground: #ffffff;
+  --muted: #101010; --muted-foreground: #a3a3a3;
+  --accent: #171717; --accent-foreground: #ffffff;
+  --destructive: #ff6b6b; --destructive-foreground: #000000;
+  --border: rgb(255 255 255 / 14%); --input: rgb(255 255 255 / 18%); --ring: #ffffff;
+  --glass: rgb(8 8 8 / 92%); --glass-strong: rgb(5 5 5 / 97%);
+  --glass-border: rgb(255 255 255 / 14%);
 }
 
 @layer base {
@@ -115,24 +99,15 @@
   letter-spacing: -0.02em;
 }
 
-/* Glass belongs to controls, not large content areas. */
-@utility glass { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(16px); }
-@utility glass-strong { background: var(--glass-strong); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
-@utility glass-thin { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); }
-@utility glass-dock { background: var(--glass-strong); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
-@utility glass-matte { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(16px); }
-@utility glass-bright { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(16px); transition: transform 160ms ease; }
+/* Restrained translucent controls only. */
+@utility glass { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+@utility glass-strong { background: var(--glass-strong); border: 1px solid var(--glass-border); }
+@utility glass-thin { background: var(--glass); border: 1px solid var(--glass-border); }
+@utility glass-dock { background: var(--glass-strong); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+@utility glass-matte { background: var(--glass); border: 1px solid var(--glass-border); }
+@utility glass-bright { background: var(--glass); border: 1px solid var(--glass-border); transition: transform 160ms ease; }
 @utility glass-panel { background: var(--card); border: 1px solid var(--border); }
 @utility glass-menu { background: var(--popover); border: 1px solid var(--glass-border); border-radius: 0.75rem; color: var(--popover-foreground); backdrop-filter: blur(18px); }
-
-@keyframes energy-flow { 0%, 100% { transform: translate3d(-8%, 5%, 0) scale(.85); opacity: .55; } 50% { transform: translate3d(8%, -6%, 0) scale(1.15); opacity: .85; } }
-@utility energy-accent {
-  position: absolute; width: min(70vw, 560px); height: 170px; pointer-events: none;
-  background: radial-gradient(ellipse at 40% 45%, var(--energy), transparent 64%), radial-gradient(ellipse at 70% 60%, var(--energy-soft), transparent 57%);
-  filter: blur(30px); animation: energy-flow 13s ease-in-out infinite alternate;
-}
-@media (prefers-reduced-motion: reduce) { .energy-accent { animation: none; } }
-@media (prefers-reduced-data: reduce) { .energy-accent { animation: none; } }
 
 /* ------------------------------------------------------------
    Animations — subtle only

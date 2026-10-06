@@ -19,7 +19,7 @@ export function Logo({ className, size = 40 }: LogoProps) {
         alt="Vokque logo"
         width={size}
         height={size}
-        className="relative h-full w-full object-contain brightness-0 dark:brightness-0 dark:invert"
+        className="relative h-full w-full object-contain brightness-0 invert"
         draggable={false}
       />
     </div>

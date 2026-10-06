@@ -101,8 +101,6 @@ function Dashboard() {
   return (
     <AppShell>
       <div className="flex min-h-[100dvh] w-full flex-col items-center justify-center px-6">
-        <div aria-hidden className="energy-accent absolute top-[37%]" />
-
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -122,7 +120,7 @@ function Dashboard() {
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Ask Vokque"
+            placeholder="What’s on your mind?"
             aria-label="Ask Vokque"
             className="min-w-0 flex-1 bg-transparent text-center text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
           />

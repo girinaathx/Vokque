@@ -326,12 +326,8 @@ export function AppShell({
       onTouchEnd={endGesture}
       onTouchCancel={endGesture}
     >
-      {drawerVisible && <div className="fixed inset-0 z-40 bg-background/70 lg:hidden" onClick={() => setMobileOpen(false)} aria-hidden />}
-      {drawerVisible && <aside className="fixed inset-y-0 left-0 z-50 w-[min(85vw,360px)] lg:hidden" style={{ transform: `translateX(${(progress - 1) * 100}%)`, transition: dragging ? "none" : "transform 280ms ease" }}><Sidebar {...sidebarProps} mobile /></aside>}
-      {/* Sidebar — desktop */}
-      <aside className="sticky top-0 hidden h-[100dvh] w-72 shrink-0 flex-col p-3 lg:flex">
-        <Sidebar {...sidebarProps} />
-      </aside>
+      {drawerVisible && <button type="button" className="fixed inset-0 z-40 bg-background/70" onClick={() => setMobileOpen(false)} aria-label="Close menu" />}
+      {drawerVisible && <aside className="fixed inset-y-0 left-0 z-50 w-[min(85vw,360px)]" style={{ transform: `translateX(${(progress - 1) * 100}%)`, transition: dragging ? "none" : "transform 220ms cubic-bezier(0.32,0.72,0,1)" }}><Sidebar {...sidebarProps} mobile /></aside>}
 
       {/* Fixed app header — logo always perfectly centered */}
       <header
@@ -344,7 +340,7 @@ export function AppShell({
         <Link
           to="/menu"
           onClick={(e) => { e.preventDefault(); setMobileOpen(true); }}
-          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full text-foreground transition active:scale-90 lg:hidden"
+          className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full text-foreground transition active:scale-90"
           aria-label="Menu"
         >
           <Menu className="h-5 w-5" />

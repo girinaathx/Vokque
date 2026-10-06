@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
       { title: "Settings · Vokque" },
       {
         name: "description",
-        content: "Manage appearance, memory, chats, account, and more.",
+        content: "Manage your Vokque profile, memory, privacy, and account.",
       },
     ],
   }),

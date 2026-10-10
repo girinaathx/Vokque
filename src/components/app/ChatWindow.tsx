@@ -89,9 +89,30 @@ export function ChatWindow({
   }, [messages, onMessagesChange]);
 
   const [input, setInput] = useState("");
+  const [greeting, setGreeting] = useState("Welcome");
+  const [displayName, setDisplayName] = useState("there");
+  useEffect(() => {
+    const update = () => { const hour = new Date().getHours(); setGreeting(hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"); };
+    update();
+    const timer = window.setInterval(update, 60000);
+    let cancelled = false;
+    void supabase.auth.getSession().then(async ({ data }) => {
+      const user = data.session?.user;
+      if (!user) return;
+      const { data: profile } = await supabase.from("profiles").select("display_name, username").eq("id", user.id).maybeSingle();
+      if (!cancelled) setDisplayName(profile?.display_name?.trim() || profile?.username || "there");
+    }).catch(() => { /* Keep the welcome usable if profile lookup fails. */ });
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, []);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [attachmentUrls, setAttachmentUrls] = useState<(string | null)[]>([]);
+  useEffect(() => {
+    const urls = attachments.map((file) => file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
+    setAttachmentUrls(urls);
+    return () => urls.forEach((url) => { if (url) URL.revokeObjectURL(url); });
+  }, [attachments]);
   const [listening, setListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
@@ -125,7 +146,7 @@ export function ChatWindow({
     const el = scrollRef.current;
     if (!el) return;
     const id = requestAnimationFrame(() => {
-      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+      el.scrollTo({ top: el.scrollHeight, behavior: "instant" });
     });
     return () => cancelAnimationFrame(id);
   }, [messages, status]);
@@ -272,12 +293,13 @@ export function ChatWindow({
         style={{ paddingBottom: "180px" }}
       >
         <div className="mx-auto w-full max-w-3xl space-y-8">
-          {messages.length === 0 && !input.trim() && (
-            <div className="animate-fade-up flex flex-col items-center gap-5 pt-16 sm:pt-24">
+          {messages.length === 0 && (
+            <div className="animate-fade-up flex flex-col items-center gap-4 pt-10 sm:pt-16">
               <div aria-hidden="true" className="flex items-center gap-4 text-sakura"><Flower2 className="h-4 w-4 -rotate-12 opacity-50" /><Flower2 className="h-9 w-9" strokeWidth={1} /><Flower2 className="h-4 w-4 rotate-12 opacity-50" /></div>
               <h2 className="text-center text-2xl font-medium text-foreground sm:text-3xl">
-                What’s on your mind?
+                {greeting}, <span className="break-words text-primary">{displayName}</span>
               </h2>
+              <p className="max-w-sm text-center text-sm leading-relaxed text-muted-foreground">A little space for your next idea. What’s on your mind?</p>
               <div className="flex max-w-full flex-wrap justify-center gap-2">
                 <Button variant="ghost" className="glass h-11 rounded-full px-4" onClick={() => { setInput("Help me write "); textareaRef.current?.focus(); }}><Pencil />Write</Button>
                 <Button variant="ghost" className="glass h-11 rounded-full px-4" onClick={() => { setInput("Generate an image of "); textareaRef.current?.focus(); }}><ImagePlus />Create image</Button>
@@ -414,15 +436,16 @@ export function ChatWindow({
       {/* Lightweight translucent composer */}
       <div
         ref={composerRef}
-        className="pointer-events-none fixed right-0 bottom-0 left-0 z-30 px-3 lg:px-8"
+        className={cn("pointer-events-none z-30 px-3 lg:px-8", messages.length === 0 ? "relative mt-5 mb-auto" : "fixed right-0 bottom-0 left-0")}
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)", paddingTop: "8px" }}
       >
         <div className="pointer-events-auto mx-auto w-full max-w-3xl">
           {attachments.length > 0 && (
             <div className="mb-2 flex flex-wrap gap-2">
+              <p role="status" className="w-full text-xs text-muted-foreground">{attachments.length} {attachments.length === 1 ? "file" : "files"} attached · Ready to send</p>
               {attachments.map((f, i) => {
                 const isImg = f.type.startsWith("image/");
-                const url = isImg ? URL.createObjectURL(f) : null;
+                const url = isImg ? attachmentUrls[i] : null;
                 return (
                   <div key={`${f.name}-${i}`} className="relative">
                     {url ? (

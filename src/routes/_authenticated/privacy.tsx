@@ -12,6 +12,10 @@ export const Route = createFileRoute("/_authenticated/privacy")({
         content:
           "How Vokque collects, uses, stores, and protects your information.",
       },
+      { property: "og:title", content: "Privacy Policy · Vokque" },
+      { property: "og:description", content: "How Vokque collects, uses, stores, and protects your information." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: PrivacyPage,

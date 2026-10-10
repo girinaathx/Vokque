@@ -82,9 +82,9 @@ export function GuestChatExperience() {
       </aside>
 
       <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex h-16 items-center px-3 [padding-top:env(safe-area-inset-top,0px)]">
-        <button type="button" onClick={() => setMenuOpen(true)} className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background" aria-label="Open menu"><Menu className="h-5 w-5" /></button>
-        <div className="ml-2 flex items-center gap-2"><Logo size={24} /><span className="text-sm font-semibold">Vokque</span></div>
-        <button type="button" onClick={newChat} className="pointer-events-auto ml-auto flex min-h-11 items-center gap-2 rounded-full border border-border bg-background px-4 text-sm font-medium"><Plus className="h-4 w-4" /><span className="hidden sm:inline">New Chat</span></button>
+        <button type="button" onClick={() => setMenuOpen(true)} className="glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full" aria-label="Open menu"><Menu className="h-5 w-5" /></button>
+        <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2"><Logo size={26} /><span className="text-sm font-semibold">Vokque</span></div>
+        <button type="button" onClick={newChat} aria-label="New chat" className="glass pointer-events-auto ml-auto flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-medium"><Plus className="h-4 w-4" /><span className="hidden sm:inline">New Chat</span></button>
       </header>
 
       <main className="min-w-0 flex-1">

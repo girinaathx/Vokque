@@ -20,6 +20,10 @@ export const Route = createFileRoute("/_authenticated/account")({
     meta: [
       { title: "Account · Vokque" },
       { name: "description", content: "Manage your Vokque account, plan, and security." },
+      { property: "og:title", content: "Account · Vokque" },
+      { property: "og:description", content: "Manage your Vokque account, plan, and security." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AccountPage,

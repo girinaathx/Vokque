@@ -36,6 +36,8 @@ import { toast } from "sonner";
 import { createMemory } from "@/lib/memories.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Flower2, ImagePlus, FileText } from "lucide-react";
 
 export function ChatWindow({
   threadId,
@@ -271,10 +273,16 @@ export function ChatWindow({
       >
         <div className="mx-auto w-full max-w-3xl space-y-8">
           {messages.length === 0 && !input.trim() && (
-            <div className="flex justify-center pt-24">
-              <h2 className="text-center text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <div className="animate-fade-up flex flex-col items-center gap-5 pt-16 sm:pt-24">
+              <div aria-hidden="true" className="flex items-center gap-4 text-sakura"><Flower2 className="h-4 w-4 -rotate-12 opacity-50" /><Flower2 className="h-9 w-9" strokeWidth={1} /><Flower2 className="h-4 w-4 rotate-12 opacity-50" /></div>
+              <h2 className="text-center text-2xl font-medium text-foreground sm:text-3xl">
                 What’s on your mind?
               </h2>
+              <div className="flex max-w-full flex-wrap justify-center gap-2">
+                <Button variant="ghost" className="glass h-11 rounded-full px-4" onClick={() => { setInput("Help me write "); textareaRef.current?.focus(); }}><Pencil />Write</Button>
+                <Button variant="ghost" className="glass h-11 rounded-full px-4" onClick={() => { setInput("Generate an image of "); textareaRef.current?.focus(); }}><ImagePlus />Create image</Button>
+                <Button variant="ghost" className="glass h-11 rounded-full px-4" onClick={() => fileInputRef.current?.click()}><FileText />Add a file</Button>
+              </div>
             </div>
           )}
           {messages.map((m, idx) => {
@@ -403,7 +411,7 @@ export function ChatWindow({
       </div>
 
 
-      {/* Fixed composer — matte, no reflections */}
+      {/* Lightweight translucent composer */}
       <div
         ref={composerRef}
         className="pointer-events-none fixed right-0 bottom-0 left-0 z-30 px-3 lg:px-8"

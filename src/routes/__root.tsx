@@ -19,7 +19,7 @@ import i18n from "@/lib/i18n";
 
 const SITE_URL = "https://feyncloud.lovable.app";
 
-const documentBootScript = `(function(){try{document.documentElement.style.colorScheme='dark';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
+const documentBootScript = `(function(){try{document.documentElement.style.colorScheme='light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
 
 function NotFoundComponent() {
   return (
@@ -93,7 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "Vokque is a premium AI assistant for study, work, and everyday life — built by Vokque Technology.",
         },
-        { name: "theme-color", content: "#000000" },
+        { name: "theme-color", content: "#fcf9f6" },
         {
           property: "og:title",
           content: "Vokque — Your Everyday AI",
@@ -164,7 +164,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" style={{ colorScheme: "dark" }}>
+    <html lang="en" style={{ colorScheme: "light" }}>
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: documentBootScript }} />

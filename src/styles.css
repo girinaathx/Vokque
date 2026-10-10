@@ -2,7 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-/* Vokque is intentionally dark-only. */
+/* Vokque's restrained sakura palette. */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -34,6 +34,7 @@
   --color-ring: var(--ring);
   --color-glass: var(--glass);
   --color-glass-strong: var(--glass-strong);
+  --color-sakura: var(--sakura);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
@@ -43,19 +44,21 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --radius: 0.625rem;
-  --background: #000000; --foreground: #ffffff;
-  --card: #050505; --card-foreground: #ffffff;
-  --popover: #080808; --popover-foreground: #ffffff;
-  --primary: #ffffff; --primary-foreground: #000000;
-  --secondary: #111111; --secondary-foreground: #ffffff;
-  --muted: #101010; --muted-foreground: #a3a3a3;
-  --accent: #171717; --accent-foreground: #ffffff;
-  --destructive: #ff6b6b; --destructive-foreground: #000000;
-  --border: rgb(255 255 255 / 14%); --input: rgb(255 255 255 / 18%); --ring: #ffffff;
-  --glass: rgb(8 8 8 / 92%); --glass-strong: rgb(5 5 5 / 97%);
-  --glass-border: rgb(255 255 255 / 14%);
+  --background: oklch(0.985 0.006 65); --foreground: oklch(0.29 0.014 355);
+  --card: oklch(0.995 0.003 65); --card-foreground: var(--foreground);
+  --popover: oklch(0.99 0.008 25); --popover-foreground: var(--foreground);
+  --primary: oklch(0.42 0.065 355); --primary-foreground: oklch(0.99 0.006 65);
+  --secondary: oklch(0.95 0.022 10); --secondary-foreground: var(--foreground);
+  --muted: oklch(0.96 0.012 25); --muted-foreground: oklch(0.49 0.025 355);
+  --accent: oklch(0.92 0.04 10); --accent-foreground: var(--foreground);
+  --destructive: oklch(0.49 0.17 25); --destructive-foreground: var(--primary-foreground);
+  --border: oklch(0.86 0.025 10 / 65%); --input: var(--border); --ring: oklch(0.57 0.10 355);
+  --sakura: oklch(0.76 0.09 5);
+  --glass: oklch(0.995 0.009 15 / 72%); --glass-strong: oklch(0.985 0.014 15 / 90%);
+  --glass-border: oklch(0.86 0.035 10 / 65%);
+  --shadow-glass: 0 4px 18px oklch(0.42 0.055 355 / 6%), inset 0 1px 0 oklch(1 0 0 / 80%);
 }
 
 @layer base {
@@ -84,7 +87,7 @@
   h4 {
     font-family: var(--font-display);
     font-weight: 500;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 
   ::selection {
@@ -96,18 +99,26 @@
 @utility font-editorial {
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 /* Restrained translucent controls only. */
-@utility glass { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+@utility glass { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); box-shadow: var(--shadow-glass); }
 @utility glass-strong { background: var(--glass-strong); border: 1px solid var(--glass-border); }
 @utility glass-thin { background: var(--glass); border: 1px solid var(--glass-border); }
-@utility glass-dock { background: var(--glass-strong); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+@utility glass-dock { background: var(--glass-strong); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); box-shadow: var(--shadow-glass); }
 @utility glass-matte { background: var(--glass); border: 1px solid var(--glass-border); }
 @utility glass-bright { background: var(--glass); border: 1px solid var(--glass-border); transition: transform 160ms ease; }
 @utility glass-panel { background: var(--card); border: 1px solid var(--border); }
-@utility glass-menu { background: var(--popover); border: 1px solid var(--glass-border); border-radius: 0.75rem; color: var(--popover-foreground); backdrop-filter: blur(18px); }
+@utility glass-menu { background: var(--glass-strong); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--popover-foreground); backdrop-filter: blur(10px); box-shadow: var(--shadow-glass); }
+
+@layer base {
+  button, a { transition-duration: 140ms; }
+  html { color-scheme: light; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+}
 
 /* ------------------------------------------------------------
    Animations — subtle only

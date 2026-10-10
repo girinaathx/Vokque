@@ -3,6 +3,7 @@
 @import "tw-animate-css";
 
 /* Vokque's restrained sakura palette. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -61,6 +62,20 @@
   --shadow-glass: 0 4px 18px oklch(0.42 0.055 355 / 6%), inset 0 1px 0 oklch(1 0 0 / 80%);
 }
 
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.17 0.014 350); --foreground: oklch(0.94 0.012 20);
+  --card: oklch(0.20 0.016 350); --popover: oklch(0.23 0.02 350);
+  --primary: oklch(0.82 0.065 5); --primary-foreground: oklch(0.20 0.02 350);
+  --secondary: oklch(0.26 0.026 350); --muted: oklch(0.23 0.018 350);
+  --muted-foreground: oklch(0.73 0.02 10); --accent: oklch(0.32 0.045 350);
+  --destructive: oklch(0.76 0.12 25); --border: oklch(0.48 0.035 350 / 45%);
+  --ring: oklch(0.79 0.08 5); --sakura: oklch(0.80 0.09 5);
+  --glass: oklch(0.27 0.027 350 / 72%); --glass-strong: oklch(0.24 0.022 350 / 94%);
+  --glass-border: oklch(0.64 0.05 350 / 24%);
+  --shadow-glass: 0 4px 16px oklch(0.10 0.01 350 / 20%), inset 0 1px 0 oklch(0.9 0.03 10 / 7%);
+}
+
 @layer base {
   html,
   body {
@@ -113,8 +128,9 @@
 @utility glass-menu { background: var(--glass-strong); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--popover-foreground); backdrop-filter: blur(10px); box-shadow: var(--shadow-glass); }
 
 @layer base {
-  button, a { transition-duration: 140ms; }
-  html { color-scheme: light; }
+  button, a { transition-duration: 100ms; }
+  button[aria-pressed="true"] { background: var(--accent); }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   }
@@ -189,13 +205,13 @@
 }
 
 @utility animate-fade-up {
-  animation: fade-up 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fade-up 0.14s ease-out both;
 }
 @utility animate-fade-in-soft {
-  animation: fade-in 0.3s ease both;
+  animation: fade-in 0.12s ease both;
 }
 @utility animate-glass-pop {
-  animation: glass-pop 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: glass-pop 0.14s ease-out both;
 }
 @utility animate-float-slow {
   animation: float-slow 6s ease-in-out infinite;

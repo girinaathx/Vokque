@@ -873,7 +873,7 @@ function ThreadRow({
                 onPointerDown={(e) => e.stopPropagation()}
                 onTouchStart={(e) => e.stopPropagation()}
                 onClick={(e) => e.stopPropagation()}
-                className="glass flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition hover:opacity-80"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-0 transition-colors hover:bg-accent focus-visible:bg-accent data-[state=open]:bg-accent"
                 aria-label="Chat options"
               >
                 <MoreHorizontal className="h-4 w-4" />

@@ -7,6 +7,7 @@ import { ChatWindow } from "@/components/app/ChatWindow";
 import { Logo } from "@/components/brand/Logo";
 import { guestStore, GUEST_CHAT_LIMIT, type GuestChat } from "@/lib/guest";
 import { cn } from "@/lib/utils";
+import { ThemeChoice } from "@/components/app/ThemeChoice";
 
 export function GuestChatExperience() {
   const [chats, setChats] = useState<GuestChat[]>([]);
@@ -78,6 +79,7 @@ export function GuestChatExperience() {
             ))}
           </div>
         </div>
+        <div className="mt-4"><p className="mb-2 text-xs text-muted-foreground">Theme</p><ThemeChoice /></div>
         <Link to="/auth" className="mt-4 flex min-h-11 items-center justify-center rounded-md border border-foreground bg-foreground px-4 text-sm font-medium text-background">Sign in to save across devices</Link>
       </aside>
 

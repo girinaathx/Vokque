@@ -19,7 +19,7 @@ import i18n from "@/lib/i18n";
 
 const SITE_URL = "https://feyncloud.lovable.app";
 
-const documentBootScript = `(function(){try{document.documentElement.style.colorScheme='light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
+const documentBootScript = `(function(){try{var dark=localStorage.getItem('vokque:theme')==='dark';document.documentElement.classList.toggle('dark',dark);document.documentElement.style.colorScheme=dark?'dark':'light';var l=localStorage.getItem('avenxa:lang');if(l){document.documentElement.lang=l;if(l==='ar'||l==='ur')document.documentElement.dir='rtl';}}catch(e){}})();`;
 
 function NotFoundComponent() {
   return (
@@ -164,7 +164,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" style={{ colorScheme: "light" }}>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: documentBootScript }} />

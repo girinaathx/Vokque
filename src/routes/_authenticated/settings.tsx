@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { ThemeChoice } from "@/components/app/ThemeChoice";
 
 
 
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 
 type SectionId =
   | "profile"
+  | "theme"
   | "model"
   | "memory"
   | "privacy"
@@ -51,6 +53,7 @@ type SectionId =
 
 const NAV: Array<{ id: SectionId; label: string; icon: typeof Brain }> = [
   { id: "profile", label: "Profile", icon: UserIcon },
+  { id: "theme", label: "Theme", icon: Info },
   { id: "model", label: "AI Model", icon: Brain },
   { id: "memory", label: "Memory", icon: Brain },
   { id: "privacy", label: "Privacy Policy", icon: ShieldCheck },
@@ -102,6 +105,7 @@ function SettingsPage() {
           {/* Panel */}
           <div className="animate-fade-up [animation-delay:120ms]">
             {active === "profile" && <ProfileSection />}
+            {active === "theme" && <Card><SectionTitle title="Theme" sub="Sakura, in light or dark." /><ThemeChoice /></Card>}
             {active === "model" && <PlaceholderSection title="AI Model" description="Choose which model powers Vokque responses — coming soon." />}
             {active === "memory" && <LinkSection to="/memory" label="Open Memory" description="View, edit, search, export, and delete your AI memories." />}
             {active === "privacy" && <LinkSection to="/privacy" label="Open Privacy Policy" description="Read how Vokque handles your data, chats, and account." />}

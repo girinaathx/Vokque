@@ -289,8 +289,8 @@ export function ChatWindow({
       {/* Transcript — clean typography without message containers */}
       <div
         ref={scrollRef}
-        className="relative z-10 flex-1 overflow-y-auto px-5 pt-20 lg:px-8 lg:pt-24"
-        style={{ paddingBottom: "180px" }}
+        className={cn("relative z-10 overflow-y-auto px-5 pt-20 lg:px-8 lg:pt-24", messages.length === 0 ? "flex-none" : "flex-1")}
+        style={{ paddingBottom: messages.length === 0 ? "8px" : "180px" }}
       >
         <div className="mx-auto w-full max-w-3xl space-y-8">
           {messages.length === 0 && (

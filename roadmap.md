@@ -1,7 +1,7 @@
 # Vokque production cleanup roadmap
 
 ## Current focused sakura refresh
-- [ ] Focused follow-up: welcoming greeting, saved light/dark choice, faster controls, borderless recent-chat actions, immediate attachment feedback; verify within the remaining 2.9-credit cap.
+- [x] Focused follow-up: welcoming greeting, saved light/dark choice, faster controls, borderless recent-chat actions, immediate attachment feedback; verify within the remaining 2.9-credit cap.
 - [x] Update shared palette, glass controls, and brand contrast without changing backend behavior.
 - [x] Add writing, image-prompt, and file shortcuts to empty chats.
 - [x] Verify home shortcuts and mobile layout: writing/image drafts, file chooser, drawer, no overflow or browser errors.
